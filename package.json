@@ -1,0 +1,37 @@
+{
+  "name": "realeye",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "server": "node server.js"
+  },
+  "dependencies": {
+    "@headlessui/react": "^2.2.0",
+    "@tensorflow/tfjs": "^4.22.0",
+    "@types/node": "^22.13.0",
+    "@types/react": "19.0.8",
+    "@types/react-dom": "19.0.3",
+    "aos": "3.0.0-beta.6",
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.5",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "multer": "^2.0.2",
+    "next": "15.1.6",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "typescript": "^5.7.3",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "@tailwindcss/forms": "^0.5.10",
+    "@tailwindcss/postcss": "^4.0.3",
+    "@types/aos": "^3.0.7",
+    "postcss": "^8.5.1",
+    "tailwindcss": "^4.0.3"
+  }
+}

@@ -1,0 +1,26 @@
+[
+  {
+    "id": "a3804504-bc24-4c19-a9b1-98faba3023e9",
+    "name": "rebika",
+    "email": "yihenewrebika@gmail.com",
+    "company": null,
+    "passwordHash": "$2b$10$5B5P25BVgiJRnwTC5SFZR.2.N9lVPawd5KsBSyKw6kKhpdp8alUrm",
+    "createdAt": "2025-12-06T12:42:12.441Z"
+  },
+  {
+    "id": "51136d16-5db3-4346-9235-92bdce7b8fc1",
+    "name": "Test User",
+    "email": "test_auth_fix@example.com",
+    "company": "Test Co",
+    "passwordHash": "$2b$12$allpY5znKZZx7CiVRaWpsOk6qnFM7xaHKrLFbFT7DIj2Dm1ZHD5HK",
+    "createdAt": "2025-12-27T18:58:56.065834"
+  },
+  {
+    "id": "700d2ae2-4756-4dda-af03-8c2c0c01f8c2",
+    "name": "thio",
+    "email": "thiobista0gedefaw@gmail.com",
+    "company": "tenagari",
+    "passwordHash": "$2b$12$jizswPC.D7yYRzIuPceJN.B4azTV4sysel0iaMH48wgc2d4QZxKSG",
+    "createdAt": "2025-12-27T19:02:39.997408"
+  }
+]
