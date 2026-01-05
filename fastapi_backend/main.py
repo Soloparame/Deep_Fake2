@@ -10,10 +10,18 @@ async def lifespan(app: FastAPI):
     # Startup: Load the model
     try:
         model_service.load_model()
+        print("✅ Model loaded successfully!")
+    except FileNotFoundError as e:
+        print(f"❌ ERROR: Model file not found: {e}")
+        print(f"   Please place your deepfake_model.h5 file at: {settings.MODEL_PATH}")
+        print("   The API will start, but /api/detect-video will not work until the model is available.")
+    except ImportError as e:
+        print(f"❌ ERROR: {e}")
+        print("   Please install TensorFlow: pip install tensorflow")
+        print("   The API will start, but /api/detect-video will not work until TensorFlow is installed.")
     except Exception as e:
-        print(f"Warning: Could not load model: {e}")
-        # We don't crash here so the API can still run other things if needed,
-        # but ML endpoints will fail.
+        print(f"❌ WARNING: Could not load model: {e}")
+        print("   The API will start, but /api/detect-video will not work until the model loads successfully.")
     
     yield
     

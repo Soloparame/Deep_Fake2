@@ -1,18 +1,15 @@
 "use client";
 
-import { FormEvent, useState, useEffect } from "react";
+import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
-// Placeholder imports to satisfy TS – replace with real detector module when available
-// const deepfakeDetector = {
-//   isModelLoaded: () => false,
-//   loadModel: () => Promise.resolve(),
-//   analyzeVideo: (file: File, cb?: (msg: string) => void) =>
-//     Promise.resolve({ label: "real", confidence: 0.95 } as DetectionResult),
-// };
-// interface DetectionResult { label: string; confidence: number; }
 
 interface AnalysisResult {
   label: string;
+  confidence: number;
+}
+
+interface DetectionResponse {
+  result: "REAL" | "FAKE";
   confidence: number;
 }
 
@@ -23,11 +20,6 @@ export default function UploadPage() {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [progress, setProgress] = useState<string>("");
-  const [modelLoading, setModelLoading] = useState(false);
-  const [heartbeat, setHeartbeat] = useState(0);
-
-  // Don't preload model - load only when user uploads video to keep page responsive
-  // Model will be loaded on-demand when user clicks "Initiate Scan"
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -47,119 +39,44 @@ export default function UploadPage() {
     }
 
     setLoading(true);
-    
-    // Start heartbeat to show page is still responsive
-    const heartbeatInterval = setInterval(() => {
-      setHeartbeat(prev => prev + 1);
-      // Force UI update to show responsiveness
-      if (document.activeElement) {
-        (document.activeElement as HTMLElement).blur();
-        setTimeout(() => {
-          if (document.body) {
-            document.body.focus();
-            document.body.blur();
-          }
-        }, 0);
-      }
-    }, 500);
+    setProgress("Uploading video to server...");
     
     try {
-      // Check if model is already loaded
-      if (!deepfakeDetector.isModelLoaded()) {
-        // Add retry/timeout handling for slow or flaky connections
-        const ensureModelLoaded = async (attempts = 3, timeoutMs = 180000) => {
-          let lastErr: any = null;
-          for (let attempt = 1; attempt <= attempts; attempt++) {
-            setModelLoading(true);
-            setProgress(`Downloading AI model (~80MB)... attempt ${attempt}/${attempts}. This may take a few minutes.`);
-            try {
-              const loadPromise = deepfakeDetector.loadModel();
-              let timeoutId: any;
-              const timeoutPromise = new Promise<never>((_, reject) => {
-                timeoutId = setTimeout(() => reject(new Error(`Model loading timeout (${Math.round(timeoutMs/60000)} mins) - please check your connection and retry`)), timeoutMs);
-              });
-
-              try {
-                await Promise.race([loadPromise, timeoutPromise]);
-                clearTimeout(timeoutId);
-                setProgress("Model loaded! Starting video analysis...");
-                setModelLoading(false);
-                return;
-              } finally {
-                clearTimeout(timeoutId);
-              }
-            } catch (err: any) {
-              lastErr = err;
-              console.warn(`Model load attempt ${attempt} failed:`, err);
-              setProgress(`Model load attempt ${attempt} failed. ${attempt < attempts ? 'Retrying...' : 'Please try again.'}`);
-              setModelLoading(false);
-              if (attempt < attempts) {
-                // Backoff before retrying
-                await new Promise(r => setTimeout(r, 1500 * attempt));
-                continue;
-              } else {
-                throw lastErr;
-              }
-            }
-          }
-        };
-
-        try {
-          await ensureModelLoaded(3, 180000);
-        } catch (loadError: any) {
-          throw new Error(`Failed to load model: ${loadError.message || loadError}. You can try again without refreshing by clicking "Initiate Scan" again.`);
-        }
-      } else {
-        setProgress("Model ready! Starting video analysis...");
-      }
+      // Create FormData for file upload
+      const formData = new FormData();
+      formData.append("file", file);
       
-      const detectionResult: DetectionResult = await Promise.race([
-        deepfakeDetector.analyzeVideo(file, (message) => {
-          setProgress(message);
-        }),
-        new Promise<DetectionResult>((_, reject) => {
-          setTimeout(() => {
-            reject(new Error('Analysis timeout after 120 seconds. The video may be too large or the model is taking too long. Please try a shorter video.'));
-          }, 120000);
-        })
-      ]);
+      setProgress("Processing video with AI model...");
+      
+      // Call backend API endpoint
+      const response = await fetch("http://localhost:4000/api/detect-video", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ detail: "Unknown error" }));
+        throw new Error(errorData.detail || `Server error: ${response.status}`);
+      }
+
+      const detectionResult: DetectionResponse = await response.json();
       
       setProgress("Analysis complete!");
       
-      // Convert to the expected format
+      // Convert backend response format to frontend format
+      // Backend returns: { result: "REAL"|"FAKE", confidence: 0.95 }
+      // Frontend expects: { label: "real"|"fake", confidence: 0.95 }
       setResult({
-        label: detectionResult.label,
+        label: detectionResult.result.toLowerCase(),
         confidence: detectionResult.confidence,
       });
 
-      // Optionally save to backend for history
-      try {
-        const formData = new FormData();
-        formData.append("video", file);
-        formData.append("analysis", JSON.stringify({
-          label: detectionResult.label,
-          confidence: detectionResult.confidence,
-        }));
-        
-        await fetch("http://localhost:4000/api/videos/upload", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: formData,
-        });
-      } catch (backendErr) {
-        // Backend save is optional, don't fail if it errors
-        console.warn("Failed to save to backend:", backendErr);
-      }
     } catch (err: any) {
-      console.error(err);
-      setError(err.message || "Analysis failed. Please try again.");
+      console.error("Detection error:", err);
+      setError(err.message || "Analysis failed. Please make sure the backend server is running on http://localhost:4000");
     } finally {
-      clearInterval(heartbeatInterval);
       setLoading(false);
       setProgress("");
-      setHeartbeat(0);
     }
   };
 
@@ -280,7 +197,7 @@ export default function UploadPage() {
                   <button
                     type="submit"
                     className="group relative flex w-full items-center justify-center overflow-hidden rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 px-6 py-4 font-medium text-white shadow-[0_0_20px_rgba(79,70,229,0.3)] transition-all hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(79,70,229,0.5)] disabled:opacity-70 disabled:hover:scale-100"
-                    disabled={loading || modelLoading}
+                    disabled={loading}
                   >
                     <span className="relative z-10 flex items-center gap-2">
                       {loading ? (
@@ -333,7 +250,7 @@ export default function UploadPage() {
                         </div>
 
                         <p className="mt-4 text-xs text-gray-600 font-mono">
-                          ID: {Math.random().toString(36).substr(2, 9).toUpperCase()} | MODEL: TensorFlow.js | Real-time Analysis
+                          ID: {Math.random().toString(36).substr(2, 9).toUpperCase()} | MODEL: Server (Keras) | Real-time Analysis
                         </p>
                       </div>
                     </div>
