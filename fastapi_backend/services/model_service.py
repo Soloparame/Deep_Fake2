@@ -272,14 +272,25 @@ def predict_video(video_path: str) -> dict:
         time.sleep(1.5)
         
         # Simulate a result (mostly REAL for test, occasionally FAKE)
-        is_fake = random.random() > 0.7  # 30% chance of fake
-        confidence = 0.85 + (random.random() * 0.14) if is_fake else 0.10 + (random.random() * 0.10)
-        
-        result_label = "FAKE" if is_fake else "REAL"
+        p_fake = 0.10 + (random.random() * 0.10)  # 10%–20% fake probability baseline
+        # Occasionally produce higher fake probability
+        if random.random() > 0.7:
+            p_fake = 0.70 + (random.random() * 0.25)  # 70%–95%
+        p_real = 1.0 - p_fake
+
+        if p_fake >= settings.FAKE_THRESHOLD:
+            result_label = "FAKE"
+            final_confidence = round(p_fake * 100, 2)
+            message = "The video is likely manipulated."
+        else:
+            result_label = "REAL"
+            final_confidence = round(p_real * 100, 2)
+            message = "The video appears authentic."
         
         return {
             "result": result_label,
-            "confidence": float(confidence),
+            "confidence": float(final_confidence),
+            "message": message,
             "mock_mode": True
         }
 
@@ -367,7 +378,12 @@ def predict_video(video_path: str) -> dict:
         
         # Validate we got predictions
         if not predictions:
-            raise ValueError("Could not extract any valid frames from video")
+            logger.warning("No frames could be processed/detected from the video.")
+            return {
+                "result": "UNKNOWN",
+                "confidence": 0.0,
+                "message": "No detectable face or valid frames found in the video."
+            }
         
         logger.info(f"Processed {processed_count} frames, got {len(predictions)} predictions")
         
@@ -376,39 +392,35 @@ def predict_video(video_path: str) -> dict:
         # ============================================
         # Strategy: Average all frame predictions
         # This gives us a single probability score
-        avg_confidence = np.mean(predictions)
+        avg_confidence = np.mean(predictions) # This is p_fake
         
         # ============================================
         # THRESHOLDING & CLASSIFICATION
         # ============================================
-        # Assumption: Model outputs probability where:
-        #   - Close to 0.0 = REAL video
-        #   - Close to 1.0 = FAKE video (deepfake)
-        # 
-        # Threshold: 0.5 (can be adjusted based on your model's training)
-        # If avg_confidence > 0.5 → FAKE
-        # If avg_confidence <= 0.5 → REAL
-        #
-        # Confidence score: 
-        #   - For FAKE: use avg_confidence directly
-        #   - For REAL: use (1 - avg_confidence) to show "realness" confidence
         
-        threshold = 0.5
-        is_fake = avg_confidence > threshold
+        p_fake = float(avg_confidence)
+        p_real = 1.0 - p_fake
         
-        result = "FAKE" if is_fake else "REAL"
-        
-        # Confidence reflects certainty relative to threshold (0.5):
-        #  - Near 0.5 → low confidence
-        #  - Far from 0.5 → high confidence
-        confidence = float(abs(avg_confidence - threshold) * 2.0)
-        confidence = max(0.0, min(1.0, confidence))
-        
-        logger.info(f"Prediction: {result} (confidence: {confidence:.3f})")
+        # Threshold: settings.FAKE_THRESHOLD
+        if p_fake >= settings.FAKE_THRESHOLD:
+            # FAKE
+            # Confidence is the probability of being FAKE
+            final_confidence = round(p_fake * 100, 2)
+            result = "FAKE"
+            message = "The video is likely manipulated."
+        else:
+            # REAL
+            # Confidence is the probability of being REAL
+            final_confidence = round(p_real * 100, 2)
+            result = "REAL"
+            message = "The video appears authentic."
+            
+        logger.info(f"Prediction: {result} (confidence: {final_confidence}%)")
         
         return {
             "result": result,
-            "confidence": confidence
+            "confidence": final_confidence,
+            "message": message
         }
         
     except Exception as e:

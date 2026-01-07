@@ -11,10 +11,11 @@ router = APIRouter()
 class DetectionResponse(BaseModel):
     """
     Response model for video detection endpoint.
-    Returns only result (REAL/FAKE) and confidence score.
+    Returns result (REAL/FAKE), confidence score (percentage), and a message.
     """
-    result: Literal["REAL", "FAKE"]
+    result: Literal["REAL", "FAKE", "UNKNOWN"]
     confidence: float
+    message: str
 
 @router.post("/detect-video", response_model=DetectionResponse, status_code=status.HTTP_200_OK)
 async def detect_video(file: UploadFile = File(...)):
@@ -29,7 +30,8 @@ async def detect_video(file: UploadFile = File(...)):
     ```json
     {
         "result": "REAL" or "FAKE",
-        "confidence": 0.95
+        "confidence": 95.5,
+        "message": "The video is likely manipulated."
     }
     ```
     
@@ -39,7 +41,7 @@ async def detect_video(file: UploadFile = File(...)):
     3. Extracts and processes frames
     4. Runs ML model inference
     5. Aggregates predictions
-    6. Returns result with confidence
+    6. Returns result with confidence and message
     7. Cleans up temporary files
     """
     # Validate file type
@@ -92,10 +94,11 @@ async def detect_video(file: UploadFile = File(...)):
         # Run ML inference
         result = model_service.predict_video(temp_path)
         
-        # Ensure response matches exact format (only result and confidence)
+        # Ensure response matches exact format
         return DetectionResponse(
             result=result["result"],
-            confidence=result["confidence"]
+            confidence=result["confidence"],
+            message=result.get("message", "")
         )
         
     except ValueError as e:

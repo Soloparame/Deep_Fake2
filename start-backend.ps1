@@ -34,3 +34,4 @@ Write-Host "✅ Starting FastAPI server on http://localhost:4000" -ForegroundCol
 Write-Host ""
 python main.py
 
+

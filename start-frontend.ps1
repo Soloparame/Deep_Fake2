@@ -12,3 +12,4 @@ Write-Host "✅ Starting Next.js server on http://localhost:3000" -ForegroundCol
 Write-Host ""
 npm run dev
 
+

@@ -48,3 +48,4 @@ if ($LASTEXITCODE -eq 0) {
     Write-Host "❌ Installation failed. Check errors above." -ForegroundColor Red
 }
 
+

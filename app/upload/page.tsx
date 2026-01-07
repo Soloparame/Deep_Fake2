@@ -6,11 +6,13 @@ import { useRouter } from "next/navigation";
 interface AnalysisResult {
   label: string;
   confidence: number;
+  message: string;
 }
 
 interface DetectionResponse {
-  result: "REAL" | "FAKE";
+  result: "REAL" | "FAKE" | "UNKNOWN";
   confidence: number;
+  message: string;
 }
 
 export default function UploadPage() {
@@ -64,11 +66,10 @@ export default function UploadPage() {
       setProgress("Analysis complete!");
       
       // Convert backend response format to frontend format
-      // Backend returns: { result: "REAL"|"FAKE", confidence: 0.95 }
-      // Frontend expects: { label: "real"|"fake", confidence: 0.95 }
       setResult({
         label: detectionResult.result.toLowerCase(),
         confidence: detectionResult.confidence,
+        message: detectionResult.message
       });
 
     } catch (err: any) {
@@ -224,28 +225,50 @@ export default function UploadPage() {
 
                       <div className="relative z-10 bg-gray-950/50 p-5">
                         <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-gray-500">
-                          <span className="inline-block h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
+                          <span className={`inline-block h-2 w-2 rounded-full animate-pulse ${
+                            result.label === 'real' ? 'bg-green-500' : 
+                            result.label === 'fake' ? 'bg-red-500' : 'bg-yellow-500'
+                          }`}></span>
                           Analysis Complete
                         </h3>
 
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between mb-6">
                           <div>
                             <p className="text-sm text-gray-400">Detection Result</p>
-                            <p className={`mt-1 text-3xl font-bold tracking-tight ${result.label.toLowerCase() === 'real' ? 'text-green-400' : 'text-red-400'}`}>
+                            <p className={`mt-1 text-3xl font-bold tracking-tight ${
+                              result.label === 'real' ? 'text-green-400' : 
+                              result.label === 'fake' ? 'text-red-400' : 'text-yellow-400'
+                            }`}>
                               {result.label.toUpperCase()}
                             </p>
                           </div>
                           <div className="text-right">
                             <p className="text-sm text-gray-400">Confidence Score</p>
-                            <p className="mt-1 font-mono text-3xl font-bold text-white">{(result.confidence * 100).toFixed(1)}%</p>
+                            <p className="mt-1 font-mono text-3xl font-bold text-white">{result.confidence.toFixed(2)}%</p>
                           </div>
+                        </div>
+
+                        {/* Message Display */}
+                        <div className={`mb-6 rounded-lg border p-4 ${
+                          result.label === 'real' ? 'border-green-500/20 bg-green-500/10 text-green-200' : 
+                          result.label === 'fake' ? 'border-red-500/20 bg-red-500/10 text-red-200' : 'border-yellow-500/20 bg-yellow-500/10 text-yellow-200'
+                        }`}>
+                          <p className="flex items-center gap-2 font-medium">
+                            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            {result.message}
+                          </p>
                         </div>
 
                         {/* Progress Bar Visualization */}
                         <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-gray-800">
                           <div
-                            className={`h-full rounded-full ${result.label.toLowerCase() === 'real' ? 'bg-green-500' : 'bg-red-500'} transition-all duration-1000 ease-out`}
-                            style={{ width: `${result.confidence * 100}%` }}
+                            className={`h-full rounded-full ${
+                              result.label === 'real' ? 'bg-green-500' : 
+                              result.label === 'fake' ? 'bg-red-500' : 'bg-yellow-500'
+                            } transition-all duration-1000 ease-out`}
+                            style={{ width: `${result.confidence}%` }}
                           ></div>
                         </div>
 
