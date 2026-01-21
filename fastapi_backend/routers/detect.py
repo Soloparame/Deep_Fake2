@@ -1,10 +1,12 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException, status
+from fastapi import APIRouter, UploadFile, File, HTTPException, status, Request
 from fastapi_backend.services import model_service
 import shutil
 import os
 import uuid
 from pydantic import BaseModel
 from typing import Literal
+import datetime
+from fastapi_backend.database import predictions_col
 
 router = APIRouter()
 
@@ -18,7 +20,7 @@ class DetectionResponse(BaseModel):
     message: str
 
 @router.post("/detect-video", response_model=DetectionResponse, status_code=status.HTTP_200_OK)
-async def detect_video(file: UploadFile = File(...)):
+async def detect_video(request: Request, file: UploadFile = File(...)):
     """
     Upload a video file to detect deepfakes.
     
@@ -93,6 +95,22 @@ async def detect_video(file: UploadFile = File(...)):
             
         # Run ML inference
         result = model_service.predict_video(temp_path)
+        
+        # Persist prediction to MongoDB
+        user_email = request.headers.get("X-User-Email")
+        record = {
+            "id": str(uuid.uuid4()),
+            "user_email": user_email,
+            "filename": file.filename,
+            "result": result["result"],
+            "confidence": result["confidence"],
+            "message": result.get("message", ""),
+            "created_at": datetime.datetime.utcnow(),
+        }
+        try:
+            predictions_col.insert_one(record)
+        except Exception:
+            pass
         
         # Ensure response matches exact format
         return DetectionResponse(

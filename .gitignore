@@ -120,3 +120,6 @@ public/uploads/
 /data/chats.json
 /data/users.json
 /data/videos.json
+
+# Local JSON Database
+local_db_*.json

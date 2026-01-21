@@ -50,9 +50,14 @@ export default function UploadPage() {
       
       setProgress("Processing video with AI model...");
       
+      const userEmail = window.localStorage.getItem("realeye_user_email") || "";
+
       // Call backend API endpoint
       const response = await fetch("http://localhost:4000/api/detect-video", {
         method: "POST",
+        headers: {
+          "X-User-Email": userEmail,
+        },
         body: formData,
       });
 

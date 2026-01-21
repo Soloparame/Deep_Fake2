@@ -24,10 +24,13 @@ export default function SignIn() {
       });
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.message || "Failed to sign in");
+        throw new Error(data.message || data.detail || "Failed to sign in");
       }
       if (data.access_token) {
         window.localStorage.setItem("realeye_token", data.access_token);
+        if (data.user_email) {
+          window.localStorage.setItem("realeye_user_email", data.user_email);
+        }
         // Dispatch event immediately and also after a micro-task to ensure all listeners catch it
         window.dispatchEvent(new Event("auth-change"));
         setTimeout(() => window.dispatchEvent(new Event("auth-change")), 100);
