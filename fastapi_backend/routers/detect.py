@@ -13,10 +13,12 @@ router = APIRouter()
 class DetectionResponse(BaseModel):
     """
     Response model for video detection endpoint.
-    Returns result (REAL/FAKE), confidence score (percentage), and a message.
+    Returns label (REAL/FAKE) and score (0-1).
     """
-    result: Literal["REAL", "FAKE", "UNKNOWN"]
-    confidence: float
+    label: Literal["REAL", "FAKE", "UNKNOWN"]
+    score: float
+    probability: float
+    classification: str
     message: str
 
 @router.post("/detect-video", response_model=DetectionResponse, status_code=status.HTTP_200_OK)
@@ -32,7 +34,7 @@ async def detect_video(request: Request, file: UploadFile = File(...)):
     ```json
     {
         "result": "REAL" or "FAKE",
-        "confidence": 95.5,
+        "confidence": 0.955,
         "message": "The video is likely manipulated."
     }
     ```
@@ -46,8 +48,13 @@ async def detect_video(request: Request, file: UploadFile = File(...)):
     6. Returns result with confidence and message
     7. Cleans up temporary files
     """
-    # Validate file type
-    if not file.content_type or not file.content_type.startswith("video/"):
+    # Validate file type (allow by extension if Content-Type is missing)
+    allowed_exts = {".mp4", ".avi", ".mov", ".webm"}
+    print(f"Incoming upload headers: content_type={file.content_type}, filename={file.filename}")
+    ct = (file.content_type or "").lower()
+    fname = (file.filename or "")
+    ext = os.path.splitext(fname)[1].lower()
+    if not (ct.startswith("video/") or ext in allowed_exts):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="File must be a video. Supported formats: mp4, avi, mov, webm, etc."
@@ -102,20 +109,28 @@ async def detect_video(request: Request, file: UploadFile = File(...)):
             "id": str(uuid.uuid4()),
             "user_email": user_email,
             "filename": file.filename,
-            "result": result["result"],
-            "confidence": result["confidence"],
+            "label": result["label"],
+            "score": result["score"],
             "message": result.get("message", ""),
             "created_at": datetime.datetime.utcnow(),
         }
         try:
-            predictions_col.insert_one(record)
-        except Exception:
-            pass
+            # Print for debugging
+            print(f"Attempting to save record to DB: {record}")
+            if predictions_col:
+                insert_result = predictions_col.insert_one(record)
+                print(f"✅ Record saved with ID: {insert_result.inserted_id}")
+            else:
+                print("⚠️  predictions_col is None, skipping save")
+        except Exception as e:
+            print(f"❌ Failed to save to MongoDB: {e}")
         
         # Ensure response matches exact format
         return DetectionResponse(
-            result=result["result"],
-            confidence=result["confidence"],
+            label=result["label"],
+            score=result["score"],
+            probability=result.get("probability", result["score"]),
+            classification=result.get("classification", result["label"]),
             message=result.get("message", "")
         )
         

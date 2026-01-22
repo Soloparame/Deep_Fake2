@@ -1,18 +1,12 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { deepfakeDetector, DetectionResult } from "@/utils/deepfakeDetector";
 
 interface AnalysisResult {
   label: string;
   confidence: number;
-  message: string;
-}
-
-interface DetectionResponse {
-  result: "REAL" | "FAKE" | "UNKNOWN";
-  confidence: number;
-  message: string;
 }
 
 export default function UploadPage() {
@@ -22,6 +16,11 @@ export default function UploadPage() {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [progress, setProgress] = useState<string>("");
+  const [modelLoading, setModelLoading] = useState(false);
+  const [heartbeat, setHeartbeat] = useState(0);
+
+  // Don't preload model - load only when user uploads video to keep page responsive
+  // Model will be loaded on-demand when user clicks "Initiate Scan"
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -41,48 +40,90 @@ export default function UploadPage() {
     }
 
     setLoading(true);
-    setProgress("Uploading video to server...");
+    
+    // Start heartbeat to show page is still responsive
+    const heartbeatInterval = setInterval(() => {
+      setHeartbeat(prev => prev + 1);
+      // Force UI update to show responsiveness
+      if (document.activeElement) {
+        document.activeElement.blur();
+        setTimeout(() => {
+          if (document.body) {
+            document.body.focus();
+            document.body.blur();
+          }
+        }, 0);
+      }
+    }, 500);
     
     try {
-      // Create FormData for file upload
-      const formData = new FormData();
-      formData.append("file", file);
-      
-      setProgress("Processing video with AI model...");
-      
-      const userEmail = window.localStorage.getItem("realeye_user_email") || "";
-
-      // Call backend API endpoint
-      const response = await fetch("http://localhost:4000/api/detect-video", {
-        method: "POST",
-        headers: {
-          "X-User-Email": userEmail,
-        },
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ detail: "Unknown error" }));
-        throw new Error(errorData.detail || `Server error: ${response.status}`);
+      // Check if model is already loaded
+      if (!deepfakeDetector.isModelLoaded()) {
+        setProgress("Initializing AI worker and loading model (page will remain responsive)...");
+        
+        // Ensure model is loaded with timeout
+        try {
+          const loadPromise = deepfakeDetector.loadModel();
+          const timeoutPromise = new Promise((_, reject) => {
+            setTimeout(() => reject(new Error('Model loading timeout - please refresh the page')), 45000);
+          });
+          
+          await Promise.race([loadPromise, timeoutPromise]);
+          setProgress("Model loaded! Starting video analysis...");
+        } catch (loadError: any) {
+          throw new Error(`Failed to load model: ${loadError.message}. Please refresh the page and try again.`);
+        }
+      } else {
+        setProgress("Model ready! Starting video analysis...");
       }
-
-      const detectionResult: DetectionResponse = await response.json();
+      
+      const detectionResult: DetectionResult = await Promise.race([
+        deepfakeDetector.analyzeVideo(file, (message) => {
+          setProgress(message);
+        }),
+        new Promise<DetectionResult>((_, reject) => {
+          setTimeout(() => {
+            reject(new Error('Analysis timeout after 300 seconds. The video may be too large or the model is taking too long. Please try a shorter video.'));
+          }, 300000);
+        })
+      ]);
       
       setProgress("Analysis complete!");
       
-      // Convert backend response format to frontend format
+      // Convert to the expected format
       setResult({
-        label: detectionResult.result.toLowerCase(),
+        label: detectionResult.label,
         confidence: detectionResult.confidence,
-        message: detectionResult.message
       });
 
+      // Optionally save to backend for history
+      try {
+        const formData = new FormData();
+        formData.append("video", file);
+        formData.append("analysis", JSON.stringify({
+          label: detectionResult.label,
+          confidence: detectionResult.confidence,
+        }));
+        
+        await fetch("http://localhost:4000/api/videos/upload", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        });
+      } catch (backendErr) {
+        // Backend save is optional, don't fail if it errors
+        console.warn("Failed to save to backend:", backendErr);
+      }
     } catch (err: any) {
-      console.error("Detection error:", err);
-      setError(err.message || "Analysis failed. Please make sure the backend server is running on http://localhost:4000");
+      console.error(err);
+      setError(err.message || "Analysis failed. Please try again.");
     } finally {
+      clearInterval(heartbeatInterval);
       setLoading(false);
       setProgress("");
+      setHeartbeat(0);
     }
   };
 
@@ -203,7 +244,7 @@ export default function UploadPage() {
                   <button
                     type="submit"
                     className="group relative flex w-full items-center justify-center overflow-hidden rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 px-6 py-4 font-medium text-white shadow-[0_0_20px_rgba(79,70,229,0.3)] transition-all hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(79,70,229,0.5)] disabled:opacity-70 disabled:hover:scale-100"
-                    disabled={loading}
+                    disabled={loading || modelLoading}
                   >
                     <span className="relative z-10 flex items-center gap-2">
                       {loading ? (
@@ -231,54 +272,46 @@ export default function UploadPage() {
                       <div className="relative z-10 bg-gray-950/50 p-5">
                         <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-gray-500">
                           <span className={`inline-block h-2 w-2 rounded-full animate-pulse ${
-                            result.label === 'real' ? 'bg-green-500' : 
-                            result.label === 'fake' ? 'bg-red-500' : 'bg-yellow-500'
+                            result.confidence <= 0.3 ? 'bg-green-500' : 
+                            result.confidence <= 0.6 ? 'bg-yellow-500' : 
+                            'bg-red-500'
                           }`}></span>
                           Analysis Complete
                         </h3>
 
-                        <div className="flex items-center justify-between mb-6">
+                        <div className="flex items-center justify-between">
                           <div>
                             <p className="text-sm text-gray-400">Detection Result</p>
                             <p className={`mt-1 text-3xl font-bold tracking-tight ${
-                              result.label === 'real' ? 'text-green-400' : 
-                              result.label === 'fake' ? 'text-red-400' : 'text-yellow-400'
+                              result.confidence <= 0.3 ? 'text-green-400' : 
+                              result.confidence <= 0.6 ? 'text-yellow-400' : 
+                              'text-red-400'
                             }`}>
-                              {result.label.toUpperCase()}
+                              {result.confidence <= 0.3 ? 'LIKELY REAL' : 
+                               result.confidence <= 0.6 ? 'UNCERTAIN' : 
+                               'LIKELY FAKE'}
                             </p>
                           </div>
                           <div className="text-right">
-                            <p className="text-sm text-gray-400">Confidence Score</p>
-                            <p className="mt-1 font-mono text-3xl font-bold text-white">{result.confidence.toFixed(2)}%</p>
+                            <p className="text-sm text-gray-400">Fake Probability</p>
+                            <p className="mt-1 font-mono text-3xl font-bold text-white">{(result.confidence * 100).toFixed(1)}%</p>
                           </div>
-                        </div>
-
-                        {/* Message Display */}
-                        <div className={`mb-6 rounded-lg border p-4 ${
-                          result.label === 'real' ? 'border-green-500/20 bg-green-500/10 text-green-200' : 
-                          result.label === 'fake' ? 'border-red-500/20 bg-red-500/10 text-red-200' : 'border-yellow-500/20 bg-yellow-500/10 text-yellow-200'
-                        }`}>
-                          <p className="flex items-center gap-2 font-medium">
-                            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            {result.message}
-                          </p>
                         </div>
 
                         {/* Progress Bar Visualization */}
                         <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-gray-800">
                           <div
-                            className={`h-full rounded-full ${
-                              result.label === 'real' ? 'bg-green-500' : 
-                              result.label === 'fake' ? 'bg-red-500' : 'bg-yellow-500'
-                            } transition-all duration-1000 ease-out`}
-                            style={{ width: `${result.confidence}%` }}
+                            className={`h-full rounded-full transition-all duration-1000 ease-out ${
+                              result.confidence <= 0.3 ? 'bg-green-500' : 
+                              result.confidence <= 0.6 ? 'bg-yellow-500' : 
+                              'bg-red-500'
+                            }`}
+                            style={{ width: `${result.confidence * 100}%` }}
                           ></div>
                         </div>
 
                         <p className="mt-4 text-xs text-gray-600 font-mono">
-                          ID: {Math.random().toString(36).substr(2, 9).toUpperCase()} | MODEL: Server (Keras) | Real-time Analysis
+                          ID: {Math.random().toString(36).substr(2, 9).toUpperCase()} | MODEL: TensorFlow.js | Real-time Analysis
                         </p>
                       </div>
                     </div>

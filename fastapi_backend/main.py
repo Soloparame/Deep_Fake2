@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from fastapi_backend.core.config import settings
 from fastapi_backend.services import model_service
-from fastapi_backend.routers import detect, auth, chat, history, user
+from fastapi_backend.routers import detect, auth, chat, history
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -51,7 +51,6 @@ app.add_middleware(
 # Include Routers
 app.include_router(detect.router, prefix="/api", tags=["Detection"])
 app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
-app.include_router(user.router, prefix="/api", tags=["User"])
 app.include_router(chat.router, prefix="/api", tags=["Chat"])
 app.include_router(history.router, prefix="/api", tags=["History"])
 

@@ -31,79 +31,79 @@ export async function generateStaticParams() {
 const pageContent: Record<string, { title: string; content: string }> = {
   "how-it-works": {
     title: "How It Works",
-    content: "RealEye uses advanced deep learning algorithms to analyze video frames for artifacts commonly found in deepfakes. Our multi-stage pipeline first extracts faces using MTCNN, then processes them through ensemble models including XceptionNet and EfficientNet. These models check for inconsistencies in lighting, facial movements, eye blinking patterns, and pixel-level details that are often invisible to the human eye but detectable by AI. The result is a comprehensive authenticity score that helps you verify media integrity.",
+    content: "RealEye uses advanced deep learning algorithms to analyze video frames for artifacts commonly found in deepfakes. Our model checks for inconsistencies in lighting, facial movements, and pixel-level details that are invisible to the human eye.",
   },
   features: {
     title: "Features",
-    content: "Our platform offers a comprehensive suite of detection tools. Key features include real-time video analysis, frame-by-frame deepfake probability scoring, and detailed forensic reports. We support multiple video formats (MP4, AVI, MOV) and offer an easy-to-use API for developers. Our dashboard provides historical data tracking, team collaboration tools, and exportable PDF reports for legal and compliance use cases.",
+    content: "Our platform offers real-time detection, high accuracy rates, detailed analysis reports, and API access for developers. We support various video formats and provide frame-by-frame analysis.",
   },
   pricing: {
     title: "Pricing",
-    content: "We offer flexible pricing plans designed to scale with your needs. Our 'Starter' plan is perfect for individuals and researchers, offering basic detection capabilities. The 'Pro' plan introduces batch processing and API access for small teams. For large organizations, our 'Enterprise' tier provides dedicated support, custom model fine-tuning, and unlimited API calls. Contact our sales team for a custom quote tailored to your volume requirements.",
+    content: "We offer flexible pricing plans for individuals, businesses, and enterprise needs. Contact our sales team for custom solutions.",
   },
   "api-access": {
     title: "API Access",
-    content: "Integrate RealEye's powerful detection engine directly into your applications with our RESTful API. We provide secure, token-based authentication and comprehensive endpoints for video upload, status polling, and result retrieval. Our API is designed for high throughput and low latency, making it suitable for social media platforms, news agencies, and content moderation pipelines. Check our developer portal for Swagger documentation and SDKs in Python and JavaScript.",
+    content: "Integrate RealEye's detection capabilities into your own applications with our robust API. Read our documentation to get started.",
   },
   documentation: {
     title: "Documentation",
-    content: "Welcome to the RealEye knowledge base. Here you will find detailed guides on how to use our web interface, integrate our API, and interpret detection results. We cover topics ranging from 'Getting Started' to advanced configuration for enterprise deployments. Our documentation also includes best practices for video preparation to ensure the highest detection accuracy.",
+    content: "Comprehensive guides and references for using the RealEye platform and API.",
   },
   "about-us": {
     title: "About Us",
-    content: "RealEye is a mission-driven company dedicated to combating the spread of misinformation and protecting digital authenticity. Founded by a team of AI researchers and cybersecurity experts, we are building the standard for deepfake detection. We believe in a world where digital content can be trusted, and we are working tirelessly to stay ahead of generative AI threats.",
+    content: "RealEye is dedicated to combating misinformation and protecting digital authenticity. Our team consists of AI researchers and security experts.",
   },
   research: {
     title: "Research",
-    content: "Our R&D team is at the forefront of media forensics. We actively publish papers in top conferences like CVPR and ICCV. Our research focuses on generalizable deepfake detection, adversarial robustness, and multimodal analysis. On this page, you can access our whitepapers, technical reports, and datasets that we release to the academic community to foster collaboration.",
+    content: "Explore our latest research papers and findings in the field of deepfake detection and media forensics.",
   },
   blog: {
     title: "Blog",
-    content: "Stay updated with the latest trends in synthetic media and cybersecurity. Our blog features articles on emerging deepfake technologies, case studies of real-world deepfake incidents, and updates on our product roadmap. We also feature guest posts from industry leaders and tutorials on how to verify digital content.",
+    content: "Stay updated with the latest news, trends, and insights from the RealEye team.",
   },
   careers: {
     title: "Careers",
-    content: "Join our mission to secure the digital world. We are looking for passionate individuals to join our engineering, research, and product teams. At RealEye, you will work on cutting-edge AI challenges and have a tangible impact on society. We offer competitive salaries, remote-first work culture, and the opportunity to work with some of the brightest minds in AI.",
+    content: "Join our mission to secure the digital world. Check out our open positions.",
   },
   contact: {
     title: "Contact",
-    content: "We'd love to hear from you. Whether you have a question about our features, need technical support, or want to discuss a partnership, our team is here to help. You can reach us via email, phone, or by filling out the form below. For urgent security matters, please use our dedicated security contact channel.",
+    content: "Get in touch with us for support, inquiries, or feedback.",
   },
   community: {
     title: "Community",
-    content: "Join our vibrant community of developers, researchers, and digital safety advocates. We host a Discord server and a community forum where you can share ideas, ask questions, and collaborate on open-source projects related to media authenticity. We also organize hackathons and webinars to engage with the broader ecosystem.",
+    content: "Join our community of developers and researchers to collaborate and share knowledge.",
   },
   "terms-of-service": {
     title: "Terms of Service",
-    content: "By using RealEye, you agree to our Terms of Service. These terms govern your use of our website, API, and services. They cover important topics such as user responsibilities, intellectual property rights, data usage, and liability limitations. We encourage you to read them carefully to understand your rights and obligations.",
+    content: "Please read our terms of service carefully before using our platform.",
   },
   "privacy-policy": {
     title: "Privacy Policy",
-    content: "Your privacy is paramount to us. This policy outlines how we collect, use, and protect your personal data and the media content you upload. We adhere to strict data protection regulations (GDPR, CCPA) and employ industry-standard encryption for data at rest and in transit. We do not sell your data to third parties.",
+    content: "We value your privacy. Learn how we collect, use, and protect your data.",
   },
   security: {
     title: "Security",
-    content: "Security is ingrained in our DNA. We employ a defense-in-depth approach to protect our infrastructure and your data. Our security measures include regular penetration testing, automated vulnerability scanning, and strict access controls. We also offer features like SSO (Single Sign-On) and audit logs for our enterprise customers.",
+    content: "Security is our top priority. Learn about our security measures and compliance.",
   },
   "help-center": {
     title: "Help Center",
-    content: "Need assistance? Our Help Center is your first stop for answers. Browse through our categorized articles to find solutions to common issues, from account setup to troubleshooting API errors. If you can't find what you're looking for, you can easily submit a support ticket directly from this page.",
+    content: "Find answers to common questions and learn how to use RealEye effectively.",
   },
   tutorials: {
     title: "Tutorials",
-    content: "Master RealEye with our step-by-step tutorials. Whether you are a first-time user or an advanced developer, we have learning paths for you. Learn how to upload your first video, interpret the confidence heatmap, or build a custom integration using Webhooks. Our video and text-based tutorials make learning easy.",
+    content: "Step-by-step tutorials to help you get the most out of RealEye.",
   },
   faq: {
     title: "FAQ",
-    content: "Find quick answers to the most frequently asked questions. We cover topics such as 'How accurate is the detection?', 'What video formats are supported?', 'Is there a free trial?', and 'How do I cancel my subscription?'. This section is regularly updated based on user feedback.",
+    content: "Frequently asked questions about deepfakes, our technology, and account management.",
   },
   "report-issue": {
     title: "Report Issue",
-    content: "Found a bug or have a suggestion? We value your feedback. Use our issue reporting tool to describe the problem you encountered or the feature you'd like to see. Please provide as much detail as possible, including screenshots or reproduction steps, to help our engineering team address it quickly.",
+    content: "Encountered a bug or issue? Let us know so we can fix it.",
   },
   "learn-more": {
     title: "Learn More",
-    content: "Deepfakes are evolving rapidly, and so are we. In this section, we provide educational resources to help you understand the technology behind synthetic media. Learn about GANs (Generative Adversarial Networks), diffusion models, and the ethics of AI. Empower yourself with knowledge to navigate the digital landscape safely.",
+    content: "Discover how RealEye is revolutionizing media authenticity. From individual creators to large enterprises, our tools provide the assurance you need in a digital world.",
   },
 };
 
