@@ -22,3 +22,22 @@ class UserModel:
         
         users_col.insert_one(data)
         return data
+
+    @staticmethod
+    def update_password_by_email(email: str, new_hash: str) -> bool:
+        res = users_col.update_one({"email": email}, {"$set": {"password_hash": new_hash}})
+        return getattr(res, "matched_count", 0) > 0
+
+    @staticmethod
+    def get_by_id(user_id: str) -> Optional[Dict[str, Any]]:
+        return users_col.find_one({"id": user_id})
+
+    @staticmethod
+    def update_password_by_id(user_id: str, new_hash: str) -> bool:
+        res = users_col.update_one({"id": user_id}, {"$set": {"password_hash": new_hash}})
+        return getattr(res, "matched_count", 0) > 0
+
+    @staticmethod
+    def update_last_login_by_id(user_id: str, dt: datetime.datetime) -> bool:
+        res = users_col.update_one({"id": user_id}, {"$set": {"last_login": dt}})
+        return getattr(res, "matched_count", 0) > 0

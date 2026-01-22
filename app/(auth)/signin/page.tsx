@@ -24,15 +24,16 @@ export default function SignIn() {
       });
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.message || "Failed to sign in");
+        const msg = data?.detail || data?.message || `Failed to sign in (${res.status})`;
+        setError(msg);
+        return;
       }
       if (data.access_token) {
         window.localStorage.setItem("realeye_token", data.access_token);
-        // Dispatch event immediately and also after a micro-task to ensure all listeners catch it
         window.dispatchEvent(new Event("auth-change"));
         setTimeout(() => window.dispatchEvent(new Event("auth-change")), 100);
+        router.push("/chat");
       }
-      router.push("/chat");
     } catch (err: any) {
       console.error(err);
       setError(err.message || "Sign-in failed.");
