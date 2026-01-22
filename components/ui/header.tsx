@@ -4,12 +4,10 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Logo from "./logo";
-import ProfileModal from "./profile-modal";
 
 export default function Header() {
   const router = useRouter();
   const [isAuthed, setIsAuthed] = useState(false);
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   useEffect(() => {
     const checkAuth = () => {
@@ -91,23 +89,21 @@ export default function Header() {
                   </Link>
                 </li>
                 <li>
-                  <button
-                    type="button"
-                    onClick={() => setIsProfileOpen(true)}
+                  <Link
+                    href="/profile"
                     className="btn-sm flex items-center gap-2 rounded-full bg-indigo-600 px-4 py-1.5 text-sm font-medium text-white shadow-lg shadow-indigo-500/20 transition-all hover:bg-indigo-500 hover:shadow-indigo-500/30"
                   >
                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
                     Profile
-                  </button>
+                  </Link>
                 </li>
               </>
             )}
           </ul>
         </div>
       </div>
-      <ProfileModal isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} />
     </header>
   );
 }

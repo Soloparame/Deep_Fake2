@@ -21,3 +21,7 @@ class UserResponse(BaseModel):
     name: str
     email: EmailStr
     created_at: str
+
+class ChangePassword(BaseModel):
+    old_password: str
+    new_password: str
