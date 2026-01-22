@@ -2,14 +2,7 @@
 
 import { FormEvent, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-// Placeholder imports to satisfy TS – replace with real detector module when available
-// const deepfakeDetector = {
-//   isModelLoaded: () => false,
-//   loadModel: () => Promise.resolve(),
-//   analyzeVideo: (file: File, cb?: (msg: string) => void) =>
-//     Promise.resolve({ label: "real", confidence: 0.95 } as DetectionResult),
-// };
-// interface DetectionResult { label: string; confidence: number; }
+import { deepfakeDetector, DetectionResult } from "@/utils/deepfakeDetector";
 
 interface AnalysisResult {
   label: string;
@@ -53,7 +46,7 @@ export default function UploadPage() {
       setHeartbeat(prev => prev + 1);
       // Force UI update to show responsiveness
       if (document.activeElement) {
-        (document.activeElement as HTMLElement).blur();
+        document.activeElement.blur();
         setTimeout(() => {
           if (document.body) {
             document.body.focus();
@@ -66,48 +59,19 @@ export default function UploadPage() {
     try {
       // Check if model is already loaded
       if (!deepfakeDetector.isModelLoaded()) {
-        // Add retry/timeout handling for slow or flaky connections
-        const ensureModelLoaded = async (attempts = 3, timeoutMs = 180000) => {
-          let lastErr: any = null;
-          for (let attempt = 1; attempt <= attempts; attempt++) {
-            setModelLoading(true);
-            setProgress(`Downloading AI model (~80MB)... attempt ${attempt}/${attempts}. This may take a few minutes.`);
-            try {
-              const loadPromise = deepfakeDetector.loadModel();
-              let timeoutId: any;
-              const timeoutPromise = new Promise<never>((_, reject) => {
-                timeoutId = setTimeout(() => reject(new Error(`Model loading timeout (${Math.round(timeoutMs/60000)} mins) - please check your connection and retry`)), timeoutMs);
-              });
-
-              try {
-                await Promise.race([loadPromise, timeoutPromise]);
-                clearTimeout(timeoutId);
-                setProgress("Model loaded! Starting video analysis...");
-                setModelLoading(false);
-                return;
-              } finally {
-                clearTimeout(timeoutId);
-              }
-            } catch (err: any) {
-              lastErr = err;
-              console.warn(`Model load attempt ${attempt} failed:`, err);
-              setProgress(`Model load attempt ${attempt} failed. ${attempt < attempts ? 'Retrying...' : 'Please try again.'}`);
-              setModelLoading(false);
-              if (attempt < attempts) {
-                // Backoff before retrying
-                await new Promise(r => setTimeout(r, 1500 * attempt));
-                continue;
-              } else {
-                throw lastErr;
-              }
-            }
-          }
-        };
-
+        setProgress("Initializing AI worker and loading model (page will remain responsive)...");
+        
+        // Ensure model is loaded with timeout
         try {
-          await ensureModelLoaded(3, 180000);
+          const loadPromise = deepfakeDetector.loadModel();
+          const timeoutPromise = new Promise((_, reject) => {
+            setTimeout(() => reject(new Error('Model loading timeout - please refresh the page')), 45000);
+          });
+          
+          await Promise.race([loadPromise, timeoutPromise]);
+          setProgress("Model loaded! Starting video analysis...");
         } catch (loadError: any) {
-          throw new Error(`Failed to load model: ${loadError.message || loadError}. You can try again without refreshing by clicking "Initiate Scan" again.`);
+          throw new Error(`Failed to load model: ${loadError.message}. Please refresh the page and try again.`);
         }
       } else {
         setProgress("Model ready! Starting video analysis...");
@@ -119,8 +83,8 @@ export default function UploadPage() {
         }),
         new Promise<DetectionResult>((_, reject) => {
           setTimeout(() => {
-            reject(new Error('Analysis timeout after 120 seconds. The video may be too large or the model is taking too long. Please try a shorter video.'));
-          }, 120000);
+            reject(new Error('Analysis timeout after 300 seconds. The video may be too large or the model is taking too long. Please try a shorter video.'));
+          }, 300000);
         })
       ]);
       
@@ -307,19 +271,29 @@ export default function UploadPage() {
 
                       <div className="relative z-10 bg-gray-950/50 p-5">
                         <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-gray-500">
-                          <span className="inline-block h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
+                          <span className={`inline-block h-2 w-2 rounded-full animate-pulse ${
+                            result.confidence <= 0.3 ? 'bg-green-500' : 
+                            result.confidence <= 0.6 ? 'bg-yellow-500' : 
+                            'bg-red-500'
+                          }`}></span>
                           Analysis Complete
                         </h3>
 
                         <div className="flex items-center justify-between">
                           <div>
                             <p className="text-sm text-gray-400">Detection Result</p>
-                            <p className={`mt-1 text-3xl font-bold tracking-tight ${result.label.toLowerCase() === 'real' ? 'text-green-400' : 'text-red-400'}`}>
-                              {result.label.toUpperCase()}
+                            <p className={`mt-1 text-3xl font-bold tracking-tight ${
+                              result.confidence <= 0.3 ? 'text-green-400' : 
+                              result.confidence <= 0.6 ? 'text-yellow-400' : 
+                              'text-red-400'
+                            }`}>
+                              {result.confidence <= 0.3 ? 'LIKELY REAL' : 
+                               result.confidence <= 0.6 ? 'UNCERTAIN' : 
+                               'LIKELY FAKE'}
                             </p>
                           </div>
                           <div className="text-right">
-                            <p className="text-sm text-gray-400">Confidence Score</p>
+                            <p className="text-sm text-gray-400">Fake Probability</p>
                             <p className="mt-1 font-mono text-3xl font-bold text-white">{(result.confidence * 100).toFixed(1)}%</p>
                           </div>
                         </div>
@@ -327,7 +301,11 @@ export default function UploadPage() {
                         {/* Progress Bar Visualization */}
                         <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-gray-800">
                           <div
-                            className={`h-full rounded-full ${result.label.toLowerCase() === 'real' ? 'bg-green-500' : 'bg-red-500'} transition-all duration-1000 ease-out`}
+                            className={`h-full rounded-full transition-all duration-1000 ease-out ${
+                              result.confidence <= 0.3 ? 'bg-green-500' : 
+                              result.confidence <= 0.6 ? 'bg-yellow-500' : 
+                              'bg-red-500'
+                            }`}
                             style={{ width: `${result.confidence * 100}%` }}
                           ></div>
                         </div>

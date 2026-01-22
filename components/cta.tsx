@@ -1,7 +1,25 @@
+"use client";
+
 import Image from "next/image";
 import BlurredShape from "@/public/images/blurred-shape.svg";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function Cta() {
+  const router = useRouter();
+
+  const handleStartClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (typeof window !== "undefined") {
+      const token = window.localStorage.getItem("realeye_token");
+      if (token) {
+        router.push("/upload");
+      } else {
+        router.push("/signin");
+      }
+    }
+  };
+
   return (
     <section className="relative overflow-hidden">
       <div
@@ -28,8 +46,9 @@ export default function Cta() {
             <div className="mx-auto max-w-xs sm:flex sm:max-w-none sm:justify-center">
               <div data-aos="fade-up" data-aos-delay={400}>
                 <a
-                  className="btn group mb-4 w-full bg-linear-to-t from-indigo-600 to-indigo-500 bg-[length:100%_100%] bg-[bottom] text-white shadow-[inset_0px_1px_0px_0px_--theme(--color-white/.16)] hover:bg-[length:100%_150%] sm:mb-0 sm:w-auto"
+                  className="btn group mb-4 w-full cursor-pointer bg-linear-to-t from-indigo-600 to-indigo-500 bg-[length:100%_100%] bg-[bottom] text-white shadow-[inset_0px_1px_0px_0px_--theme(--color-white/.16)] hover:bg-[length:100%_150%] sm:mb-0 sm:w-auto"
                   href="#0"
+                  onClick={handleStartClick}
                 >
                   <span className="relative inline-flex items-center">
                     Start Detecting Now
@@ -40,12 +59,12 @@ export default function Cta() {
                 </a>
               </div>
               <div data-aos="fade-up" data-aos-delay={600}>
-                <a
+                <Link
                   className="btn relative w-full bg-linear-to-b from-gray-800 to-gray-800/60 bg-[length:100%_100%] bg-[bottom] text-gray-300 before:pointer-events-none before:absolute before:inset-0 before:rounded-[inherit] before:border before:border-transparent before:[background:linear-gradient(to_right,var(--color-gray-800),var(--color-gray-700),var(--color-gray-800))_border-box] before:[mask-composite:exclude_!important] before:[mask:linear-gradient(white_0_0)_padding-box,_linear-gradient(white_0_0)] hover:bg-[length:100%_150%] sm:ml-4 sm:w-auto"
-                  href="#0"
+                  href="/pages/learn-more"
                 >
                   Learn More
-                </a>
+                </Link>
               </div>
             </div>
           </div>

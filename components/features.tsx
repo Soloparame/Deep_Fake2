@@ -49,23 +49,13 @@ export default function Features() {
           </div>
           {/* Features image with enhanced styling */}
           <div className="flex justify-center pb-4 md:pb-12" data-aos="fade-up">
-            <div className="relative">
-              {/* Border wrapper with gradient */}
-              <div className="absolute inset-0 rounded-3xl bg-linear-to-br from-indigo-500/20 via-purple-500/10 to-indigo-500/20 p-[1px]">
-                <div className="h-full w-full rounded-3xl bg-gray-950" />
-              </div>
-              
-              {/* Image container with shadow and hover effects */}
-              <div className="relative overflow-hidden rounded-3xl shadow-2xl shadow-indigo-500/10 transition-shadow hover:shadow-indigo-500/20">
-                <Image
-                  className="mx-auto w-full max-w-3xl transition-transform duration-500 hover:scale-105"
-                  src={FeaturesImage}
-                  width={880}
-                  height={306}
-                  alt="Features"
-                />
-              </div>
-            </div>
+            <Image
+              className="mx-auto w-full max-w-4xl"
+              src={FeaturesImage}
+              width={960}
+              height={360}
+              alt="Features"
+            />
           </div>
           {/* Items */}
           <div className="mx-auto grid max-w-sm gap-12 sm:max-w-none sm:grid-cols-2 md:gap-x-14 md:gap-y-16 lg:grid-cols-3">

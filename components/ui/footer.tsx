@@ -1,6 +1,7 @@
 import Logo from "./logo";
 import Image from "next/image";
 import FooterIllustration from "@/public/images/footer-illustration.svg";
+import Link from "next/link";
 
 export default function Footer() {
   return (
@@ -25,44 +26,44 @@ export default function Footer() {
             <h3 className="text-sm font-medium text-gray-200">Product</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <a
+                <Link
                   className="text-indigo-200/65 transition hover:text-indigo-500"
-                  href="#0"
+                  href="/pages/how-it-works"
                 >
                   How It Works
-                </a>
+                </Link>
               </li>
               <li>
-                <a
+                <Link
                   className="text-indigo-200/65 transition hover:text-indigo-500"
-                  href="#0"
+                  href="/pages/features"
                 >
                   Features
-                </a>
+                </Link>
               </li>
               <li>
-                <a
+                <Link
                   className="text-indigo-200/65 transition hover:text-indigo-500"
-                  href="#0"
+                  href="/pages/pricing"
                 >
                   Pricing
-                </a>
+                </Link>
               </li>
               <li>
-                <a
+                <Link
                   className="text-indigo-200/65 transition hover:text-indigo-500"
-                  href="#0"
+                  href="/pages/api-access"
                 >
                   API Access
-                </a>
+                </Link>
               </li>
               <li>
-                <a
+                <Link
                   className="text-indigo-200/65 transition hover:text-indigo-500"
-                  href="#0"
+                  href="/pages/documentation"
                 >
                   Documentation
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -71,44 +72,44 @@ export default function Footer() {
             <h3 className="text-sm font-medium text-gray-200">Company</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <a
+                <Link
                   className="text-indigo-200/65 transition hover:text-indigo-500"
-                  href="#0"
+                  href="/pages/about-us"
                 >
                   About Us
-                </a>
+                </Link>
               </li>
               <li>
-                <a
+                <Link
                   className="text-indigo-200/65 transition hover:text-indigo-500"
-                  href="#0"
+                  href="/pages/research"
                 >
                   Research
-                </a>
+                </Link>
               </li>
               <li>
-                <a
+                <Link
                   className="text-indigo-200/65 transition hover:text-indigo-500"
-                  href="#0"
+                  href="/pages/blog"
                 >
                   Blog
-                </a>
+                </Link>
               </li>
               <li>
-                <a
+                <Link
                   className="text-indigo-200/65 transition hover:text-indigo-500"
-                  href="#0"
+                  href="/pages/careers"
                 >
                   Careers
-                </a>
+                </Link>
               </li>
               <li>
-                <a
+                <Link
                   className="text-indigo-200/65 transition hover:text-indigo-500"
-                  href="#0"
+                  href="/pages/contact"
                 >
                   Contact
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -117,36 +118,36 @@ export default function Footer() {
             <h3 className="text-sm font-medium text-gray-200">Resources</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <a
+                <Link
                   className="text-indigo-200/65 transition hover:text-indigo-500"
-                  href="#0"
+                  href="/pages/community"
                 >
                   Community
-                </a>
+                </Link>
               </li>
               <li>
-                <a
+                <Link
                   className="text-indigo-200/65 transition hover:text-indigo-500"
-                  href="#0"
+                  href="/pages/terms-of-service"
                 >
                   Terms of Service
-                </a>
+                </Link>
               </li>
               <li>
-                <a
+                <Link
                   className="text-indigo-200/65 transition hover:text-indigo-500"
-                  href="#0"
+                  href="/pages/privacy-policy"
                 >
                   Privacy Policy
-                </a>
+                </Link>
               </li>
               <li>
-                <a
+                <Link
                   className="text-indigo-200/65 transition hover:text-indigo-500"
-                  href="#0"
+                  href="/pages/security"
                 >
                   Security
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -157,36 +158,36 @@ export default function Footer() {
             </h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <a
+                <Link
                   className="text-indigo-200/65 transition hover:text-indigo-500"
-                  href="#0"
+                  href="/pages/help-center"
                 >
                   Help Center
-                </a>
+                </Link>
               </li>
               <li>
-                <a
+                <Link
                   className="text-indigo-200/65 transition hover:text-indigo-500"
-                  href="#0"
+                  href="/pages/tutorials"
                 >
                   Tutorials
-                </a>
+                </Link>
               </li>
               <li>
-                <a
+                <Link
                   className="text-indigo-200/65 transition hover:text-indigo-500"
-                  href="#0"
+                  href="/pages/faq"
                 >
                   FAQ
-                </a>
+                </Link>
               </li>
               <li>
-                <a
+                <Link
                   className="text-indigo-200/65 transition hover:text-indigo-500"
-                  href="#0"
+                  href="/pages/report-issue"
                 >
                   Report Issue
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -197,62 +198,8 @@ export default function Footer() {
             </div>
             <div className="text-sm">
               <p className="mb-3 text-indigo-200/65">
-                © 2024 RealEye
-                <span className="text-gray-700"> · </span>
-                <a
-                  className="text-indigo-200/65 transition hover:text-indigo-500"
-                  href="#0"
-                >
-                  Terms
-                </a>
+                © 2026 RealEye
               </p>
-              <ul className="inline-flex gap-1">
-                <li>
-                  <a
-                    className="flex items-center justify-center text-indigo-500 transition hover:text-indigo-400"
-                    href="#0"
-                    aria-label="Twitter"
-                  >
-                    <svg
-                      className="h-8 w-8 fill-current"
-                      viewBox="0 0 32 32"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path d="m13.063 9 3.495 4.475L20.601 9h2.454l-5.359 5.931L24 23h-4.938l-3.866-4.893L10.771 23H8.316l5.735-6.342L8 9h5.063Zm-.74 1.347h-1.457l8.875 11.232h1.36l-8.778-11.232Z" />
-                    </svg>
-                  </a>
-                </li>
-                <li>
-                  <a
-                    className="flex items-center justify-center text-indigo-500 transition hover:text-indigo-400"
-                    href="#0"
-                    aria-label="GitHub"
-                  >
-                    <svg
-                      className="h-8 w-8 fill-current"
-                      viewBox="0 0 32 32"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path d="M16 8.2c-4.4 0-8 3.6-8 8 0 3.5 2.3 6.5 5.5 7.6.4.1.5-.2.5-.4V22c-2.2.5-2.7-1-2.7-1-.4-.9-.9-1.2-.9-1.2-.7-.5.1-.5.1-.5.8.1 1.2.8 1.2.8.7 1.3 1.9.9 2.3.7.1-.5.3-.9.5-1.1-1.8-.2-3.6-.9-3.6-4 0-.9.3-1.6.8-2.1-.1-.2-.4-1 .1-2.1 0 0 .7-.2 2.2.8.6-.2 1.3-.3 2-.3s1.4.1 2 .3c1.5-1 2.2-.8 2.2-.8.4 1.1.2 1.9.1 2.1.5.6.8 1.3.8 2.1 0 3.1-1.9 3.7-3.7 3.9.3.4.6.9.6 1.6v2.2c0 .2.1.5.6.4 3.2-1.1 5.5-4.1 5.5-7.6-.1-4.4-3.7-8-8.1-8z" />
-                    </svg>
-                  </a>
-                </li>
-                <li>
-                  <a
-                    className="flex items-center justify-center text-indigo-500 transition hover:text-indigo-400"
-                    href="#0"
-                    aria-label="LinkedIn"
-                  >
-                    <svg
-                      className="h-8 w-8 fill-current"
-                      viewBox="0 0 32 32"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path d="M23.3 8H8.7c-.4 0-.7.3-.7.7v14.7c0 .3.3.6.7.6h14.7c.4 0 .7-.3.7-.7V8.6c-.1-.3-.4-.6-.8-.6zM12.7 21.6h-2.3V14h2.4v7.6h-.1zM11.6 13c-.8 0-1.4-.7-1.4-1.4 0-.8.6-1.4 1.4-1.4.8 0 1.4.6 1.4 1.4-.1.7-.7 1.4-1.4 1.4zm10 8.6h-2.4v-3.7c0-.9 0-2-1.2-2s-1.4.9-1.4 1.9v3.8h-2.4V14h2.3v1c.3-.6 1.1-1.2 2.2-1.2 2.4 0 2.8 1.6 2.8 3.6v4.2z" />
-                    </svg>
-                  </a>
-                </li>
-              </ul>
             </div>
           </div>
         </div>
