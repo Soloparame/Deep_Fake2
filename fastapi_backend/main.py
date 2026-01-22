@@ -3,11 +3,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from fastapi_backend.core.config import settings
 from fastapi_backend.services import model_service
+from fastapi_backend.models.knowledge import KnowledgeModel
 from fastapi_backend.routers import detect, auth, chat, history
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup: Load the model
+    # Startup: Load the model and seed knowledge base
     try:
         model_service.load_model()
         print("✅ Model loaded successfully!")
@@ -23,6 +24,12 @@ async def lifespan(app: FastAPI):
         print(f"❌ WARNING: Could not load model: {e}")
         print("   The API will start, but /api/detect-video will not work until the model loads successfully.")
     
+    # Seed knowledge base
+    try:
+        KnowledgeModel.seed_defaults()
+    except Exception as e:
+        print(f"⚠️  Could not seed knowledge base: {e}")
+
     yield
     
     # Shutdown: Clean up if needed

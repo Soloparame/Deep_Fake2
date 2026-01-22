@@ -46,6 +46,8 @@ try:
     users_col = db["users"]
     predictions_col = db["predictions"]
     chats_col = db["chats"]
+    chat_sessions_col = db["chat_sessions"]
+    knowledge_col = db["knowledge_base"]
     
 except Exception as e:
     print(f"⚠️  MongoDB connection failed: {e}")
@@ -56,6 +58,13 @@ except Exception as e:
             print(f"⚠️  MongoDB not connected - skipping insert operation")
             return type('obj', (object,), {'inserted_id': None})()
         
+        def insert_many(self, *args, **kwargs):
+            print(f"⚠️  MongoDB not connected - skipping insert_many operation")
+            return type('obj', (object,), {'inserted_ids': []})()
+        
+        def count_documents(self, *args, **kwargs):
+            return 0
+
         def find_one(self, *args, **kwargs):
             return None
         
@@ -73,6 +82,8 @@ except Exception as e:
     users_col = DummyCollection()
     predictions_col = DummyCollection()
     chats_col = DummyCollection()
+    chat_sessions_col = DummyCollection()
+    knowledge_col = DummyCollection()
 
 # Helper utils
 def now_iso() -> str:

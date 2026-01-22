@@ -11,16 +11,37 @@ interface ChatMessage {
   createdAt: string;
 }
 
+interface ChatSession {
+  session_id: string;
+  title: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export default function ChatPage() {
   const router = useRouter();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [sessions, setSessions] = useState<ChatSession[]>([]);
+  const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [suggestedQuestions, setSuggestedQuestions] = useState<string[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
-  // Load history on mount
+  // Load suggested questions
+  useEffect(() => {
+    fetch("http://localhost:4000/api/chat/questions")
+      .then(res => {
+        if (res.ok) return res.json();
+        return [];
+      })
+      .then(data => setSuggestedQuestions(data))
+      .catch(err => console.error("Failed to load suggested questions:", err));
+  }, []);
+
+  // Load sessions on mount
   useEffect(() => {
     const token = window.localStorage.getItem("realeye_token");
     if (!token) {
@@ -28,37 +49,56 @@ export default function ChatPage() {
       return;
     }
 
-    const loadHistory = async () => {
+    const loadSessions = async () => {
       try {
-        const res = await fetch("http://localhost:4000/api/chat", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        const res = await fetch("http://localhost:4000/api/chat/sessions", {
+          headers: { Authorization: `Bearer ${token}` },
         });
-        if (res.status === 401) {
-          router.push("/signin");
-          return;
+        if (res.ok) {
+          const data = await res.json();
+          setSessions(data);
+          // If we have sessions, select the most recent one (first one if sorted by backend)
+          if (data.length > 0) {
+            // Sort by updated_at just in case
+            const sorted = data.sort((a: ChatSession, b: ChatSession) => 
+                new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+            );
+            setSessions(sorted);
+            loadSession(sorted[0].session_id);
+          }
         }
-        if (!res.ok) {
-          throw new Error(`Server returned ${res.status}`);
-        }
-        const data = await res.json();
-        setMessages(data.messages || []);
-        setError(null); // Clear any previous errors
-      } catch (err: any) {
-        console.error("Failed to load chat history:", err);
-        // Don't show error if it's just a network issue - user can still chat
-        // The error will be shown when they try to send a message
-        if (err.message?.includes("Failed to fetch") || err.message?.includes("NetworkError")) {
-          setError("Backend server is not running. Please start it with 'npm run server' to load chat history.");
-        } else {
-          setError("Failed to load chat history. You can still send messages.");
-        }
+      } catch (err) {
+        console.error("Failed to load sessions:", err);
       }
     };
-
-    loadHistory();
+    loadSessions();
   }, [router]);
+
+  const loadSession = async (sessionId: string) => {
+    const token = window.localStorage.getItem("realeye_token");
+    if (!token) return;
+
+    setCurrentSessionId(sessionId);
+    setLoading(true);
+    try {
+      const res = await fetch(`http://localhost:4000/api/chat/sessions/${sessionId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setMessages(data.messages || []);
+      }
+    } catch (err) {
+      console.error("Failed to load session history:", err);
+    } finally {
+        setLoading(false);
+    }
+  };
+
+  const handleNewChat = () => {
+    setMessages([]);
+    setCurrentSessionId(null);
+  };
 
   // Auto-scroll to bottom when messages change, but only if user is near bottom
   useEffect(() => {
@@ -75,10 +115,11 @@ export default function ChatPage() {
     }
   }, [messages]);
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent, overrideMessage?: string) => {
     e.preventDefault();
     setError(null);
-    const trimmed = input.trim();
+    const messageToSend = overrideMessage || input;
+    const trimmed = messageToSend.trim();
     if (!trimmed) return;
 
     const token = window.localStorage.getItem("realeye_token");
@@ -88,6 +129,20 @@ export default function ChatPage() {
     }
 
     setLoading(true);
+    // Add user message optimistically
+    const tempId = Date.now().toString();
+    setMessages((prev) => [
+        ...prev, 
+        { 
+            id: tempId, 
+            userId: "me", 
+            role: "user", 
+            text: trimmed, 
+            createdAt: new Date().toISOString() 
+        }
+    ]);
+    setInput("");
+
     try {
       const res = await fetch("http://localhost:4000/api/chat", {
         method: "POST",
@@ -95,20 +150,53 @@ export default function ChatPage() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ message: trimmed }),
+        body: JSON.stringify({ 
+            message: trimmed,
+            session_id: currentSessionId 
+        }),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         throw new Error(data.message || `Server returned ${res.status}`);
       }
       const data = await res.json();
-      if (data.messages) {
-        setMessages((prev) => [...prev, ...data.messages]);
+      
+      // Update session ID if this was a new session
+      if (data.session_id && !currentSessionId) {
+          setCurrentSessionId(data.session_id);
+          // Refresh sessions list to show the new one in sidebar
+          fetch("http://localhost:4000/api/chat/sessions", {
+             headers: { Authorization: `Bearer ${token}` }
+          })
+          .then(r => r.json())
+          .then(data => {
+             const sorted = data.sort((a: ChatSession, b: ChatSession) => 
+                 new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+             );
+             setSessions(sorted);
+          });
       }
-      setInput("");
-      setError(null); // Clear any previous errors
+
+      if (data.message) {
+        // Replace the optimistic message or just append the response?
+        // Let's append the response. The optimistic message is already there.
+        // But we might want to replace the optimistic one with the real one from DB if we want IDs to match.
+        // For simplicity, let's just append the bot response.
+        setMessages((prev) => {
+            // Remove the temp user message if we want to rely on backend return?
+            // Actually, the backend returns the *response*, not the full history usually.
+            // Let's check schemas/chat.py. ChatResponse has `message: ChatMessage` (the bot response).
+            // It doesn't return the user message with ID.
+            // So we keep our optimistic user message.
+            return [...prev, data.message];
+        });
+      }
+      setError(null); 
     } catch (err: any) {
       console.error("Failed to send message:", err);
+      // Remove optimistic message on error? Or show error state?
+      setMessages(prev => prev.filter(m => m.id !== tempId));
+      
       if (err.message?.includes("Failed to fetch") || err.message?.includes("NetworkError")) {
         setError("Backend server is not running. Please start it with 'npm run server' in a separate terminal.");
       } else {
@@ -128,7 +216,7 @@ export default function ChatPage() {
       <aside className="hidden w-72 flex-shrink-0 flex-col border-r border-white/5 bg-gray-900/40 backdrop-blur-md p-4 md:flex h-full overflow-hidden">
         <button
           type="button"
-          onClick={() => setMessages([])}
+          onClick={handleNewChat}
           className="group mb-6 flex w-full items-center gap-2 rounded-xl bg-indigo-600 px-4 py-3 text-left text-sm font-medium text-white shadow-lg shadow-indigo-500/20 transition-all hover:bg-indigo-500"
         >
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -142,22 +230,32 @@ export default function ChatPage() {
         </div>
 
         <div className="flex-1 space-y-2 overflow-y-auto pr-2 custom-scrollbar">
-          {messages.length === 0 ? (
+          {sessions.length === 0 ? (
             <div className="rounded-lg border border-dashed border-white/5 p-4 text-center">
               <p className="text-xs text-gray-500">No recent conversations.</p>
             </div>
           ) : (
-            <div className="group flex cursor-pointer items-center gap-3 rounded-lg bg-white/5 p-3 transition-colors hover:bg-white/10">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-indigo-500/20 text-indigo-400">
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                </svg>
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm text-gray-300">Analysis Discussion</p>
-                <p className="text-[10px] text-gray-500">{messages.length} messages</p>
-              </div>
-            </div>
+            sessions.map((session) => (
+                <div 
+                    key={session.session_id}
+                    onClick={() => loadSession(session.session_id)}
+                    className={`group flex cursor-pointer items-center gap-3 rounded-lg p-3 transition-colors hover:bg-white/10 ${
+                        currentSessionId === session.session_id ? "bg-white/10" : "bg-white/5"
+                    }`}
+                >
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-indigo-500/20 text-indigo-400">
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                        </svg>
+                    </div>
+                    <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm text-gray-300">{session.title || "New Chat"}</p>
+                        <p className="text-[10px] text-gray-500">
+                            {new Date(session.updated_at).toLocaleDateString()}
+                        </p>
+                    </div>
+                </div>
+            ))
           )}
         </div>
 
@@ -205,16 +303,28 @@ export default function ChatPage() {
             >
               <div className="space-y-6">
                 {messages.length === 0 && (
-                  <div className="flex h-full min-h-[400px] flex-col items-center justify-center text-center opacity-60">
+                  <div className="flex h-full min-h-[400px] flex-col items-center justify-center text-center opacity-100">
                     <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-3xl bg-indigo-500/10 text-indigo-400">
                       <svg className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
                       </svg>
                     </div>
                     <h3 className="text-xl font-medium text-white">How can I help you detect deepfakes?</h3>
-                    <p className="mt-2 max-w-md text-sm text-gray-400">
+                    <p className="mt-2 mb-8 max-w-md text-sm text-gray-400">
                       Ask about artifacts, upload guidance, or technical details about the detection architecture.
                     </p>
+                    
+                    <div className="grid w-full max-w-lg grid-cols-1 gap-3 sm:grid-cols-2">
+                        {suggestedQuestions.map((q, i) => (
+                            <button
+                                key={i}
+                                onClick={(e) => handleSubmit(e as unknown as FormEvent, q)}
+                                className="rounded-xl border border-white/10 bg-white/5 p-3 text-left text-sm text-gray-300 transition-colors hover:border-indigo-500/50 hover:bg-white/10"
+                            >
+                                {q}
+                            </button>
+                        ))}
+                    </div>
                   </div>
                 )}
                 {messages.map((m) => (
