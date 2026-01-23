@@ -11,18 +11,26 @@ async def lifespan(app: FastAPI):
     # Startup: Load the model and seed knowledge base
     try:
         model_service.load_model()
-        print("✅ Model loaded successfully!")
+        # Check if model actually loaded or if we're in mock mode
+        if model_service._model is not None:
+            print("✅ Model loaded successfully!")
+        elif model_service.MOCK_MODE:
+            print("⚠️  Model loading failed - MOCK MODE enabled")
+            print("   The API will work with simulated predictions for testing.")
+        else:
+            print("❌ WARNING: Model is not loaded and MOCK_MODE is disabled")
+            print("   The API may not work correctly. Check server logs for details.")
     except FileNotFoundError as e:
         print(f"❌ ERROR: Model file not found: {e}")
-        print(f"   Please place your deepfake_model.h5 file at: {settings.MODEL_PATH}")
-        print("   The API will start, but /api/detect-video will not work until the model is available.")
+        print(f"   Please place your model file at: {settings.MODEL_PATH}")
+        print("   MOCK MODE will be enabled - API will work with simulated predictions.")
     except ImportError as e:
         print(f"❌ ERROR: {e}")
         print("   Please install TensorFlow: pip install tensorflow")
-        print("   The API will start, but /api/detect-video will not work until TensorFlow is installed.")
+        print("   MOCK MODE will be enabled - API will work with simulated predictions.")
     except Exception as e:
         print(f"❌ WARNING: Could not load model: {e}")
-        print("   The API will start, but /api/detect-video will not work until the model loads successfully.")
+        print("   MOCK MODE will be enabled - API will work with simulated predictions.")
     
     # Seed knowledge base
     try:
