@@ -74,8 +74,16 @@ export default function Header() {
               <>
                 <li>
                   <Link
-                    href="/chat"
+                    href="/community"
                     className="rounded-full px-4 py-1.5 text-sm font-medium text-gray-300 transition-colors hover:bg-white/5 hover:text-white"
+                  >
+                    Community
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/chat"
+                    className="rounded-full px-4 py-1.5 text-sm font-medium text-gray-300 transition-colors hover:bg白/5 hover:text白"
                   >
                     Chat
                   </Link>

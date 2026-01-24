@@ -4,7 +4,8 @@ from contextlib import asynccontextmanager
 from fastapi_backend.core.config import settings
 from fastapi_backend.services import model_service
 from fastapi_backend.models.knowledge import KnowledgeModel
-from fastapi_backend.routers import detect, auth, chat, history, user
+from fastapi_backend.routers import detect, auth, chat, history, user, community
+from fastapi.staticfiles import StaticFiles
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -61,6 +62,9 @@ app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
 app.include_router(chat.router, prefix="/api", tags=["Chat"])
 app.include_router(history.router, prefix="/api", tags=["History"])
 app.include_router(user.router, prefix="/api", tags=["User"])
+app.include_router(community.router, prefix="/api", tags=["Community"])
+
+app.mount("/static/testvideo", StaticFiles(directory=f"{settings.BASE_DIR}/testvideo"), name="testvideo")
 
 @app.get("/")
 def read_root():
