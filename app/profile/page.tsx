@@ -176,7 +176,7 @@ export default function ProfilePage() {
                                     <div className="space-y-2">
                                         <label className="text-xs font-medium uppercase text-gray-500">User ID</label>
                                         <div className="rounded-lg border border-white/10 bg-gray-900/50 p-3 font-mono text-xs text-gray-400 backdrop-blur-sm">
-                                            {profile?.id || "unknown"}
+                                            {profile?.email || "unknown"}
                                         </div>
                                     </div>
                                 </div>
