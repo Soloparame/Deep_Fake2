@@ -22,7 +22,6 @@ interface UserStats {
 export default function ProfilePage() {
     const router = useRouter();
     const [profile, setProfile] = useState<UserProfile | null>(null);
-    const [stats, setStats] = useState<UserStats | null>(null);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState("identity");
     const [pwdCurrent, setPwdCurrent] = useState("");
@@ -47,17 +46,6 @@ export default function ProfilePage() {
                 if (userRes.ok) {
                     const userData = await userRes.json();
                     setProfile(userData);
-                }
-
-                // Fetch Stats
-                // Note: You'll need to implement this endpoint in backend
-                const statsRes = await fetch("http://localhost:4000/api/user/stats", {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-
-                if (statsRes.ok) {
-                    const statsData = await statsRes.json();
-                    setStats(statsData);
                 }
             } catch (err) {
                 console.error("Failed to load profile", err);
@@ -86,7 +74,6 @@ export default function ProfilePage() {
     const tabs = [
         { id: "identity", label: "Identity", icon: "👤" },
         { id: "security", label: "Security", icon: "🔒" },
-        { id: "activity", label: "Activity", icon: "📊" },
         { id: "data", label: "Data", icon: "💾" },
         { id: "preferences", label: "Preferences", icon: "⚙️" },
     ];
@@ -286,55 +273,7 @@ export default function ProfilePage() {
                             </div>
                         )}
 
-                        {/* Activity Tab */}
-                        {activeTab === "activity" && (
-                            <div className="space-y-6">
-                                <h2 className="text-xl font-semibold text-white">Your Activity</h2>
-
-                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                                    <div className="rounded-xl border border-white/10 p-4 transition-all hover:bg-white/5">
-                                        <div className="text-2xl font-bold text-indigo-400">{stats?.total_chats || 0}</div>
-                                        <div className="text-xs text-gray-400">Total Conversations</div>
-                                    </div>
-                                    <div className="rounded-xl border border-white/10 p-4 transition-all hover:bg-white/5">
-                                        <div className="text-2xl font-bold text-purple-400">{stats?.total_videos || 0}</div>
-                                        <div className="text-xs text-gray-400">Videos Uploaded</div>
-                                    </div>
-                                    <div className="rounded-xl border border-white/10 p-4 transition-all hover:bg-white/5">
-                                        <div className="text-2xl font-bold text-green-400">Active</div>
-                                        <div className="text-xs text-gray-400">Account Status</div>
-                                    </div>
-                                </div>
-
-                                <div className="mt-8">
-                                    <h3 className="mb-4 text-sm font-medium uppercase text-gray-500">Recent History</h3>
-                                    <div className="space-y-3">
-                                        {/* Placeholder for recent activity items */}
-                                        <div className="flex items-center justify-between rounded-lg border border-white/10 p-3 transition-colors hover:bg-white/5">
-                                            <div className="flex items-center gap-3">
-                                                <div className="rounded bg-indigo-500/20 p-2 text-indigo-400">💬</div>
-                                                <div>
-                                                    <div className="text-sm font-medium text-gray-200">Chat Session</div>
-                                                    <div className="text-xs text-gray-500">Started 2 hours ago</div>
-                                                </div>
-                                            </div>
-                                            <Link href="/chat" className="text-xs text-indigo-400 hover:text-indigo-300">View</Link>
-                                        </div>
-
-                                        <div className="flex items-center justify-between rounded-lg border border-white/10 p-3 transition-colors hover:bg-white/5">
-                                            <div className="flex items-center gap-3">
-                                                <div className="rounded bg-purple-500/20 p-2 text-purple-400">📹</div>
-                                                <div>
-                                                    <div className="text-sm font-medium text-gray-200">Deepfake Analysis</div>
-                                                    <div className="text-xs text-gray-500">Uploaded yesterday</div>
-                                                </div>
-                                            </div>
-                                            <Link href="/upload" className="text-xs text-indigo-400 hover:text-indigo-300">View</Link>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
+                        {/* Activity Tab removed to prevent network errors when stats are unavailable */}
 
                         {/* Data Tab */}
                         {activeTab === "data" && (

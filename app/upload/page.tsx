@@ -9,6 +9,14 @@ interface AnalysisResult {
   confidence: number;
 }
 
+interface VideoHistoryItem {
+  id: string;
+  filename: string;
+  result: string;
+  confidence: number;
+  created_at: string;
+}
+
 export default function UploadPage() {
   const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
@@ -18,9 +26,48 @@ export default function UploadPage() {
   const [progress, setProgress] = useState<string>("");
   const [modelLoading, setModelLoading] = useState(false);
   const [heartbeat, setHeartbeat] = useState(0);
+  const [history, setHistory] = useState<VideoHistoryItem[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
 
   // Don't preload model - load only when user uploads video to keep page responsive
   // Model will be loaded on-demand when user clicks "Initiate Scan"
+
+  // Fetch user's video history
+  useEffect(() => {
+    const fetchHistory = async () => {
+      const token = window.localStorage.getItem("realeye_token");
+      if (!token) return;
+
+      setHistoryLoading(true);
+      try {
+        // First get user profile to get email
+        const profileRes = await fetch("http://localhost:4000/api/auth/me", {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        if (profileRes.ok) {
+          const profile = await profileRes.json();
+          const userEmail = profile.email;
+
+          // Fetch predictions for this user
+          const historyRes = await fetch(`http://localhost:4000/api/predictions?user_email=${encodeURIComponent(userEmail)}&limit=10`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+
+          if (historyRes.ok) {
+            const data = await historyRes.json();
+            setHistory(data.predictions || []);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load history:", err);
+      } finally {
+        setHistoryLoading(false);
+      }
+    };
+
+    fetchHistory();
+  }, [result]); // Refetch when new result is added
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -321,6 +368,66 @@ export default function UploadPage() {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* History Section */}
+        <div className="mt-16">
+          <h2 className="mb-6 text-center font-nacelle text-2xl font-semibold text-white md:text-3xl">
+            <span className="bg-gradient-to-r from-indigo-200 via-white to-indigo-200 bg-clip-text text-transparent">
+              Your Analysis History
+            </span>
+          </h2>
+          
+          {historyLoading ? (
+            <div className="flex justify-center py-12">
+              <div className="animate-pulse text-indigo-400">Loading history...</div>
+            </div>
+          ) : history.length === 0 ? (
+            <div className="rounded-xl border border-white/10 p-8 text-center">
+              <p className="text-gray-400">No analysis history yet. Upload a video to get started!</p>
+            </div>
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {history.map((item) => (
+                <div
+                  key={item.id}
+                  className="group rounded-xl border border-white/10 p-4 transition-all hover:border-indigo-500/50 hover:bg-white/5"
+                >
+                  <div className="mb-3 flex items-start justify-between">
+                    <div className="flex-1 min-w-0">
+                      <p className="truncate text-sm font-medium text-white">{item.filename}</p>
+                      <p className="mt-1 text-xs text-gray-500">
+                        {new Date(item.created_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <span className={`ml-2 inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
+                      item.result === "FAKE" || item.confidence > 0.6
+                        ? "bg-red-500/10 text-red-400 ring-1 ring-red-500/20"
+                        : item.confidence > 0.3
+                        ? "bg-yellow-500/10 text-yellow-400 ring-1 ring-yellow-500/20"
+                        : "bg-green-500/10 text-green-400 ring-1 ring-green-500/20"
+                    }`}>
+                      {item.result === "FAKE" || item.confidence > 0.6 ? "FAKE" : item.confidence > 0.3 ? "UNCERTAIN" : "REAL"}
+                    </span>
+                  </div>
+                  <div className="mt-3">
+                    <div className="mb-1 flex items-center justify-between text-xs">
+                      <span className="text-gray-500">Confidence</span>
+                      <span className="font-mono text-gray-300">{(item.confidence * 100).toFixed(1)}%</span>
+                    </div>
+                    <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-800">
+                      <div
+                        className={`h-full transition-all ${
+                          item.confidence > 0.6 ? "bg-red-500" : item.confidence > 0.3 ? "bg-yellow-500" : "bg-green-500"
+                        }`}
+                        style={{ width: `${item.confidence * 100}%` }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </section>

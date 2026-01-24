@@ -50,7 +50,7 @@ export default function Features() {
           {/* Features image with enhanced styling */}
           <div className="flex justify-center pb-4 md:pb-12" data-aos="fade-up">
             <Image
-              className="mx-auto w-full max-w-[200px]"
+              className="mx-auto w-full max-w-[140px]"
               src={FeaturesImage}
               width={960}
               height={360}

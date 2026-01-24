@@ -23,12 +23,24 @@ async def get_user_stats(request: Request):
     chats = ChatModel.get_user_sessions(user_email) or []
     total_chats = len(chats)
     
-    # Video Stats (Placeholder until VideoModel exists)
-    total_videos = 0 
+    # Video Stats - Count predictions for this user
+    try:
+        from fastapi_backend.database import predictions_col
+        video_predictions = list(predictions_col.find({"user_email": user_email}))
+        total_videos = len(video_predictions)
+        last_prediction = video_predictions[0] if video_predictions else None
+        # Sort by created_at descending
+        if video_predictions:
+            video_predictions.sort(key=lambda x: x.get("created_at", ""), reverse=True)
+            last_prediction = video_predictions[0]
+    except Exception as e:
+        print(f"Error fetching video stats: {e}")
+        total_videos = 0
+        last_prediction = None
     
     return {
         "total_chats": total_chats,
         "total_videos": total_videos,
-        "last_prediction": None, # Placeholder
+        "last_prediction": last_prediction,
         "last_chat_session": chats[0] if chats else None
     }
