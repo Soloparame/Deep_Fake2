@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 
 const faqs = [
   {
@@ -75,7 +76,7 @@ export default function Testimonials() {
             Frequently Asked Questions
           </h2>
           <p className="text-lg text-indigo-200/65">
-            Everything you need to know about RealEye's deepfake detection capabilities, 
+            Everything you need to know about RealEye's deepfake detection capabilities,
             privacy features, and technical specifications.
           </p>
         </div>
@@ -86,11 +87,10 @@ export default function Testimonials() {
             {categories.map((category) => (
               <button
                 key={category.id}
-                className={`flex h-8 items-center gap-2.5 whitespace-nowrap rounded-full px-4 text-sm font-medium transition-colors focus-visible:outline-hidden focus-visible:ring-3 focus-visible:ring-indigo-200 ${
-                  activeCategory === category.id
-                    ? "relative bg-linear-to-b from-gray-900 via-gray-800/60 to-gray-900 before:pointer-events-none before:absolute before:inset-0 before:rounded-[inherit] before:border before:border-transparent before:[background:linear-gradient(to_bottom,--theme(--color-indigo-500/0),--theme(--color-indigo-500/.5))_border-box] before:[mask-composite:exclude_!important] before:[mask:linear-gradient(white_0_0)_padding-box,_linear-gradient(white_0_0)]"
-                    : "opacity-65 transition-opacity hover:opacity-90"
-                }`}
+                className={`flex h-8 items-center gap-2.5 whitespace-nowrap rounded-full px-4 text-sm font-medium transition-colors focus-visible:outline-hidden focus-visible:ring-3 focus-visible:ring-indigo-200 ${activeCategory === category.id
+                  ? "relative bg-linear-to-b from-gray-900 via-gray-800/60 to-gray-900 before:pointer-events-none before:absolute before:inset-0 before:rounded-[inherit] before:border before:border-transparent before:[background:linear-gradient(to_bottom,--theme(--color-indigo-500/0),--theme(--color-indigo-500/.5))_border-box] before:[mask-composite:exclude_!important] before:[mask:linear-gradient(white_0_0)_padding-box,_linear-gradient(white_0_0)]"
+                  : "opacity-65 transition-opacity hover:opacity-90"
+                  }`}
                 onClick={() => {
                   setActiveCategory(category.id);
                   setOpenIndex(0);
@@ -139,12 +139,12 @@ export default function Testimonials() {
           <p className="mb-4 text-indigo-200/65">
             Still have questions?
           </p>
-          <a
-            href="#0"
+          <Link
+            href="/contact"
             className="btn-sm bg-linear-to-t from-indigo-600 to-indigo-500 bg-[length:100%_100%] bg-[bottom] py-[5px] text-white shadow-[inset_0px_1px_0px_0px_--theme(--color-white/.16)] hover:bg-[length:100%_150%]"
           >
             Contact Support
-          </a>
+          </Link>
         </div>
       </div>
     </div>

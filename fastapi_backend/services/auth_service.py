@@ -109,3 +109,52 @@ class AuthService:
         if not updated:
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to update password")
         return {"message": "Password updated successfully"}
+
+    @staticmethod
+    def request_password_reset(email: str):
+        """Generate and store password reset token"""
+        user = UserModel.get_by_email(email)
+        if not user:
+            # Don't reveal if user exists for security
+            return {"message": "If an account exists with this email, a reset link has been sent."}
+        
+        # Generate reset token
+        reset_token = f"reset_{uuid.uuid4()}_{uuid.uuid4()}"
+        from datetime import datetime, timedelta
+        expires_at = datetime.utcnow() + timedelta(hours=1)  # Token valid for 1 hour
+        
+        UserModel.set_reset_token(email, reset_token, expires_at)
+        
+        # In production, send email here with reset link
+        # For now, return token in response (remove in production!)
+        reset_link = f"http://localhost:3000/reset-password?token={reset_token}"
+        
+        return {
+            "message": "Password reset link has been sent to your email.",
+            "reset_token": reset_token,  # Remove in production!
+            "reset_link": reset_link  # Remove in production!
+        }
+
+    @staticmethod
+    def reset_password(reset_token: str, new_password: str):
+        """Reset password using reset token"""
+        user = UserModel.get_by_reset_token(reset_token)
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid or expired reset token"
+            )
+        
+        # Update password
+        new_hash = hashlib.sha256(new_password.encode("utf-8")).hexdigest()
+        updated = UserModel.update_password_by_email(user["email"], new_hash)
+        if not updated:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to reset password"
+            )
+        
+        # Clear reset token
+        UserModel.clear_reset_token(user["email"])
+        
+        return {"message": "Password has been reset successfully"}

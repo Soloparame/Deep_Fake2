@@ -19,7 +19,6 @@ except ImportError as e:
 
 # Global variable to hold the model
 _model = None
-MOCK_MODE = False
 
 def load_model():
     """
@@ -42,7 +41,6 @@ def load_model():
         Exception: If model loading fails (corrupted file, version mismatch, etc.)
     """
     global _model
-    global MOCK_MODE
     
     if not TF_AVAILABLE:
         logger.error("TensorFlow is not available. Cannot load model.")
@@ -177,11 +175,7 @@ def load_model():
                         raise RuntimeError(error_msg) from last_error
 
         if _model is None:
-            # If model loading fails, enable mock mode for development/testing
-            logger.warning("⚠️  Model loading failed - enabling MOCK MODE for development")
-            logger.warning("⚠️  The API will return mock predictions for testing purposes")
-            MOCK_MODE = True
-            logger.info("✅ Mock mode enabled - API will work with simulated predictions")
+            raise RuntimeError("Model could not be loaded.")
         
         # Log model summary for debugging
         logger.info("Model loaded successfully!")
@@ -193,11 +187,8 @@ def load_model():
     except Exception as e:
         error_msg = f"Failed to load model: {str(e)}"
         logger.error(error_msg)
-        # Enable mock mode for development/testing
-        logger.warning("⚠️  Model loading failed - enabling MOCK MODE for development")
-        logger.warning("⚠️  The API will return mock predictions for testing purposes")
-        MOCK_MODE = True
-        logger.info("✅ Mock mode enabled - API will work with simulated predictions")
+        raise e
+
 
 def preprocess_frame(frame, target_size: tuple) -> np.ndarray:
     """
@@ -264,44 +255,13 @@ def predict_video(video_path: str) -> dict:
         RuntimeError: If model is not loaded
         ValueError: If video file cannot be opened or processed
     """
-    global _model, MOCK_MODE
+    global _model
     
     # Check if model is loaded
-    if _model is None and not MOCK_MODE:
-        error_msg = "Model is not loaded and Mock Mode is disabled. Check server logs."
+    if _model is None:
+        error_msg = "Model is not loaded. Please ensure the model file exists at the correct path."
         logger.error(error_msg)
         raise RuntimeError(error_msg)
-
-    if MOCK_MODE:
-        logger.warning("Running prediction in MOCK MODE (Real model unavailable).")
-        import time
-        import random
-        
-        # Simulate processing time
-        time.sleep(1.5)
-        
-        # Simulate a result (mostly REAL for test, occasionally FAKE)
-        p_fake = 0.10 + (random.random() * 0.10)  # 10%–20% fake probability baseline
-        # Occasionally produce higher fake probability
-        if random.random() > 0.7:
-            p_fake = 0.70 + (random.random() * 0.25)  # 70%–95%
-
-        score = float(p_fake)
-        if score > 0.5:
-            label = "FAKE"
-            message = "The video is likely manipulated."
-        else:
-            label = "REAL"
-            message = "The video appears authentic."
-        
-        return {
-            "label": label,
-            "score": score,
-            "probability": score,
-            "classification": label,
-            "message": message,
-            "mock_mode": True
-        }
 
     # Open video file
     cap = cv2.VideoCapture(video_path)
@@ -481,7 +441,7 @@ def predict_video(video_path: str) -> dict:
         score = float(avg_confidence)
         
         # Thresholding
-        if score > 0.5:
+        if score > settings.FAKE_THRESHOLD:
             label = "FAKE"
             message = "The video is likely manipulated."
         else:
