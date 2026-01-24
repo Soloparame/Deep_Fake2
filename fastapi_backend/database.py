@@ -28,6 +28,8 @@ db = None
 users_col = None
 predictions_col = None
 chats_col = None
+challenge_videos_col = None
+community_votes_col = None
 
 # Try to connect to MongoDB, but don't fail if connection is not available
 try:
@@ -48,6 +50,8 @@ try:
     chats_col = db["chats"]
     chat_sessions_col = db["chat_sessions"]
     knowledge_col = db["knowledge_base"]
+    challenge_videos_col = db["challenge_videos"]
+    community_votes_col = db["community_votes"]
     
 except Exception as e:
     print(f"⚠️  MongoDB connection failed: {e}")

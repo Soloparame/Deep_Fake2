@@ -99,6 +99,9 @@ coverage.xml
 .pytest_cache/
 cover/
 
+# Uploads
+temp_uploads/
+
 # Jupyter Notebook
 .ipynb_checkpoints
 

@@ -8,7 +8,8 @@ class Settings:
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     
     # Model path (full Saved Keras model)
-    MODEL_PATH = os.path.join(BASE_DIR, "models", "deepfake_detector.keras")
+    # MODEL_PATH = os.path.join(BASE_DIR, "models", "deepfake_detector.keras")
+    MODEL_PATH = os.path.join(os.path.dirname(BASE_DIR), "realeye_deepfake_detector.keras")
     
     # Video processing settings
     MAX_FRAMES_TO_PROCESS = 15  # Number of frames to sample

@@ -20,6 +20,15 @@ except ImportError as e:
 # Global variable to hold the model
 _model = None
 
+def set_model_path(new_path: str):
+    """
+    Update the active model path and reload the model.
+    """
+    if not isinstance(new_path, str) or not new_path:
+        raise ValueError("Invalid model path")
+    settings.MODEL_PATH = new_path
+    load_model()
+
 def load_model():
     """
     Loads the TensorFlow/Keras model from disk.

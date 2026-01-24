@@ -93,11 +93,13 @@ export default function UploadPage() {
       setHeartbeat(prev => prev + 1);
       // Force UI update to show responsiveness
       if (document.activeElement) {
-        document.activeElement.blur();
+        const ae = document.activeElement as HTMLElement | null;
+        ae?.blur();
         setTimeout(() => {
           if (document.body) {
-            document.body.focus();
-            document.body.blur();
+            const bodyEl = document.body as HTMLElement;
+            bodyEl.focus();
+            bodyEl.blur();
           }
         }, 0);
       }

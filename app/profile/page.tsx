@@ -40,7 +40,7 @@ export default function ProfilePage() {
                 // Fetch User Info
                 // Note: You'll need to implement this endpoint in backend
                 const userRes = await fetch("http://localhost:4000/api/auth/me", {
-                    headers: { Authorization: `Bearer ${token}` }
+                    headers: { Authorization: Bearer ${token} }
                 });
 
                 if (userRes.ok) {
@@ -85,8 +85,7 @@ export default function ProfilePage() {
                 <div className="absolute left-[20%] top-[20%] h-96 w-96 rounded-full bg-indigo-600/10 blur-[100px] animate-pulse"></div>
                 <div className="absolute right-[20%] bottom-[20%] h-64 w-64 rounded-full bg-violet-600/10 blur-[80px]"></div>
             </div>
-
-            <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
                 <div className="mb-8 flex flex-col items-start justify-between gap-4 border-b border-gray-800 pb-6 sm:flex-row sm:items-center">
                     <div>
                         <h1 className="animate-[gradient_6s_linear_infinite] bg-[linear-gradient(to_right,var(--color-gray-200),var(--color-indigo-200),var(--color-gray-50),var(--color-indigo-300),var(--color-gray-200))] bg-[length:200%_auto] bg-clip-text pb-1 font-nacelle text-3xl font-semibold text-transparent md:text-4xl">
@@ -96,10 +95,10 @@ export default function ProfilePage() {
                     </div>
                     <div className="flex items-center gap-3">
                         <div className="h-12 w-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-xl font-bold text-white ring-2 ring-white/20 shadow-lg shadow-indigo-500/30">
-                            {profile?.email?.[0].toUpperCase() || "U"}
+                            {profile?.email?.[0].toUpperCase()  "U"}
                         </div>
                         <div className="text-right hidden sm:block">
-                            <div className="text-sm font-medium text-white">{profile?.name || "User"}</div>
+                            <div className="text-sm font-medium text-white">{profile?.name  "User"}</div>
                             <div className="text-xs text-gray-500">{profile?.email}</div>
                         </div>
                     </div>
@@ -135,8 +134,7 @@ export default function ProfilePage() {
 
                     {/* Main Content Area */}
                     <div className="p-6 lg:col-span-3">
-
-                        {/* Identity Tab */}
+                      {/* Identity Tab */}
                         {activeTab === "identity" && (
                             <div className="space-y-6">
                                 <h2 className="text-xl font-semibold text-white">Identity Information</h2>
@@ -153,7 +151,7 @@ export default function ProfilePage() {
                                         <div className="space-y-2">
                                             <label className="text-xs font-medium uppercase text-gray-500">Full Name</label>
                                             <div className="rounded-lg border border-white/10 p-3 text-gray-300">
-                                                {profile?.name || "Not set"}
+                                                {profile?.name  "Not set"}
                                             </div>
                                         </div>
                                         <div className="space-y-2">
@@ -189,7 +187,7 @@ export default function ProfilePage() {
                                                 <input
                                                     type="password"
                                                     className="mt-1 w-full rounded-lg border border-white/10 px-3 py-2 text-gray-200 outline-none transition-all focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10"
-                                                    value={pwdCurrent}
+                                                  value={pwdCurrent}
                                                     onChange={(e) => setPwdCurrent(e.target.value)}
                                                     placeholder="••••••••"
                                                 />
@@ -225,14 +223,14 @@ export default function ProfilePage() {
                                                         });
                                                         const data = await res.json().catch(() => ({}));
                                                         if (!res.ok) {
-                                                            setPwdMsg(data?.detail || data?.message || "Failed to change password");
+                                                            setPwdMsg(data?.detail  data?.message  "Failed to change password");
                                                             return;
                                                         }
                                                         setPwdMsg("Password updated successfully");
                                                         setPwdCurrent("");
                                                         setPwdNew("");
                                                     } catch (err: any) {
-                                                        setPwdMsg(err.message || "Failed to change password");
+                                                        setPwdMsg(err.message  "Failed to change password");
                                                     }
                                                 }}
                                                 className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition-colors"
@@ -242,8 +240,7 @@ export default function ProfilePage() {
                                         </div>
                                     </div>
                                 </div>
-
-                                <div className="rounded-xl border border-white/10 p-4">
+                          <div className="rounded-xl border border-white/10 p-4">
                                     <div className="flex items-center justify-between">
                                         <div>
                                             <h3 className="font-medium text-white">Active Sessions</h3>
@@ -297,8 +294,7 @@ export default function ProfilePage() {
                                         </div>
                                         <span className="text-2xl transition-transform group-hover:scale-110">📹</span>
                                     </Link>
-
-                                    <div className="group flex items-center justify-between rounded-xl border border-white/10 p-4 transition-all hover:bg-white/5">
+                                  <div className="group flex items-center justify-between rounded-xl border border-white/10 p-4 transition-all hover:bg-white/5">
                                         <div>
                                             <h3 className="font-medium text-white">Download All Data</h3>
                                             <p className="text-xs text-gray-400">Get a copy of everything we know about you.</p>
