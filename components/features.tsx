@@ -73,11 +73,12 @@ export default function Features() {
                 />
               </svg>
               <h3 className="mb-1 font-nacelle text-[1rem] font-semibold text-gray-200">
-                Face Detection & Analysis
+                AI-Powered Face Detection & Deep Analysis
               </h3>
               <p className="text-indigo-200/65">
-                Advanced face detection using MTCNN and Dlib to extract and analyze facial regions
-                for deepfake identification.
+                Utilizes advanced face detection algorithms including MTCNN and Dlib to precisely extract 
+                facial regions from video frames, followed by comprehensive deep learning analysis to identify 
+                subtle manipulation artifacts and deepfake patterns that are invisible to the human eye.
               </p>
             </article>
             <article>
