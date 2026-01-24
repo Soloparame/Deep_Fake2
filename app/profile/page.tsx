@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import PageIllustration from "@/components/page-illustration";
+
 
 interface UserProfile {
     email: string;
@@ -93,9 +93,10 @@ export default function ProfilePage() {
 
     return (
         <section className="relative min-h-screen overflow-hidden bg-gray-900 pt-24 pb-12">
-            {/* Background Gradients */}
-            <div className="absolute top-0 left-0 -z-10 h-full w-full overflow-hidden">
-                <PageIllustration multiple />
+            {/* Background Decor */}
+            <div className="absolute inset-0 -z-10">
+                <div className="absolute left-[20%] top-[20%] h-96 w-96 rounded-full bg-indigo-600/10 blur-[100px] animate-pulse"></div>
+                <div className="absolute right-[20%] bottom-[20%] h-64 w-64 rounded-full bg-violet-600/10 blur-[80px]"></div>
             </div>
 
             <div className="mx-auto max-w-6xl px-4 sm:px-6">
@@ -152,31 +153,27 @@ export default function ProfilePage() {
                         {activeTab === "identity" && (
                             <div className="space-y-6">
                                 <h2 className="text-xl font-semibold text-white">Identity Information</h2>
-                                <div className="grid gap-6 md:grid-cols-2">
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-medium uppercase text-gray-500">Email Address</label>
-                                        <div className="rounded-lg border border-white/10 bg-gray-900/50 p-3 text-gray-300 backdrop-blur-sm">
-                                            {profile?.email}
-                                            <span className="ml-2 inline-flex items-center rounded-full bg-green-500/10 px-2 py-0.5 text-xs font-medium text-green-400 ring-1 ring-green-500/20">Verified</span>
+                                <div className="group relative overflow-hidden rounded-xl bg-gray-900/50 p-6 transition-all before:pointer-events-none before:absolute before:inset-0 before:rounded-[inherit] before:border before:border-transparent before:[background:linear-gradient(to_right,var(--color-gray-800),var(--color-gray-700),var(--color-gray-800))_border-box] before:[mask-composite:exclude_!important] before:[mask:linear-gradient(white_0_0)_padding-box,_linear-gradient(white_0_0)]">
+                                    <div className="relative z-10 grid gap-6 md:grid-cols-2">
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-medium uppercase text-gray-500">Email Address</label>
+                                            <div className="rounded-lg border border-white/10 bg-gray-900/50 p-3 text-gray-300 backdrop-blur-sm">
+                                                {profile?.email}
+                                                <span className="ml-2 inline-flex items-center rounded-full bg-green-500/10 px-2 py-0.5 text-xs font-medium text-green-400 ring-1 ring-green-500/20">Verified</span>
+                                            </div>
+                                            <p className="text-xs text-indigo-200/50">Your email is your primary identity.</p>
                                         </div>
-                                        <p className="text-xs text-indigo-200/50">Your email is your primary identity.</p>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-medium uppercase text-gray-500">Full Name</label>
-                                        <div className="rounded-lg border border-white/10 bg-gray-900/50 p-3 text-gray-300 backdrop-blur-sm">
-                                            {profile?.name || "Not set"}
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-medium uppercase text-gray-500">Full Name</label>
+                                            <div className="rounded-lg border border-white/10 bg-gray-900/50 p-3 text-gray-300 backdrop-blur-sm">
+                                                {profile?.name || "Not set"}
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-medium uppercase text-gray-500">Account Created</label>
-                                        <div className="rounded-lg border border-white/10 bg-gray-900/50 p-3 text-gray-300 backdrop-blur-sm">
-                                            {profile?.created_at ? new Date(profile.created_at).toLocaleDateString() : "Unknown"}
-                                        </div>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-medium uppercase text-gray-500">User ID</label>
-                                        <div className="rounded-lg border border-white/10 bg-gray-900/50 p-3 font-mono text-xs text-gray-400 backdrop-blur-sm">
-                                            {profile?.id || "unknown"}
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-medium uppercase text-gray-500">Account Created</label>
+                                            <div className="rounded-lg border border-white/10 bg-gray-900/50 p-3 text-gray-300 backdrop-blur-sm">
+                                                {profile?.created_at ? new Date(profile.created_at).toLocaleDateString() : "Unknown"}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -191,8 +188,8 @@ export default function ProfilePage() {
                                     <p className="text-sm text-gray-400">Manage your password and session security.</p>
                                 </div>
 
-                                <div className="space-y-4 rounded-xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
-                                    <div className="space-y-3">
+                                <div className="group relative overflow-hidden rounded-xl bg-gray-900/50 p-6 transition-all before:pointer-events-none before:absolute before:inset-0 before:rounded-[inherit] before:border before:border-transparent before:[background:linear-gradient(to_right,var(--color-gray-800),var(--color-gray-700),var(--color-gray-800))_border-box] before:[mask-composite:exclude_!important] before:[mask:linear-gradient(white_0_0)_padding-box,_linear-gradient(white_0_0)]">
+                                    <div className="relative z-10 space-y-3">
                                         <h3 className="font-medium text-white">Change Password</h3>
                                         {pwdMsg && (
                                             <div className={`rounded-lg border px-3 py-2 text-sm ${pwdMsg.includes("success") ? "border-green-500/20 bg-green-500/10 text-green-400" : "border-red-500/20 bg-red-500/10 text-red-400"}`}>
@@ -259,8 +256,8 @@ export default function ProfilePage() {
                                     </div>
                                 </div>
 
-                                <div className="space-y-4 rounded-xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
-                                    <div className="flex items-center justify-between">
+                                <div className="group relative overflow-hidden rounded-xl bg-gray-900/50 p-4 transition-all before:pointer-events-none before:absolute before:inset-0 before:rounded-[inherit] before:border before:border-transparent before:[background:linear-gradient(to_right,var(--color-gray-800),var(--color-gray-700),var(--color-gray-800))_border-box] before:[mask-composite:exclude_!important] before:[mask:linear-gradient(white_0_0)_padding-box,_linear-gradient(white_0_0)]">
+                                    <div className="relative z-10 flex items-center justify-between">
                                         <div>
                                             <h3 className="font-medium text-white">Active Sessions</h3>
                                             <p className="text-xs text-gray-400">You are currently logged in on this device.</p>

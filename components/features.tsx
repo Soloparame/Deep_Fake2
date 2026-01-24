@@ -43,14 +43,14 @@ export default function Features() {
               Powered by State-of-the-Art Technology
             </h2>
             <p className="text-lg text-indigo-200/65">
-              RealEye leverages deep neural networks, including XceptionNet and EfficientNet, 
+              RealEye leverages deep neural networks, including XceptionNet and EfficientNet,
               to analyze visual features and identify AI-generated content with high accuracy.
             </p>
           </div>
           {/* Features image with enhanced styling */}
           <div className="flex justify-center pb-4 md:pb-12" data-aos="fade-up">
             <Image
-              className="mx-auto w-full max-w-4xl"
+              className="mx-auto w-full max-w-[200px]"
               src={FeaturesImage}
               width={960}
               height={360}
@@ -76,7 +76,7 @@ export default function Features() {
                 Face Detection & Analysis
               </h3>
               <p className="text-indigo-200/65">
-                Advanced face detection using MTCNN and Dlib to extract and analyze facial regions 
+                Advanced face detection using MTCNN and Dlib to extract and analyze facial regions
                 for deepfake identification.
               </p>
             </article>
@@ -94,7 +94,7 @@ export default function Features() {
                 Frame Extraction
               </h3>
               <p className="text-indigo-200/65">
-                Automated frame extraction using OpenCV and FFmpeg to process videos 
+                Automated frame extraction using OpenCV and FFmpeg to process videos
                 and prepare them for deep learning analysis.
               </p>
             </article>
@@ -115,7 +115,7 @@ export default function Features() {
                 Real-Time Analysis
               </h3>
               <p className="text-indigo-200/65">
-                Fast and efficient video processing with optimized algorithms to deliver 
+                Fast and efficient video processing with optimized algorithms to deliver
                 detection results in seconds.
               </p>
             </article>
@@ -143,7 +143,7 @@ export default function Features() {
                 High Accuracy Detection
               </h3>
               <p className="text-indigo-200/65">
-                State-of-the-art models trained on extensive datasets to identify 
+                State-of-the-art models trained on extensive datasets to identify
                 deepfakes with confidence scores and detailed analysis.
               </p>
             </article>
@@ -165,7 +165,7 @@ export default function Features() {
                 Privacy Focused
               </h3>
               <p className="text-indigo-200/65">
-                Your uploaded videos are processed securely and deleted immediately after analysis 
+                Your uploaded videos are processed securely and deleted immediately after analysis
                 to protect your privacy.
               </p>
             </article>
@@ -186,7 +186,7 @@ export default function Features() {
                 Detailed Reports
               </h3>
               <p className="text-indigo-200/65">
-                Receive comprehensive analysis reports with confidence scores, 
+                Receive comprehensive analysis reports with confidence scores,
                 visual indicators, and verification status.
               </p>
             </article>
