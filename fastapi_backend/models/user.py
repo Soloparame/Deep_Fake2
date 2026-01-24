@@ -41,3 +41,33 @@ class UserModel:
     def update_last_login_by_id(user_id: str, dt: datetime.datetime) -> bool:
         res = users_col.update_one({"id": user_id}, {"$set": {"last_login": dt}})
         return getattr(res, "matched_count", 0) > 0
+
+    @staticmethod
+    def set_reset_token(email: str, token: str, expires_at: datetime.datetime) -> bool:
+        """Store password reset token for user"""
+        res = users_col.update_one(
+            {"email": email},
+            {"$set": {"reset_token": token, "reset_token_expires": expires_at}}
+        )
+        return getattr(res, "matched_count", 0) > 0
+
+    @staticmethod
+    def get_by_reset_token(token: str) -> Optional[Dict[str, Any]]:
+        """Get user by reset token if valid"""
+        user = users_col.find_one({"reset_token": token})
+        if user and user.get("reset_token_expires"):
+            expires = user.get("reset_token_expires")
+            if isinstance(expires, str):
+                expires = datetime.datetime.fromisoformat(expires.replace('Z', '+00:00'))
+            if expires > datetime.datetime.utcnow():
+                return user
+        return None
+
+    @staticmethod
+    def clear_reset_token(email: str) -> bool:
+        """Clear reset token after successful password reset"""
+        res = users_col.update_one(
+            {"email": email},
+            {"$unset": {"reset_token": "", "reset_token_expires": ""}}
+        )
+        return getattr(res, "matched_count", 0) > 0

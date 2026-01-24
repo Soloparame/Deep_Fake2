@@ -90,7 +90,7 @@ class DeepfakeDetector {
       };
 
       xhr.onerror = () => {
-        reject(new Error("Network error occurred"));
+        reject(new Error(`Network error occurred while connecting to ${this.BACKEND_URL}/detect-video. Please ensure the backend server is running.`));
       };
 
       xhr.send(formData);

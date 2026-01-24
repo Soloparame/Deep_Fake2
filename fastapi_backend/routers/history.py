@@ -248,3 +248,5 @@ async def get_prediction_stats(user_email: Optional[str] = Query(None)):
             detail=f"Failed to retrieve stats: {str(e)}"
         )
 
+
+

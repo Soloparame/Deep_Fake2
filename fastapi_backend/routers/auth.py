@@ -1,5 +1,5 @@
 from fastapi import APIRouter, status, Request, HTTPException
-from fastapi_backend.schemas.user import UserCreate, UserLogin, Token, ChangePassword
+from fastapi_backend.schemas.user import UserCreate, UserLogin, Token, ChangePassword, ForgotPasswordRequest, ResetPasswordRequest
 from fastapi_backend.services.auth_service import AuthService
 
 router = APIRouter()
@@ -25,3 +25,13 @@ async def change_password(request: Request, payload: ChangePassword):
     if not token:
         raise HTTPException(status_code=401, detail="Missing token")
     return AuthService.change_password(token, payload)
+
+@router.post("/forgot-password")
+async def forgot_password(payload: ForgotPasswordRequest):
+    """Request password reset - sends verification email"""
+    return AuthService.request_password_reset(payload.email)
+
+@router.post("/reset-password")
+async def reset_password(payload: ResetPasswordRequest):
+    """Reset password using reset token"""
+    return AuthService.reset_password(payload.token, payload.new_password)

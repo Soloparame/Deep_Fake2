@@ -289,3 +289,5 @@ This allows the app to work without MongoDB, but data is stored locally only.
 
 Once MongoDB is connected, all video detection results will be automatically saved to the database. You can query them using the API endpoints or view them in MongoDB Compass.
 
+
+

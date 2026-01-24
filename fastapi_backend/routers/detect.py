@@ -1,5 +1,6 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException, status, Request
 from fastapi_backend.services import model_service
+from fastapi_backend.services.auth_service import AuthService
 import shutil
 import os
 import uuid
@@ -15,6 +16,53 @@ from fastapi_backend.core.config import settings
 from fastapi import Form
 
 router = APIRouter()
+
+@router.post("/videos/upload")
+async def save_video_prediction(request: Request, video: UploadFile = File(...), analysis: str = None):
+    """
+    Save a video prediction result to history.
+    This endpoint is used by the frontend after client-side analysis.
+    """
+    import json
+    
+    # Extract user email from token
+    user_email = None
+    try:
+        token = request.headers.get("Authorization")
+        if token:
+            profile = AuthService.get_current_user_profile(token)
+            user_email = profile.get("email")
+    except:
+        pass
+    
+    # Parse analysis data if provided
+    analysis_data = {}
+    if analysis:
+        try:
+            analysis_data = json.loads(analysis)
+        except:
+            pass
+    
+    # Create prediction record
+    record = {
+        "id": str(uuid.uuid4()),
+        "user_email": user_email,
+        "filename": video.filename or "unknown",
+        "result": analysis_data.get("label", "UNKNOWN"),
+        "confidence": analysis_data.get("confidence", 0.0),
+        "message": analysis_data.get("message", ""),
+        "created_at": datetime.datetime.utcnow(),
+    }
+    
+    try:
+        if predictions_col:
+            predictions_col.insert_one(record)
+            return {"message": "Prediction saved successfully", "id": record["id"]}
+        else:
+            return {"message": "MongoDB not connected, prediction not saved"}
+    except Exception as e:
+        print(f"Failed to save prediction: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to save prediction: {str(e)}")
 
 class DetectionResponse(BaseModel):
     """
@@ -110,13 +158,21 @@ async def detect_video(request: Request, file: UploadFile = File(...)):
         result = model_service.predict_video(temp_path)
         
         # Persist prediction to MongoDB
-        user_email = request.headers.get("X-User-Email")
+        user_email = None
+        try:
+            token = request.headers.get("Authorization")
+            if token:
+                profile = AuthService.get_current_user_profile(token)
+                user_email = profile.get("email")
+        except:
+            pass  # If auth fails, continue without user_email
+        
         record = {
             "id": str(uuid.uuid4()),
             "user_email": user_email,
-            "filename": file.filename,
-            "label": result["label"],
-            "score": result["score"],
+            "filename": file.filename or "unknown",
+            "result": result["label"],  # Changed from "label" to "result" to match history API
+            "confidence": result["score"],  # Changed from "score" to "confidence" to match history API
             "message": result.get("message", ""),
             "created_at": datetime.datetime.utcnow(),
         }
