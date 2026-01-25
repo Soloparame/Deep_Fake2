@@ -336,7 +336,7 @@ export default function UploadPage() {
                             </p>
                           </div>
                           <div className="text-right">
-                            <p className="text-sm text-gray-400">Fake Probability</p>
+                            <p className="text-sm text-gray-400">Confidence Score</p>
                             <p className="mt-1 font-mono text-3xl font-bold text-white">{(result.confidence * 100).toFixed(1)}%</p>
                           </div>
                         </div>

@@ -327,7 +327,7 @@ export default function ChatPage() {
                     </div>
                   </div>
                 )}
-                {messages.map((m) => (
+                {messages.map((m, index) => (
                   <div
                     key={m.id}
                     className={`flex ${m.role === "user" ? "justify-end" : "justify-start"
@@ -360,6 +360,25 @@ export default function ChatPage() {
                     </div>
                   </div>
                 ))}
+                
+                {/* Show suggested questions after assistant's last message */}
+                {messages.length > 0 && messages[messages.length - 1]?.role === "assistant" && !loading && (
+                  <div className="mt-6 flex flex-col items-center">
+                    <p className="mb-4 text-sm text-gray-400">Suggested questions:</p>
+                    <div className="grid w-full max-w-lg grid-cols-1 gap-3 sm:grid-cols-2">
+                      {suggestedQuestions.map((q, i) => (
+                        <button
+                          key={i}
+                          onClick={(e) => handleSubmit(e as unknown as FormEvent, q)}
+                          className="rounded-xl border border-white/10 bg-white/5 p-3 text-left text-sm text-gray-300 transition-colors hover:border-indigo-500/50 hover:bg-white/10"
+                        >
+                          {q}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
                 {/* Scroll anchor */}
                 <div ref={messagesEndRef} />
               </div>

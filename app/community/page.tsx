@@ -88,7 +88,12 @@ export default function CommunityPage() {
           <p className="text-indigo-200/65">Video {idx + 1} of {videos.length} • Score {score}</p>
         </div>
         <div className="rounded-xl border border-white/10 p-4">
-          <video src={`http://localhost:4000${current.url}`} controls className="w-full rounded-lg" />
+          <video 
+            src={`http://localhost:4000${current.url}`} 
+            controls 
+            className="w-full rounded-lg aspect-video object-cover" 
+            style={{ maxHeight: '600px', minHeight: '400px' }}
+          />
         </div>
         <div className="mt-6 flex justify-center gap-4">
           <button className="btn bg-green-600 text-white" onClick={() => choose("REAL")} disabled={answered}>Real</button>

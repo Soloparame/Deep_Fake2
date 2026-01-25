@@ -117,22 +117,6 @@ export default function SignIn() {
             >
               {loading ? "Signing in..." : "Sign in"}
             </button>
-
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center" aria-hidden="true">
-                <div className="w-full border-t border-white/10"></div>
-              </div>
-              <div className="relative flex justify-center">
-                <span className="bg-transparent px-2 text-sm text-gray-500">or</span>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 font-medium text-gray-300 transition-all hover:bg-white/10 hover:text-white"
-            >
-              Sign In with Google (soon)
-            </button>
           </div>
         </form>
         {/* Bottom link */}
