@@ -319,8 +319,7 @@ export default function UploadPage() {
                       <div className="relative z-10 bg-gray-950/50 p-5">
                         <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-gray-500">
                           <span className={`inline-block h-2 w-2 rounded-full animate-pulse ${
-                            result.confidence <= 0.3 ? 'bg-green-500' : 
-                            result.confidence <= 0.6 ? 'bg-yellow-500' : 
+                            result.confidence <= 0.6 ? 'bg-green-500' : 
                             'bg-red-500'
                           }`}></span>
                           Analysis Complete
@@ -330,13 +329,10 @@ export default function UploadPage() {
                           <div>
                             <p className="text-sm text-gray-400">Detection Result</p>
                             <p className={`mt-1 text-3xl font-bold tracking-tight ${
-                              result.confidence <= 0.3 ? 'text-green-400' : 
-                              result.confidence <= 0.6 ? 'text-yellow-400' : 
+                              result.confidence <= 0.6 ? 'text-green-400' : 
                               'text-red-400'
                             }`}>
-                              {result.confidence <= 0.3 ? 'LIKELY REAL' : 
-                               result.confidence <= 0.6 ? 'UNCERTAIN' : 
-                               'LIKELY FAKE'}
+                              {result.confidence <= 0.6 ? 'REAL' : 'FAKE'}
                             </p>
                           </div>
                           <div className="text-right">
@@ -349,8 +345,7 @@ export default function UploadPage() {
                         <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-gray-800">
                           <div
                             className={`h-full rounded-full transition-all duration-1000 ease-out ${
-                              result.confidence <= 0.3 ? 'bg-green-500' : 
-                              result.confidence <= 0.6 ? 'bg-yellow-500' : 
+                              result.confidence <= 0.6 ? 'bg-green-500' : 
                               'bg-red-500'
                             }`}
                             style={{ width: `${result.confidence * 100}%` }}
@@ -403,11 +398,9 @@ export default function UploadPage() {
                     <span className={`ml-2 inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
                       item.result === "FAKE" || item.confidence > 0.6
                         ? "bg-red-500/10 text-red-400 ring-1 ring-red-500/20"
-                        : item.confidence > 0.3
-                        ? "bg-yellow-500/10 text-yellow-400 ring-1 ring-yellow-500/20"
                         : "bg-green-500/10 text-green-400 ring-1 ring-green-500/20"
                     }`}>
-                      {item.result === "FAKE" || item.confidence > 0.6 ? "FAKE" : item.confidence > 0.3 ? "UNCERTAIN" : "REAL"}
+                      {item.result === "FAKE" || item.confidence > 0.6 ? "FAKE" : "REAL"}
                     </span>
                   </div>
                   <div className="mt-3">
@@ -418,7 +411,7 @@ export default function UploadPage() {
                     <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-800">
                       <div
                         className={`h-full transition-all ${
-                          item.confidence > 0.6 ? "bg-red-500" : item.confidence > 0.3 ? "bg-yellow-500" : "bg-green-500"
+                          item.confidence > 0.6 ? "bg-red-500" : "bg-green-500"
                         }`}
                         style={{ width: `${item.confidence * 100}%` }}
                       />

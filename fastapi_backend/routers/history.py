@@ -87,7 +87,7 @@ async def get_predictions(
                 id=pred_id,
                 user_email=pred.get("user_email"),
                 filename=pred.get("filename", "unknown"),
-                result=pred.get("result", "UNKNOWN"),
+                result=pred.get("result", "REAL"),  # Default to REAL if not provided
                 confidence=pred.get("confidence", 0.0),
                 message=pred.get("message", ""),
                 created_at=pred.get("created_at", datetime.utcnow())
@@ -154,7 +154,7 @@ async def get_prediction_by_id(prediction_id: str):
             id=pred_id,
             user_email=pred.get("user_email"),
             filename=pred.get("filename", "unknown"),
-            result=pred.get("result", "UNKNOWN"),
+            result=pred.get("result", "REAL"),  # Default to REAL if not provided
             confidence=pred.get("confidence", 0.0),
             message=pred.get("message", ""),
             created_at=pred.get("created_at", datetime.utcnow())
@@ -247,6 +247,7 @@ async def get_prediction_stats(user_email: Optional[str] = Query(None)):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to retrieve stats: {str(e)}"
         )
+
 
 
 

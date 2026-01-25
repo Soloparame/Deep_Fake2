@@ -426,12 +426,13 @@ def predict_video(video_path: str) -> dict:
         # Validate we got predictions
         if not predictions:
             logger.warning("No frames could be processed/detected from the video.")
+            # Default to REAL if no predictions (conservative approach)
             return {
-                "label": "UNKNOWN",
+                "label": "REAL",
                 "score": 0.0,
                 "probability": 0.0,
-                "classification": "UNKNOWN",
-                "message": "No detectable face or valid frames found in the video."
+                "classification": "REAL",
+                "message": "No detectable face or valid frames found in the video. Defaulting to REAL."
             }
         
         logger.info(f"Processed frames, got {len(predictions)} predictions")
@@ -440,7 +441,7 @@ def predict_video(video_path: str) -> dict:
         avg_confidence = np.mean(predictions)
         score = float(avg_confidence)
         
-        # Thresholding
+        # Thresholding - only REAL or FAKE, no uncertainty
         if score > settings.FAKE_THRESHOLD:
             label = "FAKE"
             message = "The video is likely manipulated."

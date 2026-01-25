@@ -1,4 +1,32 @@
 import os
+from dotenv import load_dotenv, dotenv_values
+
+# Load environment variables from fastapi_backend/.env
+# Use same method as database.py to ensure consistency
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # fastapi_backend directory
+ENV_PATH = os.path.join(BASE_DIR, ".env")
+if not os.path.exists(ENV_PATH):
+    # Fallback: try current working directory
+    ENV_PATH = os.path.join(os.getcwd(), "fastapi_backend", ".env")
+    if not os.path.exists(ENV_PATH):
+        # Last fallback: try just .env in current directory
+        ENV_PATH = os.path.join(os.getcwd(), ".env")
+
+print(f"Loading email config from: {ENV_PATH}")
+print(f"File exists: {os.path.exists(ENV_PATH)}")
+
+# Load .env file and ensure variables are applied to process environment
+if os.path.exists(ENV_PATH):
+    values = dotenv_values(ENV_PATH)
+    if values:
+        for k, v in values.items():
+            if v is not None:
+                os.environ[k] = v
+    load_dotenv(ENV_PATH, override=True)
+    print(f"✅ Loaded .env file from: {ENV_PATH}")
+else:
+    print(f"⚠️  .env file not found at: {ENV_PATH}")
+    load_dotenv()
 
 class Settings:
     PROJECT_NAME: str = "RealEye Backend"
@@ -15,4 +43,29 @@ class Settings:
     INPUT_SHAPE = (224, 224)    # Adjust based on your model's requirement
     FAKE_THRESHOLD = 0.6        # Safer threshold to reduce false FAKEs
     
+    # Email/SMTP settings (for password reset)
+    SMTP_HOST: str = os.getenv("SMTP_HOST", "smtp.gmail.com")
+    SMTP_PORT: int = int(os.getenv("SMTP_PORT", "587"))
+    SMTP_USER: str = os.getenv("SMTP_USER", "")
+    SMTP_PASSWORD: str = os.getenv("SMTP_PASSWORD", "")
+    SMTP_FROM: str = os.getenv("SMTP_FROM", os.getenv("SMTP_USER", "noreply@realeye.com"))
+    
+    # Frontend URL for password reset links
+    FRONTEND_URL: str = os.getenv("FRONTEND_URL", "http://localhost:3000")
+    
 settings = Settings()
+
+# Print email config status on startup (for debugging)
+print(f"📧 Email Configuration Status:")
+print(f"   SMTP_HOST: {settings.SMTP_HOST}")
+print(f"   SMTP_PORT: {settings.SMTP_PORT}")
+print(f"   SMTP_USER: {settings.SMTP_USER if settings.SMTP_USER else '❌ Not set'}")
+print(f"   SMTP_PASSWORD: {'✅ Set (' + str(len(settings.SMTP_PASSWORD)) + ' chars)' if settings.SMTP_PASSWORD else '❌ Not set'}")
+print(f"   SMTP_FROM: {settings.SMTP_FROM}")
+print(f"   FRONTEND_URL: {settings.FRONTEND_URL}")
+
+# Debug: Show raw environment variables
+print(f"\n🔍 Debug - Raw Environment Variables:")
+print(f"   os.getenv('SMTP_USER'): {os.getenv('SMTP_USER', 'NOT FOUND')}")
+print(f"   os.getenv('SMTP_PASSWORD'): {'FOUND (' + str(len(os.getenv('SMTP_PASSWORD', ''))) + ' chars)' if os.getenv('SMTP_PASSWORD') else 'NOT FOUND'}")
+print(f"   os.getenv('SMTP_HOST'): {os.getenv('SMTP_HOST', 'NOT FOUND')}")

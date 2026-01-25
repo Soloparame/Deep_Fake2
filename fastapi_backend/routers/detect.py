@@ -42,7 +42,7 @@ async def save_video_prediction(request: Request, video: UploadFile = File(...),
         "id": str(uuid.uuid4()),
         "user_email": user_email,
         "filename": video.filename or "unknown",
-        "result": analysis_data.get("label", "UNKNOWN"),
+        "result": analysis_data.get("label", "REAL"),  # Default to REAL if not provided
         "confidence": analysis_data.get("confidence", 0.0),
         "message": analysis_data.get("message", ""),
         "created_at": datetime.datetime.utcnow(),
@@ -63,7 +63,7 @@ class DetectionResponse(BaseModel):
     Response model for video detection endpoint.
     Returns label (REAL/FAKE) and score (0-1).
     """
-    label: Literal["REAL", "FAKE", "UNKNOWN"]
+    label: Literal["REAL", "FAKE"]
     score: float
     probability: float
     classification: str

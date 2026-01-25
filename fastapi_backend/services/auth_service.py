@@ -3,6 +3,8 @@ import uuid
 from fastapi import HTTPException, status
 from fastapi_backend.models.user import UserModel
 from fastapi_backend.schemas.user import UserCreate, UserLogin, ChangePassword
+from fastapi_backend.services.email_service import EmailService
+from fastapi_backend.core.config import settings
 
 class AuthService:
     _token_store = {}  # Deprecated fallback for dev restarts
@@ -112,7 +114,7 @@ class AuthService:
 
     @staticmethod
     def request_password_reset(email: str):
-        """Generate and store password reset token"""
+        """Generate and store password reset token, then send verification email"""
         user = UserModel.get_by_email(email)
         if not user:
             # Don't reveal if user exists for security
@@ -125,15 +127,41 @@ class AuthService:
         
         UserModel.set_reset_token(email, reset_token, expires_at)
         
-        # In production, send email here with reset link
-        # For now, return token in response (remove in production!)
-        reset_link = f"http://localhost:3000/reset-password?token={reset_token}"
+        # Create reset link
+        reset_link = f"{settings.FRONTEND_URL}/reset-password?token={reset_token}"
         
-        return {
-            "message": "Password reset link has been sent to your email.",
-            "reset_token": reset_token,  # Remove in production!
-            "reset_link": reset_link  # Remove in production!
-        }
+        # Send verification email
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.info(f"Attempting to send password reset email to {email}")
+        
+        email_sent = EmailService.send_password_reset_email(email, reset_link)
+        
+        if email_sent:
+            logger.info(f"✅ Password reset email successfully sent to {email}")
+            return {
+                "message": "Password reset link has been sent to your email. Please check your inbox (and spam folder)."
+            }
+        else:
+            # If email sending fails, still return success message for security
+            # but log the issue. In development, you might want to return the link
+            # For production, this should always send email
+            logger.warning(f"❌ Failed to send password reset email to {email}, but token was generated")
+            
+            # In development, return link if SMTP not configured
+            # In production, this should not happen
+            if not settings.SMTP_USER or not settings.SMTP_PASSWORD:
+                logger.warning("SMTP not configured - returning reset link in response for development")
+                return {
+                    "message": "Password reset link generated. Email service not configured. Please configure SMTP settings in .env file. Check backend logs for details.",
+                    "reset_link": reset_link,  # Only in development
+                    "reset_token": reset_token  # Only in development
+                }
+            else:
+                logger.error("SMTP is configured but email sending failed. Check backend logs for error details.")
+                return {
+                    "message": "Password reset link has been sent to your email. Please check your inbox and spam folder. If you don't receive it, check backend logs for errors."
+                }
 
     @staticmethod
     def reset_password(reset_token: str, new_password: str):
