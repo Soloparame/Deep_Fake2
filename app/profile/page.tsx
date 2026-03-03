@@ -39,7 +39,7 @@ export default function ProfilePage() {
             try {
                 // Fetch User Info
                 // Note: You'll need to implement this endpoint in backend
-                const userRes = await fetch("http://localhost:4000/api/auth/me", {
+                const userRes = await fetch("http://localhost:8000/api/auth/me", {
                     headers: { Authorization: `Bearer ${token}` }
                 });
 
@@ -215,7 +215,7 @@ export default function ProfilePage() {
                                                         return;
                                                     }
                                                     try {
-                                                        const res = await fetch("http://localhost:4000/api/auth/change-password", {
+                                                        const res = await fetch("http://localhost:8000/api/auth/change-password", {
                                                             method: "POST",
                                                             headers: {
                                                                 "Content-Type": "application/json",

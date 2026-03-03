@@ -19,7 +19,7 @@ export default function CommunityPage() {
       router.push("/signin");
       return;
     }
-    fetch("http://localhost:4000/api/community/videos", {
+    fetch("http://localhost:8000/api/community/videos", {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(async (r) => {
@@ -88,8 +88,8 @@ export default function CommunityPage() {
           <p className="text-indigo-200/65">Video {idx + 1} of {videos.length} • Score {score}</p>
         </div>
         <div className="rounded-xl border border-white/10 p-4">
-          <video 
-            src={`http://localhost:4000${current.url}`} 
+          <video
+            src={`http://localhost:8000${current.url}`}
             controls 
             className="w-full rounded-lg aspect-video object-cover" 
             style={{ maxHeight: '600px', minHeight: '400px' }}

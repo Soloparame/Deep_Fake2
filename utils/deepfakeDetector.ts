@@ -5,7 +5,7 @@ export interface DetectionResult {
 
 class DeepfakeDetector {
   private _isModelLoaded: boolean = false;
-  private readonly BACKEND_URL = "http://localhost:4000/api"; // Updated to match backend config
+  private readonly BACKEND_URL = "http://localhost:8000/api"; // Updated to match backend config
 
   isModelLoaded(): boolean {
     // Since we are using the backend, the "model" is effectively always "loaded" 

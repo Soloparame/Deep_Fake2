@@ -177,6 +177,24 @@ export default function Features() {
                 width={24}
                 height={24}
               >
+                <path d="M19 8h5v2h-5V8Zm-4 5h9v2h-9v-2Zm9 5H11v2h13v-2Z" />
+                <path d="M19.406 3.844 6.083 20.497.586 15 2 13.586l3.917 3.917L17.844 2.595l1.562 1.25Z" />
+              </svg>
+              <h3 className="mb-1 font-nacelle text-[1rem] font-semibold text-gray-200">
+                Image Doctor
+              </h3>
+              <p className="text-indigo-200/65">
+                Advanced AI analysis for static images to detect manipulation, GAN-generated content, 
+                and deepfake artifacts with high precision.
+              </p>
+            </article>
+            <article>
+              <svg
+                className="mb-3 fill-indigo-500"
+                xmlns="http://www.w3.org/2000/svg"
+                width={24}
+                height={24}
+              >
                 <path
                   fillOpacity=".48"
                   d="M19 8h5v2h-5V8Zm-4 5h9v2h-9v-2Zm9 5H11v2h13v-2Z"

@@ -52,7 +52,11 @@ class Settings:
     
     # Frontend URL for password reset links
     FRONTEND_URL: str = os.getenv("FRONTEND_URL", "http://localhost:3000")
-    
+
+    # Hugging Face Inference API (for image detection)
+    HF_TOKEN: str = os.getenv("HF_TOKEN", "")
+    HF_IMAGE_MODEL: str = os.getenv("HF_IMAGE_MODEL", "Ateeqq/ai-vs-human-image-detector")
+
 settings = Settings()
 
 # Print email config status on startup (for debugging)

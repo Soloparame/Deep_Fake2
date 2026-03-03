@@ -30,12 +30,23 @@ pip install -r requirements.txt
 python main.py
 ```
 
-Server will start at: `http://localhost:4000`
+Server will start at: `http://localhost:8000`
 
-### 4. Test the Endpoint
+### 4. Image Detection (Optional)
+
+For image AI/human detection, add your [Hugging Face](https://huggingface.co) token to `fastapi_backend/.env`:
+
+```
+HF_TOKEN=hf_your_token_here
+```
+
+Get a token at: https://huggingface.co/settings/tokens  
+The image detector uses `Ateeqq/ai-vs-human-image-detector`.
+
+### 5. Test the Endpoint
 
 ```bash
-curl -X POST "http://localhost:4000/api/detect-video" \
+curl -X POST "http://localhost:8000/api/detect-video" \
   -F "file=@your_video.mp4"
 ```
 
@@ -78,7 +89,7 @@ Upload a video file for deepfake detection.
 
 **Example:**
 ```bash
-curl -X POST "http://localhost:4000/api/detect-video" \
+curl -X POST "http://localhost:8000/api/detect-video" \
   -F "file=@video.mp4"
 ```
 
@@ -113,6 +124,8 @@ See [ML_INTEGRATION_GUIDE.md](./ML_INTEGRATION_GUIDE.md#part-9---common-errors--
 - Videos are processed frame-by-frame with sampling
 - Temporary files are automatically cleaned up
 - Supports common video formats (mp4, avi, mov, webm)
+
+
 
 
 

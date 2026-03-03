@@ -30,9 +30,11 @@ if (-not (Test-Path "models\deepfake_model.h5")) {
 }
 
 # Start server
-Write-Host "✅ Starting FastAPI server on http://localhost:4000" -ForegroundColor Green
+Write-Host "✅ Starting FastAPI server on http://localhost:8000" -ForegroundColor Green
 Write-Host ""
 python main.py
+
+
 
 
 

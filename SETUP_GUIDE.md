@@ -179,8 +179,8 @@ pip install -r requirements.txt
 **Problem:** Backend server is not running.
 
 **Solution:**
-1. Check if backend is running on `http://localhost:4000`
-2. Open browser and visit: `http://localhost:4000/health`
+1. Check if backend is running on `http://localhost:8000`
+2. Open browser and visit: `http://localhost:8000/health`
 3. Should return: `{"status": "ok"}`
 4. If not, start backend: `cd fastapi_backend && python main.py`
 
@@ -249,7 +249,7 @@ pip install -r requirements.txt
 python main.py
 
 # Test endpoint (in another terminal)
-curl -X POST http://localhost:4000/api/detect-video -F "file=@test_video.mp4"
+curl -X POST http://localhost:8000/api/detect-video -F "file=@test_video.mp4"
 ```
 
 ### Frontend Commands
@@ -298,7 +298,7 @@ Before testing, verify:
 - [ ] Backend dependencies installed (`pip install -r fastapi_backend/requirements.txt`)
 - [ ] Model file exists (`fastapi_backend/models/deepfake_model.h5`)
 - [ ] Backend server running (`python fastapi_backend/main.py`)
-- [ ] Backend accessible (`http://localhost:4000/health` returns `{"status": "ok"}`)
+- [ ] Backend accessible (`http://localhost:8000/health` returns `{"status": "ok"}`)
 - [ ] Frontend dependencies installed (`npm install`)
 - [ ] Frontend server running (`npm run dev`)
 - [ ] Frontend accessible (`http://localhost:3000`)
@@ -333,11 +333,13 @@ npm run dev
 1. Check backend logs for errors
 2. Check browser console (F12) for frontend errors
 3. Verify both servers are running
-4. Test backend directly: `http://localhost:4000/health`
+4. Test backend directly: `http://localhost:8000/health`
 
 ---
 
 **🎉 You're all set! Happy coding!**
+
+
 
 
 

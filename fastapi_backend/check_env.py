@@ -32,6 +32,7 @@ if not env_path.exists():
     print("   SMTP_PASSWORD=your-app-password")
     print("   SMTP_FROM=noreply@realeye.com")
     print("   FRONTEND_URL=http://localhost:3000")
+    print("   HF_TOKEN=hf_your_token_here")
     exit(1)
 
 print("✅ .env file found!")
@@ -50,6 +51,7 @@ smtp_user = os.getenv("SMTP_USER", "")
 smtp_password = os.getenv("SMTP_PASSWORD", "")
 smtp_from = os.getenv("SMTP_FROM", "")
 frontend_url = os.getenv("FRONTEND_URL", "")
+hf_token = os.getenv("HF_TOKEN", "")
 
 print(f"SMTP_HOST:     {smtp_host if smtp_host else '❌ NOT SET'}")
 print(f"SMTP_PORT:     {smtp_port if smtp_port else '❌ NOT SET'}")
@@ -57,6 +59,7 @@ print(f"SMTP_USER:     {smtp_user if smtp_user else '❌ NOT SET'}")
 print(f"SMTP_PASSWORD: {'✅ SET (' + str(len(smtp_password)) + ' chars)' if smtp_password else '❌ NOT SET'}")
 print(f"SMTP_FROM:     {smtp_from if smtp_from else '❌ NOT SET (will use SMTP_USER)'}")
 print(f"FRONTEND_URL:  {frontend_url if frontend_url else '❌ NOT SET'}")
+print(f"HF_TOKEN:      {'✅ SET (' + str(len(hf_token)) + ' chars)' if hf_token else '❌ NOT SET'}")
 print()
 
 # Check if required variables are set

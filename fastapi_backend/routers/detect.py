@@ -1,9 +1,11 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException, status, Request
 from fastapi_backend.services import model_service
 from fastapi_backend.services.auth_service import AuthService
+from fastapi_backend.core.config import settings
 import shutil
 import os
 import uuid
+import requests
 from pydantic import BaseModel
 from typing import Literal
 import datetime
@@ -11,6 +13,7 @@ from fastapi_backend.database import predictions_col
 
 router = APIRouter()
 
+# Hugging Face Inference API for image detection
 @router.post("/videos/upload")
 async def save_video_prediction(request: Request, video: UploadFile = File(...), analysis: str = None):
     """
@@ -40,6 +43,7 @@ async def save_video_prediction(request: Request, video: UploadFile = File(...),
     # Create prediction record
     record = {
         "id": str(uuid.uuid4()),
+        "type": "video",
         "user_email": user_email,
         "filename": video.filename or "unknown",
         "result": analysis_data.get("label", "REAL"),  # Default to REAL if not provided
@@ -57,6 +61,187 @@ async def save_video_prediction(request: Request, video: UploadFile = File(...),
     except Exception as e:
         print(f"Failed to save prediction: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to save prediction: {str(e)}")
+
+
+@router.post("/images/upload")
+async def detect_image(request: Request, file: UploadFile = File(...)):
+    """
+    Upload an image to detect AI-generated vs human-captured.
+    Uses Hugging Face Ateeqq/ai-vs-human-image-detector model.
+    Returns label (REAL/FAKE), score (0-1), and saves to prediction history.
+    """
+    # Validate file type
+    allowed_exts = {".jpg", ".jpeg", ".png", ".webp", ".bmp", ".gif"}
+    fname = (file.filename or "").lower()
+    ext = os.path.splitext(fname)[1].lower()
+    ct = (file.content_type or "").lower()
+    if not (ct.startswith("image/") or ext in allowed_exts):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="File must be an image. Supported: jpg, png, webp, bmp, gif"
+        )
+
+    # Validate size (max 10MB for images)
+    image_data = await file.read()
+    if not image_data:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Uploaded file is empty"
+        )
+    
+    MAX_SIZE = 10 * 1024 * 1024
+    if len(image_data) > MAX_SIZE:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Image too large. Maximum size: 10MB"
+        )
+
+    hf_token = (settings.HF_TOKEN or "").strip()
+    if not hf_token:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Hugging Face token not configured for Image Doctor. Please add HF_TOKEN to your .env file."
+        )
+
+    try:
+        # Construct the exact URL that worked in terminal
+        model_id = settings.HF_IMAGE_MODEL.strip()
+        hf_api_url = f"https://router.huggingface.co/hf-inference/models/{model_id}"
+        
+        # Use a more stable content type if possible, or fallback to the file's content type
+        content_type = file.content_type
+        if not content_type or content_type == "application/octet-stream":
+            if ext == ".png":
+                content_type = "image/png"
+            else:
+                content_type = "image/jpeg"
+
+        headers = {
+            "Authorization": f"Bearer {hf_token}",
+            "Content-Type": content_type
+        }
+        
+        # Use requests.post with binary data
+        print(f"DEBUG: Calling HF API URL: {hf_api_url}")
+        print(f"DEBUG: Headers: {headers}")
+        
+        try:
+            resp = requests.post(hf_api_url, headers=headers, data=image_data, timeout=60)
+            resp.raise_for_status() # This will raise HTTPError for 4xx/5xx
+        except requests.exceptions.RequestException as e:
+            # Handle model loading separately
+            if resp.status_code == 503 or resp.status_code == 422:
+                try:
+                    err_data = resp.json()
+                    if "loading" in str(err_data).lower():
+                        raise HTTPException(
+                            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                            detail="Model is currently loading on Hugging Face. Please try again in a few seconds."
+                        )
+                except:
+                    pass
+            
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE if resp.status_code in {429, 503} else status.HTTP_502_BAD_GATEWAY,
+                detail=f"Failed to reach Hugging Face API ({type(e).__name__}): {str(e)}"
+            )
+
+        print(f"DEBUG: Status Code: {resp.status_code}")
+        print(f"DEBUG: Response Text (first 100 chars): {resp.text[:100]}")
+
+        # Robust JSON parsing
+        if not resp.text or not resp.text.strip():
+            print("DEBUG: Response body is empty")
+            raise HTTPException(
+                status_code=status.HTTP_502_BAD_GATEWAY,
+                detail="Hugging Face API returned an empty response"
+            )
+
+        try:
+            result = resp.json()
+        except Exception as e:
+            print(f"DEBUG: JSON parsing failed: {e}")
+            print(f"DEBUG: Raw response: {resp.text}")
+            raise HTTPException(
+                status_code=status.HTTP_502_BAD_GATEWAY,
+                detail=f"Hugging Face API returned non-JSON response: {resp.text[:200]}"
+            )
+
+        if not result or not isinstance(result, list):
+            print(f"DEBUG: Unexpected result format: {result}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Invalid response from image detection model"
+            )
+
+        # Get top prediction
+        pred = max(result, key=lambda x: x.get("score", 0))
+        label_raw = (pred.get("label") or "").lower()
+        score = float(pred.get("score", 0))
+
+        if "ai" in label_raw or label_raw == "ai":
+            label = "FAKE"
+            confidence = score
+        else:
+            label = "REAL"
+            confidence = score
+
+        # Get user email for history
+        user_email = None
+        try:
+            token = request.headers.get("Authorization")
+            if token:
+                profile = AuthService.get_current_user_profile(token)
+                user_email = profile.get("email")
+        except Exception:
+            pass
+
+        # Save to MongoDB
+        record = {
+            "id": str(uuid.uuid4()),
+            "type": "image",
+            "user_email": user_email,
+            "filename": file.filename or "unknown",
+            "result": label,
+            "confidence": confidence,
+            "message": f"AI-generated" if label == "FAKE" else "Human-captured",
+            "created_at": datetime.datetime.utcnow(),
+        }
+        if predictions_col:
+            try:
+                predictions_col.insert_one(record)
+            except Exception as e:
+                print(f"Failed to save image prediction: {e}")
+
+        return {
+            "label": label,
+            "score": confidence,
+            "confidence": confidence,
+            "classification": label,
+            "message": record["message"],
+        }
+
+    except HTTPException:
+        raise
+    except requests.exceptions.RequestException as e:
+        print(f"DEBUG: RequestException: {type(e).__name__}: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=f"Failed to reach Hugging Face API ({type(e).__name__}): {str(e)}"
+        )
+    except Exception as e:
+        # Check if it's a model loading error from HF
+        err_msg = str(e).lower()
+        if "loading" in err_msg:
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="Model is currently loading on Hugging Face. Please try again in a few seconds."
+            )
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Image analysis failed: {str(e)}"
+        )
+
 
 class DetectionResponse(BaseModel):
     """
@@ -163,10 +348,11 @@ async def detect_video(request: Request, file: UploadFile = File(...)):
         
         record = {
             "id": str(uuid.uuid4()),
+            "type": "video",
             "user_email": user_email,
             "filename": file.filename or "unknown",
-            "result": result["label"],  # Changed from "label" to "result" to match history API
-            "confidence": result["score"],  # Changed from "score" to "confidence" to match history API
+            "result": result["label"],
+            "confidence": result["score"],
             "message": result.get("message", ""),
             "created_at": datetime.datetime.utcnow(),
         }

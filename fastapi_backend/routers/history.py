@@ -9,6 +9,7 @@ router = APIRouter()
 class PredictionHistoryItem(BaseModel):
     """Single prediction record"""
     id: str
+    type: Optional[str] = None  # "video" | "image"
     user_email: Optional[str] = None
     filename: str
     result: str  # "REAL" or "FAKE"
@@ -26,7 +27,8 @@ async def get_predictions(
     user_email: Optional[str] = Query(None, description="Filter by user email"),
     limit: int = Query(50, ge=1, le=100, description="Maximum number of results"),
     skip: int = Query(0, ge=0, description="Number of results to skip"),
-    result: Optional[str] = Query(None, description="Filter by result: REAL or FAKE")
+    result: Optional[str] = Query(None, description="Filter by result: REAL or FAKE"),
+    type: Optional[str] = Query(None, description="Filter by type: video or image")
 ):
     """
     Get prediction history.
@@ -62,6 +64,8 @@ async def get_predictions(
             query["user_email"] = user_email
         if result:
             query["result"] = result.upper()
+        if type:
+            query["type"] = type.lower()
         
         # Get predictions (sorted by created_at descending)
         predictions = list(predictions_col.find(
@@ -85,9 +89,10 @@ async def get_predictions(
             
             prediction_items.append(PredictionHistoryItem(
                 id=pred_id,
+                type=pred.get("type"),
                 user_email=pred.get("user_email"),
                 filename=pred.get("filename", "unknown"),
-                result=pred.get("result", "REAL"),  # Default to REAL if not provided
+                result=pred.get("result", "REAL"),
                 confidence=pred.get("confidence", 0.0),
                 message=pred.get("message", ""),
                 created_at=pred.get("created_at", datetime.utcnow())
@@ -152,9 +157,10 @@ async def get_prediction_by_id(prediction_id: str):
         
         return PredictionHistoryItem(
             id=pred_id,
+            type=pred.get("type"),
             user_email=pred.get("user_email"),
             filename=pred.get("filename", "unknown"),
-            result=pred.get("result", "REAL"),  # Default to REAL if not provided
+            result=pred.get("result", "REAL"),
             confidence=pred.get("confidence", 0.0),
             message=pred.get("message", ""),
             created_at=pred.get("created_at", datetime.utcnow())

@@ -83,7 +83,7 @@ export default function Header() {
                 <li>
                   <Link
                     href="/chat"
-                    className="rounded-full px-4 py-1.5 text-sm font-medium text-gray-300 transition-colors hover:bg白/5 hover:text白"
+                    className="rounded-full px-4 py-1.5 text-sm font-medium text-gray-300 transition-colors hover:bg-white/5 hover:text-white"
                   >
                     Chat
                   </Link>
@@ -93,7 +93,7 @@ export default function Header() {
                     href="/upload"
                     className="rounded-full px-4 py-1.5 text-sm font-medium text-gray-300 transition-colors hover:bg-white/5 hover:text-white"
                   >
-                    Upload Video
+                    Upload
                   </Link>
                 </li>
                 <li>
