@@ -98,6 +98,22 @@ export default function Header() {
                 </li>
                 <li>
                   <Link
+                    href="/plagiarism"
+                    className="rounded-full px-4 py-1.5 text-sm font-medium text-gray-300 transition-colors hover:bg-white/5 hover:text-white"
+                  >
+                    Plagiarism
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/cv-generator"
+                    className="rounded-full px-4 py-1.5 text-sm font-medium text-gray-300 transition-colors hover:bg-white/5 hover:text-white"
+                  >
+                    CV Generator
+                  </Link>
+                </li>
+                <li>
+                  <Link
                     href="/profile"
                     className="btn-sm flex items-center gap-2 rounded-full bg-indigo-600 px-4 py-1.5 text-sm font-medium text-white shadow-lg shadow-indigo-500/20 transition-all hover:bg-indigo-500 hover:shadow-indigo-500/30"
                   >

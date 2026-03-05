@@ -25,33 +25,36 @@ const Spinner = () => (
   </svg>
 );
 
-const ResultCard = ({ result, mode }: { result: AnalysisResult; mode: string }) => (
-  <div className="mt-6 rounded-xl border border-white/10 bg-gray-900/50 p-5">
-    <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-gray-500">
-      <span className={`h-2 w-2 rounded-full animate-pulse ${result.confidence <= 0.6 ? "bg-green-500" : "bg-red-500"}`} />
-      Analysis Complete
-    </h3>
-    <div className="flex items-center justify-between gap-4">
-      <div>
-        <p className="text-sm text-gray-400">Result</p>
-        <p className={`mt-1 text-2xl font-bold ${result.confidence <= 0.6 ? "text-green-400" : "text-red-400"}`}>
-          {result.confidence <= 0.6 ? "REAL" : "FAKE"}
-        </p>
+const ResultCard = ({ result, mode }: { result: AnalysisResult; mode: string }) => {
+  const isReal = (result.label || "").toUpperCase() === "REAL";
+  return (
+    <div className="mt-6 rounded-xl border border-white/10 bg-gray-900/50 p-5">
+      <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-gray-500">
+        <span className={`h-2 w-2 rounded-full animate-pulse ${isReal ? "bg-green-500" : "bg-red-500"}`} />
+        Analysis Complete
+      </h3>
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <p className="text-sm text-gray-400">Result</p>
+          <p className={`mt-1 text-2xl font-bold ${isReal ? "text-green-400" : "text-red-400"}`}>
+            {result.label || "—"}
+          </p>
+        </div>
+        <div className="text-right">
+          <p className="text-sm text-gray-400">Confidence</p>
+          <p className="mt-1 font-mono text-2xl font-bold text-white">{(result.confidence * 100).toFixed(1)}%</p>
+        </div>
       </div>
-      <div className="text-right">
-        <p className="text-sm text-gray-400">Confidence</p>
-        <p className="mt-1 font-mono text-2xl font-bold text-white">{(result.confidence * 100).toFixed(1)}%</p>
+      <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-gray-800">
+        <div
+          className={`h-full rounded-full transition-all duration-500 ${isReal ? "bg-green-500" : "bg-red-500"}`}
+          style={{ width: `${result.confidence * 100}%` }}
+        />
       </div>
+      <p className="mt-3 text-xs text-gray-600 font-mono">{mode}</p>
     </div>
-    <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-gray-800">
-      <div
-        className={`h-full rounded-full transition-all duration-500 ${result.confidence <= 0.6 ? "bg-green-500" : "bg-red-500"}`}
-        style={{ width: `${result.confidence * 100}%` }}
-      />
-    </div>
-    <p className="mt-3 text-xs text-gray-600 font-mono">{mode}</p>
-  </div>
-);
+  );
+};
 
 export default function UploadPage() {
   const router = useRouter();
@@ -127,7 +130,7 @@ export default function UploadPage() {
         deepfakeDetector.analyzeVideo(file, setProgress),
         new Promise<DetectionResult>((_, r) => setTimeout(() => r(new Error("Analysis timeout")), 300000)),
       ]);
-      setResult({ label: detectionResult.label, confidence: detectionResult.confidence });
+      setResult({ label: detectionResult.label || "REAL", confidence: detectionResult.confidence });
       try {
         const formData = new FormData();
         formData.append("video", file);
@@ -410,11 +413,11 @@ export default function UploadPage() {
                       </p>
                     </div>
                     <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${
-                      item.result === "FAKE" || item.confidence > 0.6
+                      (item.result || "").toUpperCase() === "FAKE"
                         ? "bg-red-500/10 text-red-400"
                         : "bg-green-500/10 text-green-400"
                     }`}>
-                      {item.result === "FAKE" || item.confidence > 0.6 ? "FAKE" : "REAL"}
+                      {item.result || "REAL"}
                     </span>
                   </div>
                   <div className="mt-2 flex items-center justify-between gap-2">
@@ -428,7 +431,7 @@ export default function UploadPage() {
                   <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-gray-800">
                     <div
                       className={`h-full transition-all ${
-                        item.confidence > 0.6 ? "bg-red-500" : "bg-green-500"
+                        (item.result || "").toUpperCase() === "FAKE" ? "bg-red-500" : "bg-green-500"
                       }`}
                       style={{ width: `${item.confidence * 100}%` }}
                     />

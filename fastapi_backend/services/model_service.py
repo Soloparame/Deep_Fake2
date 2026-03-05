@@ -441,16 +441,16 @@ def predict_video(video_path: str) -> dict:
         avg_confidence = np.mean(predictions)
         score = float(avg_confidence)
         
-        # Thresholding - only REAL or FAKE, no uncertainty
+        # Single server-side threshold: model score -> REAL/FAKE. UI shows this label directly.
         if score > settings.FAKE_THRESHOLD:
             label = "FAKE"
             message = "The video is likely manipulated."
         else:
             label = "REAL"
             message = "The video appears authentic."
-            
+
         logger.info(f"Prediction: {label} (score: {score:.4f})")
-        
+
         return {
             "label": label,
             "score": score,

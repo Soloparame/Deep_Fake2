@@ -120,11 +120,7 @@ async def detect_image(request: Request, file: UploadFile = File(...)):
             "Authorization": f"Bearer {hf_token}",
             "Content-Type": content_type
         }
-        
-        # Use requests.post with binary data
-        print(f"DEBUG: Calling HF API URL: {hf_api_url}")
-        print(f"DEBUG: Headers: {headers}")
-        
+
         try:
             resp = requests.post(hf_api_url, headers=headers, data=image_data, timeout=60)
             resp.raise_for_status() # This will raise HTTPError for 4xx/5xx
@@ -146,12 +142,8 @@ async def detect_image(request: Request, file: UploadFile = File(...)):
                 detail=f"Failed to reach Hugging Face API ({type(e).__name__}): {str(e)}"
             )
 
-        print(f"DEBUG: Status Code: {resp.status_code}")
-        print(f"DEBUG: Response Text (first 100 chars): {resp.text[:100]}")
-
-        # Robust JSON parsing
+        # Parse API response (list of {"label":"hum"|"ai","score":0-1})
         if not resp.text or not resp.text.strip():
-            print("DEBUG: Response body is empty")
             raise HTTPException(
                 status_code=status.HTTP_502_BAD_GATEWAY,
                 detail="Hugging Face API returned an empty response"
@@ -160,31 +152,26 @@ async def detect_image(request: Request, file: UploadFile = File(...)):
         try:
             result = resp.json()
         except Exception as e:
-            print(f"DEBUG: JSON parsing failed: {e}")
-            print(f"DEBUG: Raw response: {resp.text}")
             raise HTTPException(
                 status_code=status.HTTP_502_BAD_GATEWAY,
                 detail=f"Hugging Face API returned non-JSON response: {resp.text[:200]}"
             )
 
         if not result or not isinstance(result, list):
-            print(f"DEBUG: Unexpected result format: {result}")
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Invalid response from image detection model"
             )
 
-        # Get top prediction
+        # Use API result directly: highest-score class wins. hum -> REAL, ai -> FAKE.
         pred = max(result, key=lambda x: x.get("score", 0))
         label_raw = (pred.get("label") or "").lower()
         score = float(pred.get("score", 0))
-
         if "ai" in label_raw or label_raw == "ai":
             label = "FAKE"
-            confidence = score
         else:
             label = "REAL"
-            confidence = score
+        confidence = score
 
         # Get user email for history
         user_email = None
@@ -224,7 +211,6 @@ async def detect_image(request: Request, file: UploadFile = File(...)):
     except HTTPException:
         raise
     except requests.exceptions.RequestException as e:
-        print(f"DEBUG: RequestException: {type(e).__name__}: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail=f"Failed to reach Hugging Face API ({type(e).__name__}): {str(e)}"

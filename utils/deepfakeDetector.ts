@@ -68,12 +68,11 @@ class DeepfakeDetector {
         if (xhr.status === 200) {
           try {
             const response = JSON.parse(xhr.responseText);
+            // Pass through backend model result directly (no frontend threshold).
             // Backend returns: { label: "REAL" | "FAKE", score: number, message: string }
-            // Frontend expects: { label: string, confidence: number }
-            
             const result: DetectionResult = {
-              label: response.label,
-              confidence: response.score // Map score (0-1) to confidence for frontend use
+              label: response.label ?? "REAL",
+              confidence: typeof response.score === "number" ? response.score : 0
             };
             resolve(result);
           } catch (e) {
