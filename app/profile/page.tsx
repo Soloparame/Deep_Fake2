@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 interface UserProfile {
     email: string;
@@ -14,14 +15,18 @@ interface UserProfile {
 
 interface UserStats {
     total_chats: number;
-    total_videos: number;
-    last_prediction?: any;
-    last_chat_session?: any;
+    total_predictions?: number;
+    total_images?: number;
+    total_videos?: number;
+    total_analyses?: number;
+    last_prediction?: unknown;
+    last_chat_session?: unknown;
 }
 
 export default function ProfilePage() {
     const router = useRouter();
     const [profile, setProfile] = useState<UserProfile | null>(null);
+    const [stats, setStats] = useState<UserStats | null>(null);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState("identity");
     const [pwdCurrent, setPwdCurrent] = useState("");
@@ -37,15 +42,24 @@ export default function ProfilePage() {
             }
 
             try {
-                // Fetch User Info
-                // Note: You'll need to implement this endpoint in backend
-                const userRes = await fetch("http://localhost:8000/api/auth/me", {
-                    headers: { Authorization: `Bearer ${token}` }
+                const userRes = await fetch(`${API_BASE}/api/auth/me`, {
+                    headers: { Authorization: `Bearer ${token}` },
                 });
 
                 if (userRes.ok) {
                     const userData = await userRes.json();
                     setProfile(userData);
+                }
+
+                try {
+                    const statsRes = await fetch(`${API_BASE}/api/user/stats`, {
+                        headers: { Authorization: `Bearer ${token}` },
+                    });
+                    if (statsRes.ok) {
+                        setStats(await statsRes.json());
+                    }
+                } catch {
+                    /* Stats are optional; ignore network errors (e.g. dev reload, CORS timing). */
                 }
             } catch (err) {
                 console.error("Failed to load profile", err);
@@ -163,6 +177,25 @@ export default function ProfilePage() {
                                             </div>
                                         </div>
                                     </div>
+                                    {stats && (
+                                        <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+                                            {[
+                                                { label: "Chats", value: stats.total_chats ?? 0 },
+                                                { label: "Media checks", value: stats.total_predictions ?? 0 },
+                                                { label: "Images", value: stats.total_images ?? 0 },
+                                                { label: "Videos", value: stats.total_videos ?? 0 },
+                                                { label: "Plagiarism runs", value: stats.total_analyses ?? 0 },
+                                            ].map((row) => (
+                                                <div
+                                                    key={row.label}
+                                                    className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-center"
+                                                >
+                                                    <div className="text-2xl font-bold text-white">{row.value}</div>
+                                                    <div className="text-[10px] font-medium uppercase tracking-wider text-gray-500">{row.label}</div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         )}
@@ -215,7 +248,7 @@ export default function ProfilePage() {
                                                         return;
                                                     }
                                                     try {
-                                                        const res = await fetch("http://localhost:8000/api/auth/change-password", {
+                                                        const res = await fetch(`${API_BASE}/api/auth/change-password`, {
                                                             method: "POST",
                                                             headers: {
                                                                 "Content-Type": "application/json",
@@ -292,10 +325,18 @@ export default function ProfilePage() {
 
                                     <Link href="/upload" className="group flex items-center justify-between rounded-xl border border-white/10 p-4 transition-all hover:bg-white/5">
                                         <div>
-                                            <h3 className="font-medium text-white group-hover:text-purple-300 transition-colors">Video Analysis Data</h3>
-                                            <p className="text-xs text-gray-400">Review your past deepfake detection reports.</p>
+                                            <h3 className="font-medium text-white group-hover:text-purple-300 transition-colors">Image & video analysis</h3>
+                                            <p className="text-xs text-gray-400">Review your past detection results stored in MongoDB.</p>
                                         </div>
                                         <span className="text-2xl transition-transform group-hover:scale-110">📹</span>
+                                    </Link>
+
+                                    <Link href="/plagiarism" className="group flex items-center justify-between rounded-xl border border-white/10 p-4 transition-all hover:bg-white/5">
+                                        <div>
+                                            <h3 className="font-medium text-white group-hover:text-indigo-300 transition-colors">Plagiarism analyses</h3>
+                                            <p className="text-xs text-gray-400">Open the checker — history is tied to your account.</p>
+                                        </div>
+                                        <span className="text-2xl transition-transform group-hover:scale-110">📄</span>
                                     </Link>
 
                                     <div className="group flex items-center justify-between rounded-xl border border-white/10 p-4 transition-all hover:bg-white/5">

@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 from fastapi_backend.core.config import settings
 from fastapi_backend.services import model_service
 from fastapi_backend.models.knowledge import KnowledgeModel
-from fastapi_backend.routers import detect, auth, chat, history, user, community
+from fastapi_backend.routers import detect, auth, chat, history, user, community, analyze
 from fastapi.staticfiles import StaticFiles
 
 @asynccontextmanager
@@ -63,6 +63,7 @@ app.include_router(chat.router, prefix="/api", tags=["Chat"])
 app.include_router(history.router, prefix="/api", tags=["History"])
 app.include_router(user.router, prefix="/api", tags=["User"])
 app.include_router(community.router, prefix="/api", tags=["Community"])
+app.include_router(analyze.router, prefix="/api", tags=["Analysis"])
 
 app.mount("/static/testvideo", StaticFiles(directory=f"{settings.BASE_DIR}/testvideo"), name="testvideo")
 
