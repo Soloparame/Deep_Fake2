@@ -185,6 +185,12 @@ async def analyze_project(
             extracted, _kind = extract_text_from_upload(file.filename, raw)
         except ValueError as e:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        except Exception as e:
+            # PyMuPDF / python-docx errors, corrupt PDFs, missing deps — return clear 400, not 500
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Could not read this file: {e}",
+            )
 
     pasted = (pasted_content or "").strip()
     if not extracted and pasted:

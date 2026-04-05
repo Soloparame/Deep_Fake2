@@ -4,11 +4,7 @@ import { FormEvent, useCallback, useEffect, useState, useRef, type DragEvent } f
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AnalysisHistorySidebar } from "@/components/plagiarism/analysis-history-sidebar";
-import { DevilsAdvocateCard } from "@/components/plagiarism/devils-advocate-card";
-import { SimilarityGauge } from "@/components/plagiarism/similarity-gauge";
-import { StrategyPanel } from "@/components/plagiarism/strategy-panel";
-import { SwotGrid } from "@/components/plagiarism/swot-grid";
-import { TechLensSection } from "@/components/plagiarism/tech-lens-section";
+import { AnalysisResultModal } from "@/components/plagiarism/analysis-result-modal";
 import type { AnalysisListItem, AnalysisReport } from "@/types/analysis";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
@@ -34,12 +30,15 @@ export default function PlagiarismPage() {
   const [myTechStack, setMyTechStack] = useState("");
   const [pastedContent, setPastedContent] = useState("");
   const [file, setFile] = useState<File | null>(null);
+  /** Last file that was successfully submitted (for “download original” in the modal). */
+  const [lastSubmittedFile, setLastSubmittedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [report, setReport] = useState<AnalysisReport | null>(null);
   const [resultTab, setResultTab] = useState<"overview" | "strategy">("overview");
+  const [resultModalOpen, setResultModalOpen] = useState(false);
 
   const [historyLoading, setHistoryLoading] = useState(true);
   const [history, setHistory] = useState<AnalysisListItem[]>([]);
@@ -112,6 +111,8 @@ export default function PlagiarismPage() {
     setLoading(true);
     setReport(null);
     setSelectedId(null);
+    setResultModalOpen(false);
+    setLastSubmittedFile(null);
     try {
       const res = await fetch(`${API_BASE}/api/analyze`, {
         method: "POST",
@@ -134,6 +135,9 @@ export default function PlagiarismPage() {
       }
       setReport(data as AnalysisReport);
       setResultTab("overview");
+      setResultModalOpen(true);
+      if (mode === "upload" && file) setLastSubmittedFile(file);
+      else setLastSubmittedFile(null);
       await loadHistory();
       setSelectedId((data as AnalysisReport).id);
     } catch (err) {
@@ -155,6 +159,8 @@ export default function PlagiarismPage() {
       setReport(data);
       setSelectedId(id);
       setResultTab("overview");
+      setResultModalOpen(true);
+      setLastSubmittedFile(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load analysis.");
     } finally {
@@ -478,80 +484,30 @@ export default function PlagiarismPage() {
             </form>
 
             {report && (
-              <div className="space-y-8">
-                <div className="relative overflow-hidden rounded-3xl border border-white/[0.08] bg-gradient-to-br from-zinc-900/80 via-zinc-950 to-indigo-950/30 p-6 shadow-2xl shadow-black/40 ring-1 ring-white/[0.05] sm:p-8">
-                  <div className="pointer-events-none absolute -right-16 top-0 h-48 w-48 rounded-full bg-violet-600/15 blur-3xl" />
-                  <div className="relative mb-6 flex flex-col gap-4 border-b border-white/[0.07] pb-6 sm:flex-row sm:items-end sm:justify-between">
-                    <div>
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-indigo-300/80">Your report</p>
-                      <h2 className="mt-1 font-nacelle text-2xl font-bold text-white sm:text-3xl">{report.title}</h2>
-                      {report.description ? (
-                        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-zinc-400">{report.description}</p>
-                      ) : null}
-                    </div>
-                    <div className="inline-flex shrink-0 rounded-2xl border border-white/10 bg-black/20 p-1.5 shadow-inner">
-                      <button
-                        type="button"
-                        onClick={() => setResultTab("overview")}
-                        className={`rounded-xl px-5 py-2.5 text-sm font-medium transition-all ${
-                          resultTab === "overview"
-                            ? "bg-white/10 text-white shadow-lg"
-                            : "text-zinc-500 hover:text-zinc-300"
-                        }`}
-                      >
-                        Overview
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setResultTab("strategy")}
-                        className={`rounded-xl px-5 py-2.5 text-sm font-medium transition-all ${
-                          resultTab === "strategy"
-                            ? "bg-white/10 text-white shadow-lg"
-                            : "text-zinc-500 hover:text-zinc-300"
-                        }`}
-                      >
-                        Strategy
-                      </button>
-                    </div>
+              <>
+                <AnalysisResultModal
+                  open={resultModalOpen}
+                  onClose={() => setResultModalOpen(false)}
+                  report={report}
+                  resultTab={resultTab}
+                  onTabChange={setResultTab}
+                  originalUploadedFile={lastSubmittedFile}
+                />
+                {!resultModalOpen && (
+                  <div className="flex flex-col gap-3 rounded-2xl border border-indigo-500/25 bg-indigo-950/35 px-4 py-4 shadow-lg shadow-indigo-950/20 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+                    <p className="text-sm text-zinc-200">
+                      <span className="font-medium text-indigo-200">Report ready:</span> {report.title}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setResultModalOpen(true)}
+                      className="shrink-0 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-900/30 transition hover:shadow-indigo-500/20"
+                    >
+                      Open results
+                    </button>
                   </div>
-
-                  {resultTab === "overview" ? (
-                    <div className="relative space-y-10">
-                      <div className="grid gap-6 xl:grid-cols-2">
-                        <SimilarityGauge report={report} />
-                        <SwotGrid swot={report.swot} />
-                      </div>
-                      <TechLensSection report={report} />
-                      <DevilsAdvocateCard questions={report.devils_advocate} />
-                      <details className="group rounded-2xl border border-white/[0.07] bg-zinc-950/50 transition-colors open:bg-zinc-900/40">
-                        <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-5 py-4 text-sm font-medium text-zinc-300 [&::-webkit-details-marker]:hidden">
-                          <span className="flex items-center gap-2">
-                            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-800/80 text-xs text-zinc-500">
-                              &lt;/&gt;
-                            </span>
-                            Extracted & merged content
-                          </span>
-                          <svg
-                            className="h-5 w-5 shrink-0 text-zinc-500 transition-transform group-open:rotate-180"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                          </svg>
-                        </summary>
-                        <div className="border-t border-white/[0.06] px-5 pb-5 pt-2">
-                          <pre className="max-h-56 overflow-auto whitespace-pre-wrap rounded-xl bg-black/30 p-4 font-mono text-xs leading-relaxed text-zinc-500">
-                            {report.file_content}
-                          </pre>
-                        </div>
-                      </details>
-                    </div>
-                  ) : (
-                    <StrategyPanel report={report} />
-                  )}
-                </div>
-              </div>
+                )}
+              </>
             )}
           </div>
         </div>
