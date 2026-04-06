@@ -10,6 +10,10 @@ type Props = {
 export function SimilarityGauge({ report }: Props) {
   const gradId = useId().replace(/:/g, "");
   const pct = Math.min(100, Math.max(0, report.similarity_score));
+  const badge = (report.similarity_label || "similar").toLowerCase();
+  const blurb =
+    report.similarity_description ||
+    "Relative overlap with indexed sources and public descriptions.";
   const r = 54;
   const c = 2 * Math.PI * r;
   const offset = c - (pct / 100) * c;
@@ -56,13 +60,24 @@ export function SimilarityGauge({ report }: Props) {
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           <span className="font-nacelle text-4xl font-bold tracking-tight text-white">{Math.round(pct)}%</span>
-          <span className="text-[11px] font-medium uppercase tracking-wider text-indigo-300/70">similar</span>
+          <span className="text-[11px] font-medium uppercase tracking-wider text-indigo-300/70">{badge}</span>
         </div>
       </div>
 
-      <p className="relative mt-6 text-center text-xs leading-relaxed text-zinc-500">
-        Relative overlap with indexed sources and public descriptions. Replace with your model when ready.
-      </p>
+      {report.similarity_hf_live === false && (
+        <p className="relative mb-3 text-center text-[11px] font-medium text-amber-200/90">
+          Using fallback score — add HF_TOKEN for live MiniLM similarity.
+        </p>
+      )}
+
+      <p className="relative mt-6 text-center text-xs leading-relaxed text-zinc-500">{blurb}</p>
+
+      {report.market_search_snippet ? (
+        <details className="relative mt-4 rounded-xl border border-white/[0.06] bg-black/20 px-3 py-2 text-left">
+          <summary className="cursor-pointer text-[11px] font-medium text-zinc-400">Market / web text used for comparison</summary>
+          <p className="mt-2 max-h-32 overflow-y-auto text-[11px] leading-relaxed text-zinc-500">{report.market_search_snippet}</p>
+        </details>
+      ) : null}
     </div>
   );
 }

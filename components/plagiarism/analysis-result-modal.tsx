@@ -29,6 +29,12 @@ function buildTextReport(report: AnalysisReport): string {
     report.description || "(none)",
     ``,
     `Similarity score: ${report.similarity_score}%`,
+    report.similarity_label ? `Label: ${report.similarity_label}` : "",
+    report.similarity_description ? `How it was computed: ${report.similarity_description}` : "",
+    report.similarity_hf_live != null ? `HF live scoring: ${report.similarity_hf_live ? "yes" : "no (fallback)"}` : "",
+    report.market_search_snippet
+      ? `\n--- Market / web text (comparison) ---\n${report.market_search_snippet}\n`
+      : "",
     ``,
     `--- SWOT ---`,
     `Strengths:`,
@@ -55,7 +61,7 @@ function buildTextReport(report: AnalysisReport): string {
     `--- Extracted / merged content (snippet) ---`,
     report.file_content,
   ];
-  return lines.join("\n");
+  return lines.filter((line) => line !== "").join("\n");
 }
 
 export function AnalysisResultModal(props: {

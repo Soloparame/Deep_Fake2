@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import datetime
 from typing import Optional, Tuple
 
@@ -7,6 +8,7 @@ from fastapi import APIRouter, File, Form, HTTPException, Request, UploadFile, s
 
 from fastapi_backend.database import analyses_col, new_id
 from fastapi_backend.services.auth_service import AuthService
+from fastapi_backend.services.similarity_search import SimilarityResult, compute_similarity_overlap
 from fastapi_backend.schemas.analysis import (
     AnalysisHistoryResponse,
     AnalysisListItem,
@@ -34,12 +36,13 @@ def _user_from_request(request: Request) -> Tuple[Optional[str], Optional[str]]:
         return None, None
 
 
-def _mock_report(
+def _build_report(
     analysis_id: str,
     title: str,
     description: str,
     file_content: str,
     my_tech_hint: str,
+    sim: SimilarityResult,
 ) -> AnalysisReport:
     user_stack = (my_tech_hint or "Next.js, TypeScript, Tailwind").strip()
     return AnalysisReport(
@@ -47,7 +50,11 @@ def _mock_report(
         title=title or "Untitled project",
         description=description,
         file_content=file_content[:8000] + ("..." if len(file_content) > 8000 else ""),
-        similarity_score=72.0,
+        similarity_score=sim.score,
+        similarity_label=sim.label,
+        similarity_description=sim.description,
+        market_search_snippet=sim.market_snippet,
+        similarity_hf_live=sim.hf_ok,
         swot=SWOTBlock(
             strengths=[
                 "Clear problem statement and defined user persona",
@@ -159,7 +166,8 @@ async def analyze_project(
 ):
     """
     Accept multipart form: title, description, optional my_tech_stack, optional pasted_content,
-    optional PDF/DOCX file. Extracts text, returns structured mock analysis and persists to MongoDB.
+    optional PDF/DOCX file. Extracts text, runs web search + HF similarity for the overlap index,
+    returns structured analysis (SWOT/strategy still template) and persists to MongoDB.
     Requires Authorization so the run is stored under your user (same as other app features).
     """
     user_id, user_email = _user_from_request(request)
@@ -201,12 +209,19 @@ async def analyze_project(
         file_content = "(No document body — title and description only.)"
 
     analysis_id = new_id()
-    report = _mock_report(
+    sim = await asyncio.to_thread(
+        compute_similarity_overlap,
+        title,
+        description.strip(),
+        file_content,
+    )
+    report = _build_report(
         analysis_id=analysis_id,
         title=title,
         description=description.strip(),
         file_content=file_content,
         my_tech_hint=my_tech_stack,
+        sim=sim,
     )
 
     record = report.model_dump()

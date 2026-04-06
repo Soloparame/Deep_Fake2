@@ -36,6 +36,14 @@ export interface AnalysisReport {
   description: string;
   file_content: string;
   similarity_score: number;
+  /** Badge for the gauge, e.g. "similar" | "distinct" */
+  similarity_label?: string | null;
+  /** How the overlap score was produced (HF + web vs fallback) */
+  similarity_description?: string | null;
+  /** Snippet of web/synthetic "market" text used for comparison */
+  market_search_snippet?: string | null;
+  /** True when the score came from Hugging Face Inference */
+  similarity_hf_live?: boolean | null;
   swot: SwotBlock;
   tech_comparison: TechComparisonRow[];
   recommendations: string[];

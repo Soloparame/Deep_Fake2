@@ -44,6 +44,22 @@ class AnalysisReport(BaseModel):
     description: str
     file_content: str
     similarity_score: float = Field(ge=0, le=100, description="Percentage 0–100")
+    similarity_label: Optional[str] = Field(
+        default=None,
+        description="UI badge, e.g. similar vs distinct",
+    )
+    similarity_description: Optional[str] = Field(
+        default=None,
+        description="How the overlap index was computed",
+    )
+    market_search_snippet: Optional[str] = Field(
+        default=None,
+        description="Web/market text compared against your document (truncated)",
+    )
+    similarity_hf_live: Optional[bool] = Field(
+        default=None,
+        description="True if score came from Hugging Face Inference API",
+    )
     swot: SWOTBlock = Field(default_factory=SWOTBlock)
     tech_comparison: List[TechComparisonRow] = Field(default_factory=list)
     recommendations: List[str] = Field(default_factory=list)

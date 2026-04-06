@@ -8,12 +8,16 @@ from fastapi_backend.core.config import settings
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Handle TensorFlow import gracefully
+# TensorFlow import: must catch Exception, not only ImportError.
+# A separate pip "keras" (e.g. Keras 3) alongside TF 2.10 can raise TypeError:
+# api_export.__init__() got an unexpected keyword argument 'metaclass'
+# Fix for video model users: pip uninstall keras  (use tf.keras bundled with TensorFlow)
 try:
     import tensorflow as tf
+
     TF_AVAILABLE = True
-except ImportError as e:
-    logger.error(f"Failed to import TensorFlow: {e}")
+except Exception as e:
+    logger.error("Failed to import TensorFlow: %s", e)
     TF_AVAILABLE = False
     tf = None
 
@@ -44,7 +48,10 @@ def load_model():
     
     if not TF_AVAILABLE:
         logger.error("TensorFlow is not available. Cannot load model.")
-        raise ImportError("TensorFlow is required but not installed. Install with: pip install tensorflow")
+        raise ImportError(
+            "TensorFlow failed to import. Install tensorflow==2.10.x, or if you see Keras errors, "
+            "remove the standalone keras package: pip uninstall keras"
+        )
 
     # Check if model file exists
     if not os.path.exists(settings.MODEL_PATH):

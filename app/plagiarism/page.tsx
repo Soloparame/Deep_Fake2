@@ -43,9 +43,7 @@ export default function PlagiarismPage() {
   const [historyLoading, setHistoryLoading] = useState(true);
   const [history, setHistory] = useState<AnalysisListItem[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [hasToken, setHasToken] = useState(() =>
-    typeof window !== "undefined" ? !!window.localStorage.getItem("realeye_token") : false
-  );
+  const [hasToken, setHasToken] = useState(false);
 
   const loadHistory = useCallback(async () => {
     setHistoryLoading(true);

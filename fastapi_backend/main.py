@@ -19,8 +19,9 @@ async def lifespan(app: FastAPI):
         print("   The API will start, but /api/detect-video will not work until the model is available.")
     except ImportError as e:
         print(f"❌ ERROR: {e}")
-        print("   Please install TensorFlow: pip install tensorflow")
-        print("   The API will start, but /api/detect-video will not work until TensorFlow is installed.")
+        print("   Install TensorFlow 2.10.x, or run: pip uninstall keras")
+        print("   (A separate Keras 3 install often breaks TensorFlow 2.10’s bundled keras.)")
+        print("   The API will start, but /api/detect-video will not work until the model loads.")
     except Exception as e:
         print(f"❌ WARNING: Could not load model: {e}")
         print("   The API will start, but /api/detect-video will not work until the model loads successfully.")

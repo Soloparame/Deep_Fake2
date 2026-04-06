@@ -8,6 +8,10 @@ python-multipart==0.0.6
 # NOTE: Model was saved with very old TensorFlow version (uses batch_shape)
 # Using TensorFlow 2.10 which still supports old model formats
 # If you get DLL errors on Windows, use: pip install tensorflow-cpu==2.10.0
+#
+# If startup fails with Keras TypeError (metaclass / api_export): uninstall standalone keras —
+#   pip uninstall keras
+# TensorFlow 2.10 ships keras inside tf.keras; a separate Keras 3 install breaks imports.
 tensorflow==2.10.0
 numpy==1.23.5
 
@@ -17,7 +21,9 @@ opencv-python==4.8.1.78
 
 # HTTP client (for Hugging Face inference API)
 requests>=2.28.0
-huggingface_hub>=0.17.0
+huggingface_hub>=0.26.0
+langchain-community>=0.2.0
+duckduckgo-search>=6.0.0
 
 # Utilities
 # IMPORTANT: FastAPI 0.104.1 requires Pydantic v2.x
