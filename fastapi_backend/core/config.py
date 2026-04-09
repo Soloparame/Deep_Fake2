@@ -56,6 +56,10 @@ class Settings:
     # Hugging Face Inference API (for image detection)
     HF_TOKEN: str = os.getenv("HF_TOKEN", "")
     HF_IMAGE_MODEL: str = os.getenv("HF_IMAGE_MODEL", "Ateeqq/ai-vs-human-image-detector")
+    
+    # Groq (LLM strategy generation, e.g. SWOT)
+    GROQ_API_KEY: str = os.getenv("GROQ_API_KEY", "")
+    GROQ_MODEL: str = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
 
 settings = Settings()
 

@@ -9,13 +9,17 @@ from fastapi import APIRouter, File, Form, HTTPException, Request, UploadFile, s
 from fastapi_backend.database import analyses_col, new_id
 from fastapi_backend.services.auth_service import AuthService
 from fastapi_backend.services.similarity_search import SimilarityResult, compute_similarity_overlap
+from fastapi_backend.services.swot_service import generate_swot_analysis
+from fastapi_backend.services.tech_lens_service import generate_tech_lens
+from fastapi_backend.services.recommendations_service import generate_recommendations_and_resources
+from fastapi_backend.services.devils_advocate_service import generate_devils_advocate_questions
+from fastapi_backend.services.positioning_service import generate_market_positioning
 from fastapi_backend.schemas.analysis import (
     AnalysisHistoryResponse,
     AnalysisListItem,
     AnalysisReport,
     ReferenceItem,
     StrategyBlock,
-    StrategyVenn,
     SWOTBlock,
     TechComparisonRow,
 )
@@ -41,10 +45,14 @@ def _build_report(
     title: str,
     description: str,
     file_content: str,
-    my_tech_hint: str,
     sim: SimilarityResult,
+    swot: SWOTBlock,
+    tech_comparison: list[TechComparisonRow],
+    recommendations: list[str],
+    references: list[ReferenceItem],
+    devils_advocate: list[str],
+    strategy: StrategyBlock,
 ) -> AnalysisReport:
-    user_stack = (my_tech_hint or "Next.js, TypeScript, Tailwind").strip()
     return AnalysisReport(
         id=analysis_id,
         title=title or "Untitled project",
@@ -55,102 +63,12 @@ def _build_report(
         similarity_description=sim.description,
         market_search_snippet=sim.market_snippet,
         similarity_hf_live=sim.hf_ok,
-        swot=SWOTBlock(
-            strengths=[
-                "Clear problem statement and defined user persona",
-                "Modern stack aligns with hiring market expectations",
-                "Room to differentiate on workflow UX",
-            ],
-            weaknesses=[
-                "Overlap with several well-funded competitors",
-                "Limited moat if features remain generic",
-            ],
-            opportunities=[
-                "Niche vertical packaging (e.g. education, compliance)",
-                "Partnerships with existing data providers",
-            ],
-            threats=[
-                "Rapid LLM commoditization of baseline features",
-                "Platform risk if relying on a single vendor API",
-            ],
-        ),
-        tech_comparison=[
-            TechComparisonRow(
-                area="Auth & data",
-                user_stack=user_stack,
-                competitor_stack="Firebase Auth, Firestore, proprietary rules",
-                advantage="Your choice keeps logic portable and avoids vendor lock-in for auth flows you control end-to-end.",
-            ),
-            TechComparisonRow(
-                area="Search / vectors",
-                user_stack="Embeddings API + managed vector DB (e.g. Pinecone)",
-                competitor_stack="Elasticsearch + custom ranking",
-                advantage="Faster iteration for semantic search prototypes; easier to tune per domain without ops-heavy clusters.",
-            ),
-            TechComparisonRow(
-                area="Payments",
-                user_stack="Stripe",
-                competitor_stack="PayPal + manual invoicing",
-                advantage="Stripe’s developer UX and webhooks reduce time-to-first-revenue for SaaS billing.",
-            ),
-        ],
-        recommendations=[
-            "Supabase for Postgres + auth + realtime if you want fewer moving parts early",
-            "Pinecone or Qdrant Cloud for vector search with minimal ops",
-            "Stripe Billing for subscription monetization",
-            "OpenTelemetry + a hosted collector for observability before scale",
-        ],
-        references=[
-            ReferenceItem(
-                title="Similarity & citation tooling (examples)",
-                url="https://github.com/topics/plagiarism-detection",
-                kind="github",
-            ),
-            ReferenceItem(
-                title="Sentence-BERT: Sentence Embeddings (arXiv)",
-                url="https://arxiv.org/abs/1908.10084",
-                kind="arxiv",
-            ),
-            ReferenceItem(
-                title="Dense passage retrieval for open-domain QA (arXiv)",
-                url="https://arxiv.org/abs/2004.04906",
-                kind="arxiv",
-            ),
-        ],
-        strategy=StrategyBlock(
-            venn=StrategyVenn(
-                shared_features=[
-                    "Document upload & similarity score",
-                    "User dashboard for history",
-                    "API-first integration story",
-                ],
-                unique_to_you=[
-                    "Devil’s advocate defense prep",
-                    "Combined SWOT + tech lens in one report",
-                    "Strategy tab with pivot ideas tailored to your abstract",
-                ],
-                unique_to_market=[
-                    "Mature enterprise SSO & audit trails",
-                    "Large pre-indexed web corpus licensing",
-                ],
-            ),
-            market_pivots=[
-                "Position as “thesis defense copilot” for graduate programs",
-                "Sell to bootcamps as an originality + structure coach",
-                "White-label API for LMS vendors",
-            ],
-            monetization=[
-                "SaaS: tiered monthly plans by pages analyzed",
-                "Freemium: free limited scans; paid deep reports & exports",
-                "B2B site license for institutions",
-            ],
-        ),
-        devils_advocate=[
-            "If similarity is high, what evidence proves original contribution beyond paraphrasing?",
-            "Why would users pay recurringly instead of using a free LLM once?",
-            "What stops an incumbent from shipping your roadmap in one sprint?",
-            "Which metric will you defend in six months if growth stalls?",
-        ],
+        swot=swot,
+        tech_comparison=tech_comparison,
+        recommendations=recommendations,
+        references=references,
+        strategy=strategy,
+        devils_advocate=devils_advocate,
         created_at=datetime.datetime.utcnow(),
     )
 
@@ -167,7 +85,7 @@ async def analyze_project(
     """
     Accept multipart form: title, description, optional my_tech_stack, optional pasted_content,
     optional PDF/DOCX file. Extracts text, runs web search + HF similarity for the overlap index,
-    returns structured analysis (SWOT/strategy still template) and persists to MongoDB.
+    returns structured analysis (SWOT via Groq + remaining sections template) and persists to MongoDB.
     Requires Authorization so the run is stored under your user (same as other app features).
     """
     user_id, user_email = _user_from_request(request)
@@ -215,13 +133,58 @@ async def analyze_project(
         description.strip(),
         file_content,
     )
+    swot = await asyncio.to_thread(
+        generate_swot_analysis,
+        title,
+        description.strip(),
+        file_content,
+        sim.score,
+        sim.market_snippet,
+        my_tech_stack,
+    )
+    tech_lens = await asyncio.to_thread(
+        generate_tech_lens,
+        title,
+        description.strip(),
+        my_tech_stack,
+        sim.market_snippet,
+    )
+    recommendations, references = await asyncio.to_thread(
+        generate_recommendations_and_resources,
+        title,
+        description.strip(),
+        sim.score,
+        swot,
+        sim.market_snippet,
+    )
+    devils_advocate = await asyncio.to_thread(
+        generate_devils_advocate_questions,
+        title,
+        description.strip(),
+        sim.score,
+        sim.market_snippet,
+    )
+    strategy = await asyncio.to_thread(
+        generate_market_positioning,
+        title,
+        description.strip(),
+        sim.score,
+        sim.market_snippet,
+        swot.weaknesses,
+        my_tech_stack,
+    )
     report = _build_report(
         analysis_id=analysis_id,
         title=title,
         description=description.strip(),
         file_content=file_content,
-        my_tech_hint=my_tech_stack,
         sim=sim,
+        swot=swot,
+        tech_comparison=tech_lens,
+        recommendations=recommendations,
+        references=references,
+        devils_advocate=devils_advocate,
+        strategy=strategy,
     )
 
     record = report.model_dump()

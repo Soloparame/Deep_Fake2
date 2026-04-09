@@ -17,6 +17,10 @@ function SectionTitle({ children, icon }: { children: ReactNode; icon: ReactNode
 }
 
 export function TechLensSection({ report }: Props) {
+  if (!report.tech_comparison || report.tech_comparison.length === 0) {
+    return null;
+  }
+
   return (
     <div className="space-y-10">
       <div className="rounded-3xl border border-white/[0.07] bg-zinc-950/40 p-5 shadow-inner sm:p-6">
