@@ -2,6 +2,12 @@ import cv2
 import numpy as np
 import os
 import logging
+import time
+from concurrent.futures import ThreadPoolExecutor
+from typing import Any, Dict, List, Optional
+
+import requests
+
 from fastapi_backend.core.config import settings
 
 # Configure logging
@@ -21,8 +27,13 @@ except Exception as e:
     TF_AVAILABLE = False
     tf = None
 
-# Global variable to hold the model
+# Global variable to hold the model (used only when VIDEO_USE_HF_API is false)
 _model = None
+
+
+def uses_hf_video() -> bool:
+    return bool(settings.VIDEO_USE_HF_API and (settings.HF_TOKEN or "").strip())
+
 
 def load_model():
     """
@@ -45,7 +56,15 @@ def load_model():
         Exception: If model loading fails (corrupted file, version mismatch, etc.)
     """
     global _model
-    
+
+    if uses_hf_video():
+        _model = None
+        logger.info(
+            "Video detection uses Hugging Face Inference (%s). Skipping local Keras load.",
+            ", ".join(settings.hf_video_model_ids()),
+        )
+        return
+
     if not TF_AVAILABLE:
         logger.error("TensorFlow is not available. Cannot load model.")
         raise ImportError(
@@ -234,43 +253,180 @@ def preprocess_frame(frame, target_size: tuple) -> np.ndarray:
     
     return frame
 
-def predict_video(video_path: str) -> dict:
+
+def _hf_inference_urls_for_model(model_id: str) -> List[str]:
+    """Router is the supported inference host; legacy api-inference often returns 410 Gone."""
+    mid = model_id.strip().strip("/")
+    return [
+        f"https://router.huggingface.co/hf-inference/models/{mid}",
+        f"https://api-inference.huggingface.co/models/{mid}",
+    ]
+
+
+def _hf_pack_inference_response(resp: requests.Response) -> Dict[str, Any]:
+    status_code = resp.status_code
+    if status_code == 200:
+        try:
+            return {"http_status": 200, "api": resp.json()}
+        except Exception:
+            return {
+                "http_status": 200,
+                "api": None,
+                "raw_text": (resp.text or "")[:8000],
+            }
+    try:
+        api = resp.json()
+    except Exception:
+        api = None
+    return {
+        "http_status": status_code,
+        "api": api,
+        "raw_text": None if api is not None else (resp.text or "")[:8000],
+    }
+
+
+def _hf_post_frame_model_raw(jpeg_bytes: bytes, model_id: str) -> Dict[str, Any]:
     """
-    Processes a video file and returns prediction results.
-    
-    **Process Flow:**
-    1. Opens video file using OpenCV
-    2. Samples frames (not every frame for performance)
-    3. Preprocesses each frame (resize, normalize)
-    4. Runs model inference on each frame
-    5. Aggregates predictions across all frames
-    6. Applies threshold to classify REAL/FAKE
-    7. Returns result with confidence score
-    
-    **Args:**
-        video_path (str): Path to the video file
-        
-    **Returns:**
-        dict: {
-            "label": "REAL" or "FAKE",
-            "score": float (0.0 to 1.0),
-            "probability": float,
-            "classification": str
+    POST one JPEG to a single HF model; return http_status and body as JSON (or raw_text).
+    Tries api-inference first, then router (router often returns 404 for models that work on api-inference).
+    """
+    token = (settings.HF_TOKEN or "").strip()
+    if not token:
+        return {"http_status": None, "api": None, "error": "HF_TOKEN not configured"}
+
+    urls = _hf_inference_urls_for_model(model_id)
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "image/jpeg",
+    }
+    max_attempts = 3
+    last_result: Dict[str, Any] = {"http_status": None, "api": None, "error": "request failed"}
+
+    for attempt in range(max_attempts):
+        loading_retry = False
+        attempt_last: Optional[Dict[str, Any]] = None
+
+        for url in urls:
+            try:
+                resp = requests.post(url, headers=headers, data=jpeg_bytes, timeout=90)
+            except requests.RequestException as exc:
+                logger.warning("HF request failed (%s): %s", url, exc)
+                attempt_last = {"http_status": None, "api": None, "error": str(exc)}
+                last_result = attempt_last
+                continue
+
+            sc = resp.status_code
+            text_lower = (resp.text or "").lower()
+
+            if sc == 200:
+                return _hf_pack_inference_response(resp)
+
+            if sc in (503, 429) and ("loading" in text_lower or sc == 503):
+                logger.info("HF model loading, retrying (attempt %s)…", attempt + 1)
+                time.sleep(min(20, 5 + attempt * 5))
+                loading_retry = True
+                break
+
+            attempt_last = _hf_pack_inference_response(resp)
+            last_result = attempt_last
+            if sc in (404, 410):
+                logger.debug(
+                    "HF %s on %s — trying next inference base if available", sc, url
+                )
+                continue
+            return attempt_last
+
+        if loading_retry:
+            continue
+        if attempt_last is not None:
+            return attempt_last
+        time.sleep(min(3, 1 + attempt))
+
+    return last_result
+
+
+def _predict_video_huggingface(video_path: str) -> dict:
+    if not (settings.HF_TOKEN or "").strip():
+        raise RuntimeError(
+            "HF_TOKEN is not set. Add HF_TOKEN to .env for Hugging Face video detection."
+        )
+
+    cap = cv2.VideoCapture(video_path)
+    if not cap.isOpened():
+        raise ValueError(f"Could not open video file: {video_path}")
+
+    try:
+        frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        fps = cap.get(cv2.CAP_PROP_FPS)
+        if frame_count == 0:
+            raise ValueError("Video file appears to be empty or corrupted")
+
+        model_ids = settings.hf_video_model_ids()
+        logger.info(
+            "HF video deepfake: %s frames, %.2f FPS, models=%s",
+            frame_count,
+            fps,
+            model_ids,
+        )
+
+        skip_frames = max(1, frame_count // settings.MAX_FRAMES_TO_PROCESS)
+        frame_index = 0
+        processed_count = 0
+        frame_results: List[Dict[str, Any]] = []
+
+        while processed_count < settings.MAX_FRAMES_TO_PROCESS:
+            ret, frame = cap.read()
+            if not ret:
+                break
+            if frame_index % skip_frames == 0:
+                rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                ok, buf = cv2.imencode(
+                    ".jpg", rgb, [int(cv2.IMWRITE_JPEG_QUALITY), 85]
+                )
+                if ok:
+                    jpeg = buf.tobytes()
+                    workers = min(8, max(1, len(model_ids)))
+                    with ThreadPoolExecutor(max_workers=workers) as pool:
+                        payloads = list(
+                            pool.map(
+                                lambda m: _hf_post_frame_model_raw(jpeg, m),
+                                model_ids,
+                            )
+                        )
+                    per_model = {
+                        mid: p for mid, p in zip(model_ids, payloads)
+                    }
+                    frame_results.append(
+                        {"frame_index": frame_index, "models": per_model}
+                    )
+                processed_count += 1
+            frame_index += 1
+
+        logger.info(
+            "HF video: %s frames × %s models (raw API payloads only)",
+            len(frame_results),
+            len(model_ids),
+        )
+
+        return {
+            "source": "huggingface",
+            "models": model_ids,
+            "frame_count": frame_count,
+            "fps": float(fps) if fps else 0.0,
+            "frame_results": frame_results,
         }
-        
-    **Raises:**
-        RuntimeError: If model is not loaded
-        ValueError: If video file cannot be opened or processed
-    """
+    finally:
+        cap.release()
+
+
+def _predict_video_keras(video_path: str) -> dict:
+    """Legacy path: local TensorFlow/Keras model."""
     global _model
-    
-    # Check if model is loaded
     if _model is None:
         error_msg = "Model is not loaded. Please ensure the model file exists at the correct path."
         logger.error(error_msg)
         raise RuntimeError(error_msg)
 
-    # Open video file
     cap = cv2.VideoCapture(video_path)
     if not cap.isOpened():
         raise ValueError(f"Could not open video file: {video_path}")
@@ -469,3 +625,18 @@ def predict_video(video_path: str) -> dict:
     except Exception as e:
         cap.release()
         raise ValueError(f"Error processing video: {str(e)}")
+
+
+def predict_video(video_path: str) -> dict:
+    """
+    Processes a video file.
+
+    When ``VIDEO_USE_HF_API`` and ``HF_TOKEN`` are set, samples frames and calls
+    each configured HF model per frame; returns only raw API payloads (no verdict
+    or threshold on the server).
+
+    Otherwise runs the local Keras model and returns label/score/message.
+    """
+    if uses_hf_video():
+        return _predict_video_huggingface(video_path)
+    return _predict_video_keras(video_path)

@@ -12,19 +12,28 @@ async def lifespan(app: FastAPI):
     # Startup: Load the model and seed knowledge base
     try:
         model_service.load_model()
-        print("✅ Model loaded successfully!")
+        if model_service.uses_hf_video():
+            mids = ", ".join(settings.hf_video_model_ids())
+            print(
+                "✅ Video detection: Hugging Face Inference API "
+                f"({mids}). No local .keras file required."
+            )
+        else:
+            print("✅ Local Keras model loaded for video detection.")
     except FileNotFoundError as e:
         print(f"❌ ERROR: Model file not found: {e}")
-        print(f"   Please place your deepfake_model.h5 file at: {settings.MODEL_PATH}")
-        print("   The API will start, but /api/detect-video will not work until the model is available.")
+        print(f"   Please place your deepfake model at: {settings.MODEL_PATH}")
+        print("   Or set HF_TOKEN and VIDEO_USE_HF_API=true (default) to use Hugging Face for video.")
+        print("   The API will start, but /api/detect-video will not work until a backend is available.")
     except ImportError as e:
         print(f"❌ ERROR: {e}")
         print("   Install TensorFlow 2.10.x, or run: pip uninstall keras")
         print("   (A separate Keras 3 install often breaks TensorFlow 2.10’s bundled keras.)")
-        print("   The API will start, but /api/detect-video will not work until the model loads.")
+        print("   Or use HF_TOKEN + VIDEO_USE_HF_API=true for API-based video detection.")
+        print("   The API will start, but local /api/detect-video will not work until the model loads.")
     except Exception as e:
         print(f"❌ WARNING: Could not load model: {e}")
-        print("   The API will start, but /api/detect-video will not work until the model loads successfully.")
+        print("   The API will start, but local /api/detect-video will not work until the model loads successfully.")
     
     # Seed knowledge base
     try:

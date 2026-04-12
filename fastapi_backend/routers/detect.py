@@ -6,8 +6,6 @@ import shutil
 import os
 import uuid
 import requests
-from pydantic import BaseModel
-from typing import Literal
 import datetime
 from fastapi_backend.database import predictions_col
 
@@ -229,43 +227,18 @@ async def detect_image(request: Request, file: UploadFile = File(...)):
         )
 
 
-class DetectionResponse(BaseModel):
-    """
-    Response model for video detection endpoint.
-    Returns label (REAL/FAKE) and score (0-1).
-    """
-    label: Literal["REAL", "FAKE"]
-    score: float
-    probability: float
-    classification: str
-    message: str
-
-@router.post("/detect-video", response_model=DetectionResponse, status_code=status.HTTP_200_OK)
+@router.post("/detect-video", status_code=status.HTTP_200_OK)
 async def detect_video(request: Request, file: UploadFile = File(...)):
     """
-    Upload a video file to detect deepfakes.
-    
-    **Request:**
-    - Content-Type: multipart/form-data
-    - Body: video file (mp4, avi, mov, etc.)
-    
-    **Response:**
-    ```json
-    {
-        "result": "REAL" or "FAKE",
-        "confidence": 0.955,
-        "message": "The video is likely manipulated."
-    }
-    ```
-    
-    **Process:**
-    1. Validates video file type
-    2. Saves video temporarily
-    3. Extracts and processes frames
-    4. Runs ML model inference
-    5. Aggregates predictions
-    6. Returns result with confidence and message
-    7. Cleans up temporary files
+    Upload a video for deepfake analysis.
+
+    **Local Keras** (``VIDEO_USE_HF_API=false``): returns
+    ``label``, ``score``, ``probability``, ``classification``, ``message``, ``source: "keras"``.
+
+    **Hugging Face** (default): returns ``source: "huggingface"``, ``models`` (id list),
+    ``frame_count``, ``fps``, and ``frame_results``. Each frame has ``models``: mapping
+    model id → ``{ http_status, api, ... }`` as returned by the Inference API. No verdict
+    or threshold is computed on the server.
     """
     # Validate file type (allow by extension if Content-Type is missing)
     allowed_exts = {".mp4", ".avi", ".mov", ".webm"}
@@ -319,19 +292,23 @@ async def detect_video(request: Request, file: UploadFile = File(...)):
         with open(temp_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
             
-        # Run ML inference
+        # Run ML inference (HF: raw per-frame API bodies only; Keras: local scores)
         result = model_service.predict_video(temp_path)
-        
-        # Persist prediction to MongoDB
+
+        if result.get("source") == "huggingface":
+            # No server-side REAL/FAKE; client saves history via /api/videos/upload with full analysis.
+            return result
+
+        # Local Keras: persist prediction to MongoDB
         user_email = None
         try:
             token = request.headers.get("Authorization")
             if token:
                 profile = AuthService.get_current_user_profile(token)
                 user_email = profile.get("email")
-        except:
-            pass  # If auth fails, continue without user_email
-        
+        except Exception:
+            pass
+
         record = {
             "id": str(uuid.uuid4()),
             "type": "video",
@@ -343,7 +320,6 @@ async def detect_video(request: Request, file: UploadFile = File(...)):
             "created_at": datetime.datetime.utcnow(),
         }
         try:
-            # Print for debugging
             print(f"Attempting to save record to DB: {record}")
             if predictions_col:
                 insert_result = predictions_col.insert_one(record)
@@ -352,15 +328,15 @@ async def detect_video(request: Request, file: UploadFile = File(...)):
                 print("⚠️  predictions_col is None, skipping save")
         except Exception as e:
             print(f"❌ Failed to save to MongoDB: {e}")
-        
-        # Ensure response matches exact format
-        return DetectionResponse(
-            label=result["label"],
-            score=result["score"],
-            probability=result.get("probability", result["score"]),
-            classification=result.get("classification", result["label"]),
-            message=result.get("message", "")
-        )
+
+        return {
+            "source": "keras",
+            "label": result["label"],
+            "score": result["score"],
+            "probability": result.get("probability", result["score"]),
+            "classification": result.get("classification", result["label"]),
+            "message": result.get("message", ""),
+        }
         
     except ValueError as e:
         # Video processing errors (invalid file, can't read, etc.)

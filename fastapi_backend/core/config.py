@@ -1,4 +1,6 @@
 import os
+from typing import List
+
 from dotenv import load_dotenv, dotenv_values
 
 # Load environment variables from fastapi_backend/.env
@@ -56,10 +58,29 @@ class Settings:
     # Hugging Face Inference API (for image detection)
     HF_TOKEN: str = os.getenv("HF_TOKEN", "")
     HF_IMAGE_MODEL: str = os.getenv("HF_IMAGE_MODEL", "Ateeqq/ai-vs-human-image-detector")
+    # Video: comma-separated HF model ids (must be inference-live on router; see hf_video_model_ids default)
+    HF_VIDEO_MODELS: str = os.getenv("HF_VIDEO_MODELS", "")
+    # "true" = /api/detect-video uses HF only (skips local Keras on startup). "false" = legacy local model.
+    VIDEO_USE_HF_API: bool = os.getenv("VIDEO_USE_HF_API", "true").strip().lower() in (
+        "1",
+        "true",
+        "yes",
+    )
     
     # Groq (LLM strategy generation, e.g. SWOT)
     GROQ_API_KEY: str = os.getenv("GROQ_API_KEY", "")
     GROQ_MODEL: str = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
+
+    def hf_video_model_ids(self) -> List[str]:
+        raw = (self.HF_VIDEO_MODELS or "").strip()
+        if raw:
+            return [x.strip().strip("/") for x in raw.split(",") if x.strip()]
+        # These two resolve on router.huggingface.co (legacy api-inference is 410; many hub IDs are 404 on inference).
+        return [
+            "dima806/deepfake_vs_real_image_detection",
+            "Ateeqq/ai-vs-human-image-detector",
+        ]
+
 
 settings = Settings()
 

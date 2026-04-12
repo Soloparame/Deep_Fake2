@@ -2,11 +2,13 @@
 
 import { FormEvent, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { deepfakeDetector, DetectionResult } from "@/utils/deepfakeDetector";
+import { deepfakeDetector, DetectionResult, VideoVerdict } from "@/utils/deepfakeDetector";
 
 interface AnalysisResult {
   label: string;
   confidence: number;
+  source?: "huggingface" | "keras";
+  videoVerdict?: VideoVerdict;
 }
 
 interface HistoryItem {
@@ -26,6 +28,43 @@ const Spinner = () => (
 );
 
 const ResultCard = ({ result, mode }: { result: AnalysisResult; mode: string }) => {
+  const v = result.videoVerdict;
+  if (result.source === "huggingface" && v) {
+    const suspicious = v.status === "Suspicious";
+    const uncertain = v.status === "Uncertain";
+    const dotColor = uncertain ? "bg-amber-500" : suspicious ? "bg-red-500" : "bg-green-500";
+    const statusColor = uncertain ? "text-amber-400" : suspicious ? "text-red-400" : "text-green-400";
+    return (
+      <div className="mt-6 rounded-xl border border-white/10 bg-gray-900/50 p-5">
+        <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-gray-500">
+          <span className={`h-2 w-2 rounded-full ${dotColor}`} />
+          Analysis complete
+        </h3>
+        <div className="rounded-lg border border-white/5 bg-black/20 px-4 py-4">
+          <p className="text-xs font-medium uppercase tracking-wide text-gray-500">Verdict</p>
+          <p className={`mt-1 text-2xl font-bold ${statusColor}`}>{v.status}</p>
+          <p className="mt-3 text-sm text-gray-400">
+            Average fake probability
+            <span className="ml-2 font-mono text-white">{v.averageFakeProbabilityPercent.toFixed(2)}%</span>
+          </p>
+          <p className="mt-1 text-xs text-gray-600">
+            {v.modelsConfigured} HF model{v.modelsConfigured === 1 ? "" : "s"} · {v.samplesUsed} score
+            {v.samplesUsed === 1 ? "" : "s"} pooled
+          </p>
+          <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-gray-800">
+            <div
+              className={`h-full rounded-full transition-all duration-500 ${
+                uncertain ? "bg-amber-500" : suspicious ? "bg-red-500" : "bg-green-500"
+              }`}
+              style={{ width: `${Math.min(100, v.averageFakeProbabilityPercent)}%` }}
+            />
+          </div>
+        </div>
+        <p className="mt-3 text-xs text-gray-600">{mode}</p>
+      </div>
+    );
+  }
+
   const isReal = (result.label || "").toUpperCase() === "REAL";
   return (
     <div className="mt-6 rounded-xl border border-white/10 bg-gray-900/50 p-5">
@@ -130,11 +169,25 @@ export default function UploadPage() {
         deepfakeDetector.analyzeVideo(file, setProgress),
         new Promise<DetectionResult>((_, r) => setTimeout(() => r(new Error("Analysis timeout")), 300000)),
       ]);
-      setResult({ label: detectionResult.label || "REAL", confidence: detectionResult.confidence });
+      setResult({
+        label: detectionResult.label || "REAL",
+        confidence: detectionResult.confidence,
+        source: detectionResult.source,
+        videoVerdict: detectionResult.videoVerdict,
+      });
       try {
         const formData = new FormData();
         formData.append("video", file);
-        formData.append("analysis", JSON.stringify(detectionResult));
+        const analysisPayload =
+          detectionResult.source === "huggingface"
+            ? {
+                label: detectionResult.label,
+                confidence: detectionResult.confidence,
+                source: detectionResult.source,
+                videoVerdict: detectionResult.videoVerdict,
+              }
+            : detectionResult;
+        formData.append("analysis", JSON.stringify(analysisPayload));
         await fetch("http://localhost:8000/api/videos/upload", {
           method: "POST",
           headers: { Authorization: `Bearer ${token}` },
@@ -331,7 +384,16 @@ export default function UploadPage() {
                   "Scan Video"
                 )}
               </button>
-              {result && <ResultCard result={result} mode="Video · TensorFlow" />}
+              {result && (
+                <ResultCard
+                  result={result}
+                  mode={
+                    result.source === "huggingface"
+                      ? `Video · Hugging Face (${result.videoVerdict?.modelsConfigured ?? "—"} models)`
+                      : "Video · local Keras"
+                  }
+                />
+              )}
             </form>
           )}
 
