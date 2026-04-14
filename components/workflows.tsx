@@ -17,11 +17,11 @@ export default function Workflows() {
               </span>
             </div>
             <h2 className="animate-[gradient_6s_linear_infinite] bg-[linear-gradient(to_right,var(--color-gray-200),var(--color-indigo-200),var(--color-gray-50),var(--color-indigo-300),var(--color-gray-200))] bg-[length:200%_auto] bg-clip-text pb-4 font-nacelle text-3xl font-semibold text-transparent md:text-4xl">
-              How RealEye Detects Deepfakes
+              How RealEye Works
             </h2>
             <p className="text-lg text-indigo-200/65">
-              Our AI-powered detection system works in three simple steps to verify 
-              video authenticity and protect you from manipulated content.
+              A simple 3-step flow for deepfake video checks, image authenticity,
+              and Project Intel analysis.
             </p>
           </div>
           {/* Spotlight items */}
@@ -67,8 +67,8 @@ export default function Workflows() {
                     </span>
                   </div>
                   <p className="text-indigo-200/65">
-                    Upload your video file through our secure interface. 
-                    We support all major video formats for easy verification.
+                    Choose your input: upload a video, upload an image, or paste/upload
+                    project content for Project Intel.
                   </p>
                 </div>
               </div>
@@ -114,8 +114,8 @@ export default function Workflows() {
                     </span>
                   </div>
                   <p className="text-indigo-200/65">
-                    Our AI extracts frames and analyzes facial features using 
-                    advanced deep learning models to detect manipulation.
+                    RealEye runs the right pipeline: frame-level deepfake detection,
+                    image AI checks, or smart competitor-aware similarity analysis.
                   </p>
                 </div>
               </div>
@@ -161,8 +161,8 @@ export default function Workflows() {
                     </span>
                   </div>
                   <p className="text-indigo-200/65">
-                    Get instant results with detailed confidence scores and 
-                    a comprehensive authenticity report for your video.
+                    Review clear outputs with confidence, competitors found, strategy
+                    insights, and export-ready reports.
                   </p>
                 </div>
               </div>

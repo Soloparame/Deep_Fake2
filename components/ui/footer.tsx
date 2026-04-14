@@ -27,7 +27,7 @@ export default function Footer() {
             <ul className="space-y-2 text-sm">
               <li>
                 <Link
-                  className="text-indigo-200/65 transition hover:text-indigo-500"
+                  className="text-indigo-100/90 transition hover:text-indigo-200"
                   href="/pages/how-it-works"
                 >
                   How It Works
@@ -35,7 +35,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  className="text-indigo-200/65 transition hover:text-indigo-500"
+                  className="text-indigo-100/90 transition hover:text-indigo-200"
                   href="/pages/features"
                 >
                   Features
@@ -43,7 +43,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  className="text-indigo-200/65 transition hover:text-indigo-500"
+                  className="text-indigo-100/90 transition hover:text-indigo-200"
                   href="/pages/pricing"
                 >
                   Pricing
@@ -51,7 +51,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  className="text-indigo-200/65 transition hover:text-indigo-500"
+                  className="text-indigo-100/90 transition hover:text-indigo-200"
                   href="/pages/api-access"
                 >
                   API Access
@@ -59,7 +59,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  className="text-indigo-200/65 transition hover:text-indigo-500"
+                  className="text-indigo-100/90 transition hover:text-indigo-200"
                   href="/pages/documentation"
                 >
                   Documentation
@@ -73,7 +73,7 @@ export default function Footer() {
             <ul className="space-y-2 text-sm">
               <li>
                 <Link
-                  className="text-indigo-200/65 transition hover:text-indigo-500"
+                  className="text-indigo-100/90 transition hover:text-indigo-200"
                   href="/pages/about-us"
                 >
                   About Us
@@ -81,7 +81,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  className="text-indigo-200/65 transition hover:text-indigo-500"
+                  className="text-indigo-100/90 transition hover:text-indigo-200"
                   href="/pages/research"
                 >
                   Research
@@ -89,7 +89,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  className="text-indigo-200/65 transition hover:text-indigo-500"
+                  className="text-indigo-100/90 transition hover:text-indigo-200"
                   href="/pages/blog"
                 >
                   Blog
@@ -97,7 +97,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  className="text-indigo-200/65 transition hover:text-indigo-500"
+                  className="text-indigo-100/90 transition hover:text-indigo-200"
                   href="/pages/careers"
                 >
                   Careers
@@ -105,7 +105,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  className="text-indigo-200/65 transition hover:text-indigo-500"
+                  className="text-indigo-100/90 transition hover:text-indigo-200"
                   href="/pages/contact"
                 >
                   Contact
@@ -119,7 +119,7 @@ export default function Footer() {
             <ul className="space-y-2 text-sm">
               <li>
                 <Link
-                  className="text-indigo-200/65 transition hover:text-indigo-500"
+                  className="text-indigo-100/90 transition hover:text-indigo-200"
                   href="/pages/community"
                 >
                   Community
@@ -127,7 +127,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  className="text-indigo-200/65 transition hover:text-indigo-500"
+                  className="text-indigo-100/90 transition hover:text-indigo-200"
                   href="/pages/terms-of-service"
                 >
                   Terms of Service
@@ -135,7 +135,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  className="text-indigo-200/65 transition hover:text-indigo-500"
+                  className="text-indigo-100/90 transition hover:text-indigo-200"
                   href="/pages/privacy-policy"
                 >
                   Privacy Policy
@@ -143,7 +143,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  className="text-indigo-200/65 transition hover:text-indigo-500"
+                  className="text-indigo-100/90 transition hover:text-indigo-200"
                   href="/pages/security"
                 >
                   Security
@@ -159,7 +159,7 @@ export default function Footer() {
             <ul className="space-y-2 text-sm">
               <li>
                 <Link
-                  className="text-indigo-200/65 transition hover:text-indigo-500"
+                  className="text-indigo-100/90 transition hover:text-indigo-200"
                   href="/pages/help-center"
                 >
                   Help Center
@@ -167,7 +167,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  className="text-indigo-200/65 transition hover:text-indigo-500"
+                  className="text-indigo-100/90 transition hover:text-indigo-200"
                   href="/pages/tutorials"
                 >
                   Tutorials
@@ -175,7 +175,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  className="text-indigo-200/65 transition hover:text-indigo-500"
+                  className="text-indigo-100/90 transition hover:text-indigo-200"
                   href="/pages/faq"
                 >
                   FAQ
@@ -183,7 +183,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  className="text-indigo-200/65 transition hover:text-indigo-500"
+                  className="text-indigo-100/90 transition hover:text-indigo-200"
                   href="/pages/report-issue"
                 >
                   Report Issue

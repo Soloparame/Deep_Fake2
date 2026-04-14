@@ -211,11 +211,11 @@ export default function PlagiarismPage() {
           </div>
           <h1 className="font-nacelle text-4xl font-bold tracking-tight text-white drop-shadow-sm sm:text-5xl">
             <span className="bg-gradient-to-r from-indigo-200 via-white to-violet-200 bg-clip-text text-transparent">
-              Plagiarism Checker
+              Project Intel
             </span>
           </h1>
           <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-zinc-400 sm:text-base">
-            Similarity insights, SWOT, tech comparison, strategy, and defense prep — in one refined report.
+            Similarity intelligence, competitor discovery, SWOT, tech comparison, strategy, and defense prep — in one refined report.
           </p>
           {!hasToken && (
             <div className="mx-auto mt-6 max-w-lg rounded-2xl border border-amber-500/25 bg-amber-950/30 px-4 py-3 text-sm text-amber-100/90">

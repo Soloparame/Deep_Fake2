@@ -19,6 +19,7 @@ from fastapi_backend.schemas.analysis import (
     AnalysisListItem,
     AnalysisReport,
     ReferenceItem,
+    SimilarProjectItem,
     StrategyBlock,
     SWOTBlock,
     TechComparisonRow,
@@ -62,6 +63,9 @@ def _build_report(
         similarity_label=sim.label,
         similarity_description=sim.description,
         market_search_snippet=sim.market_snippet,
+        found_projects=[
+            SimilarProjectItem(name=p.name, link=p.link, snippet=p.snippet) for p in sim.found_projects
+        ],
         similarity_hf_live=sim.hf_ok,
         swot=swot,
         tech_comparison=tech_comparison,

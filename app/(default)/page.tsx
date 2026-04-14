@@ -1,6 +1,7 @@
 export const metadata = {
-  title: "RealEye - Advanced Deepfake Detection",
-  description: "Detect AI-generated videos with cutting-edge deep learning technology. Verify video authenticity and combat misinformation.",
+  title: "RealEye - Media Authenticity + Project Intel",
+  description:
+    "Detect deepfake videos and AI-generated images, then run Project Intel for similarity, competitor discovery, and strategy insights.",
 };
 
 import PageIllustration from "@/components/page-illustration";

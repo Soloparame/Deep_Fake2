@@ -72,6 +72,36 @@ export function SimilarityGauge({ report }: Props) {
 
       <p className="relative mt-6 text-center text-xs leading-relaxed text-zinc-500">{blurb}</p>
 
+      {report.found_projects?.length ? (
+        <div className="relative mt-5 rounded-2xl border border-indigo-400/20 bg-gradient-to-b from-indigo-500/[0.08] to-violet-500/[0.05] p-3 shadow-lg shadow-indigo-900/10">
+          <div className="mb-2 flex items-center justify-between gap-2">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-indigo-200/90">
+              Competitors Found
+            </p>
+            <span className="rounded-full border border-indigo-300/30 bg-indigo-500/10 px-2 py-0.5 text-[10px] font-medium text-indigo-200/80">
+              {report.found_projects.length}
+            </span>
+          </div>
+          <div className="space-y-2">
+            {report.found_projects.slice(0, 4).map((p, idx) => (
+              <a
+                key={`${p.link}-${idx}`}
+                href={p.link}
+                target="_blank"
+                rel="noreferrer"
+                className="group block rounded-xl border border-white/[0.08] bg-black/20 px-3 py-2.5 transition hover:border-indigo-400/40 hover:bg-black/35"
+              >
+                <p className="truncate text-xs font-semibold text-indigo-100 transition group-hover:text-indigo-200">
+                  {p.name}
+                </p>
+                <p className="mt-1 line-clamp-2 text-[11px] leading-relaxed text-zinc-400">{p.snippet}</p>
+                <p className="mt-1 truncate text-[10px] text-zinc-500">{p.link}</p>
+              </a>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
       {report.market_search_snippet ? (
         <details className="relative mt-4 rounded-xl border border-white/[0.06] bg-black/20 px-3 py-2 text-left">
           <summary className="cursor-pointer text-[11px] font-medium text-zinc-400">Market / web text used for comparison</summary>

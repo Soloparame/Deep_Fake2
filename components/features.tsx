@@ -36,15 +36,15 @@ export default function Features() {
           <div className="mx-auto max-w-3xl pb-4 text-center md:pb-12">
             <div className="inline-flex items-center gap-3 pb-3 before:h-px before:w-8 before:bg-linear-to-r before:from-transparent before:to-indigo-200/50 after:h-px after:w-8 after:bg-linear-to-l after:from-transparent after:to-indigo-200/50">
               <span className="inline-flex bg-linear-to-r from-indigo-500 to-indigo-200 bg-clip-text text-transparent">
-                Advanced AI Detection
+                Unified Intelligence Stack
               </span>
             </div>
             <h2 className="animate-[gradient_6s_linear_infinite] bg-[linear-gradient(to_right,var(--color-gray-200),var(--color-indigo-200),var(--color-gray-50),var(--color-indigo-300),var(--color-gray-200))] bg-[length:200%_auto] bg-clip-text pb-4 font-nacelle text-3xl font-semibold text-transparent md:text-4xl">
-              Powered by State-of-the-Art Technology
+              Built for Detection and Strategic Insight
             </h2>
             <p className="text-lg text-indigo-200/65">
-              RealEye leverages deep neural networks, including XceptionNet and EfficientNet,
-              to analyze visual features and identify AI-generated content with high accuracy.
+              RealEye pairs media forensics with market-aware project analysis so you can
+              validate authenticity and evaluate originality in one place.
             </p>
           </div>
           {/* Features image with enhanced styling */}
@@ -73,12 +73,11 @@ export default function Features() {
                 />
               </svg>
               <h3 className="mb-1 font-nacelle text-[1rem] font-semibold text-gray-200">
-                AI-Powered Face Detection & Deep Analysis
+                Deepfake Video Analysis
               </h3>
               <p className="text-indigo-200/65">
-                Utilizes advanced face detection algorithms including MTCNN and Dlib to precisely extract 
-                facial regions from video frames, followed by comprehensive deep learning analysis to identify 
-                subtle manipulation artifacts and deepfake patterns that are invisible to the human eye.
+                Frame-level analysis and model inference detect manipulated sequences,
+                synthetic faces, and visual artifacts in uploaded videos.
               </p>
             </article>
             <article>
@@ -92,11 +91,11 @@ export default function Features() {
                 <path d="M19 6H0v2h17v8H7v-6H5v8h19v-2h-5V6Z" />
               </svg>
               <h3 className="mb-1 font-nacelle text-[1rem] font-semibold text-gray-200">
-                Frame Extraction
+                AI Image Detection
               </h3>
               <p className="text-indigo-200/65">
-                Automated frame extraction using OpenCV and FFmpeg to process videos
-                and prepare them for deep learning analysis.
+                Image Doctor flags AI-generated and edited images with confidence scores,
+                helping you verify visuals before publishing or sharing.
               </p>
             </article>
             <article>
@@ -113,11 +112,11 @@ export default function Features() {
                 />
               </svg>
               <h3 className="mb-1 font-nacelle text-[1rem] font-semibold text-gray-200">
-                Real-Time Analysis
+                Project Intel Reports
               </h3>
               <p className="text-indigo-200/65">
-                Fast and efficient video processing with optimized algorithms to deliver
-                detection results in seconds.
+                Go beyond plagiarism checks with similarity scoring, SWOT, tech lens,
+                competitor discovery, recommendations, and strategy outputs.
               </p>
             </article>
             <article>
@@ -141,11 +140,11 @@ export default function Features() {
                 />
               </svg>
               <h3 className="mb-1 font-nacelle text-[1rem] font-semibold text-gray-200">
-                High Accuracy Detection
+                Competitor-Aware Similarity
               </h3>
               <p className="text-indigo-200/65">
-                State-of-the-art models trained on extensive datasets to identify
-                deepfakes with confidence scores and detailed analysis.
+                Smart context extraction and web search identify projects closest to your
+                functionality, market, and positioning.
               </p>
             </article>
             <article>
@@ -163,11 +162,11 @@ export default function Features() {
                 />
               </svg>
               <h3 className="mb-1 font-nacelle text-[1rem] font-semibold text-gray-200">
-                Privacy Focused
+                Secure and Private Processing
               </h3>
               <p className="text-indigo-200/65">
-                Your uploaded videos are processed securely and deleted immediately after analysis
-                to protect your privacy.
+                Uploaded media and documents are processed with privacy-first controls and
+                account-based history access.
               </p>
             </article>
             <article>
@@ -181,11 +180,11 @@ export default function Features() {
                 <path d="M19.406 3.844 6.083 20.497.586 15 2 13.586l3.917 3.917L17.844 2.595l1.562 1.25Z" />
               </svg>
               <h3 className="mb-1 font-nacelle text-[1rem] font-semibold text-gray-200">
-                Image Doctor
+                Actionable Output
               </h3>
               <p className="text-indigo-200/65">
-                Advanced AI analysis for static images to detect manipulation, GAN-generated content, 
-                and deepfake artifacts with high precision.
+                Every run returns clear verdicts, confidence signals, and explainable project
+                intelligence you can use immediately.
               </p>
             </article>
             <article>
@@ -202,11 +201,11 @@ export default function Features() {
                 <path d="M19.406 3.844 6.083 20.497.586 15 2 13.586l3.917 3.917L17.844 2.595l1.562 1.25Z" />
               </svg>
               <h3 className="mb-1 font-nacelle text-[1rem] font-semibold text-gray-200">
-                Detailed Reports
+                Exportable Results
               </h3>
               <p className="text-indigo-200/65">
-                Receive comprehensive analysis reports with confidence scores,
-                visual indicators, and verification status.
+                Download JSON and text reports for audit trails, collaboration, or downstream
+                tooling.
               </p>
             </article>
           </div>

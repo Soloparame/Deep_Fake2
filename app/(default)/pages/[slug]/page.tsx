@@ -52,7 +52,7 @@ function PremiumPage({ title, description, children }: { title: string, descript
           <h1 className="animate-[gradient_6s_linear_infinite] bg-[linear-gradient(to_right,var(--color-gray-200),var(--color-indigo-200),var(--color-gray-50),var(--color-indigo-300),var(--color-gray-200))] bg-[length:200%_auto] bg-clip-text pb-4 font-nacelle text-4xl font-bold text-transparent md:text-5xl">
             {title}
           </h1>
-          <p className="text-xl text-indigo-200/65">{description}</p>
+          <p className="text-xl text-indigo-100/90">{description}</p>
         </div>
 
         <div className="mx-auto">
@@ -169,7 +169,7 @@ export default async function Page({
             <p className="mt-2 text-sm text-gray-300">
               Upload via the website or API. Supported formats include MP4, MOV, AVI, and WebM. File sizes are limited for performance and reliability.
             </p>
-            <ul className="mt-3 list-disc pl-4 text-xs text-indigo-200/65">
+            <ul className="mt-3 list-disc pl-4 text-sm text-indigo-100/90">
               <li>Simple upload process with progress feedback</li>
               <li>Data encryption in transit</li>
               <li>Private and secure handling of uploads</li>
@@ -193,7 +193,7 @@ export default async function Page({
             <p className="mt-2 text-sm text-gray-300">
               The video is split into frames and key frames are selected for analysis. Working at the frame level helps catch subtle manipulations.
             </p>
-            <ul className="mt-3 list-disc pl-4 text-xs text-indigo-200/65">
+            <ul className="mt-3 list-disc pl-4 text-sm text-indigo-100/90">
               <li>Key-frame selection to focus on meaningful frames</li>
               <li>Performance-optimized sampling for fast processing</li>
             </ul>
@@ -205,7 +205,7 @@ export default async function Page({
             <p className="mt-2 text-sm text-gray-300">
               Faces are detected and tracked across frames to focus analysis on regions most commonly manipulated in deepfakes.
             </p>
-            <ul className="mt-3 list-disc pl-4 text-xs text-indigo-200/65">
+            <ul className="mt-3 list-disc pl-4 text-sm text-indigo-100/90">
               <li>Multi-face support</li>
               <li>Face alignment for consistent evaluation</li>
               <li>Stability across movements and scene changes</li>
@@ -218,7 +218,7 @@ export default async function Page({
             <p className="mt-2 text-sm text-gray-300">
               Core AI models analyze facial patterns to detect artifacts and inconsistencies, trained on real and fake datasets for robust generalization.
             </p>
-            <ul className="mt-3 list-disc pl-4 text-xs text-indigo-200/65">
+            <ul className="mt-3 list-disc pl-4 text-sm text-indigo-100/90">
               <li>Texture and pixel-level inconsistency checks</li>
               <li>Lip-sync and eye-blinking patterns</li>
               <li>Confidence aggregation across frames</li>
@@ -231,7 +231,7 @@ export default async function Page({
             <p className="mt-2 text-sm text-gray-300">
               Results across frames are combined into a final probability score, reflecting the likelihood of manipulation.
             </p>
-            <ul className="mt-3 list-disc pl-4 text-xs text-indigo-200/65">
+            <ul className="mt-3 list-disc pl-4 text-sm text-indigo-100/90">
               <li>Score meaning: Real / Suspicious / Fake</li>
               <li>High transparency in how decisions are made</li>
             </ul>
@@ -243,7 +243,7 @@ export default async function Page({
             <p className="mt-2 text-sm text-gray-300">
               A full report is generated with the confidence score, summary of analysis, and highlighted frames that triggered suspicious indicators.
             </p>
-            <ul className="mt-3 list-disc pl-4 text-xs text-indigo-200/65">
+            <ul className="mt-3 list-disc pl-4 text-sm text-indigo-100/90">
               <li>Detailed analysis summary</li>
               <li>Highlighted suspicious frames</li>
               <li>Downloadable PDF for documentation or verification</li>

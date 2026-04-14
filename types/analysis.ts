@@ -30,6 +30,12 @@ export interface StrategyBlock {
   monetization: string[];
 }
 
+export interface SimilarProjectItem {
+  name: string;
+  link: string;
+  snippet: string;
+}
+
 export interface AnalysisReport {
   id: string;
   title: string;
@@ -42,6 +48,8 @@ export interface AnalysisReport {
   similarity_description?: string | null;
   /** Snippet of web/synthetic "market" text used for comparison */
   market_search_snippet?: string | null;
+  /** Extracted real-world projects/competitors from market search text */
+  found_projects: SimilarProjectItem[];
   /** True when the score came from Hugging Face Inference */
   similarity_hf_live?: boolean | null;
   swot: SwotBlock;

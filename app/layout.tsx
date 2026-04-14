@@ -39,8 +39,9 @@ const nacelle = localFont({
 });
 
 export const metadata = {
-  title: "RealEye - AI-Powered Deepfake Detection",
-  description: "Advanced AI-based system for detecting deepfakes and synthetic videos. Protect yourself from misinformation and verify video authenticity.",
+  title: "RealEye - Deepfake, Image AI, and Project Intel",
+  description:
+    "Unified platform for deepfake video detection, AI image checks, and Project Intel analysis with similarity, competitor search, and strategic insights.",
 };
 
 export default function RootLayout({

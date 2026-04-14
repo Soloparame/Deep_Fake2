@@ -7,47 +7,47 @@ const faqs = [
   {
     category: "general",
     question: "What is RealEye and how does it work?",
-    answer: "RealEye is an AI-powered deepfake detection system that uses advanced deep learning models (XceptionNet and EfficientNet) to analyze videos and detect AI-generated or manipulated content. It processes videos through frame extraction, face detection using MTCNN/Dlib, and feature analysis to determine authenticity.",
+    answer: "RealEye is an AI trust platform with three core tools: deepfake video detection, AI image detection (Image Doctor), and Project Intel analysis for similarity, competitor discovery, and strategic insights.",
   },
   {
     category: "general",
     question: "What file formats does RealEye support?",
-    answer: "RealEye supports all major video formats including MP4, MOV, AVI, MKV, and WebM. The system uses OpenCV and FFmpeg for frame extraction and processing.",
+    answer: "For media checks, RealEye supports common video formats such as MP4, MOV, AVI, and WebM, plus major image formats for Image Doctor. Project Intel supports pasted text and document uploads (PDF/DOCX).",
   },
   {
     category: "general",
-    question: "How accurate is RealEye's detection?",
-    answer: "RealEye uses state-of-the-art deep learning models trained on extensive datasets to achieve high accuracy in detecting deepfakes. The system provides confidence scores for each analysis to help you understand the reliability of the results.",
+    question: "How accurate are the analysis results?",
+    answer: "RealEye combines model confidence with context-aware processing. Media checks provide confidence signals, while Project Intel blends semantic similarity and market search context to produce practical, stable scoring.",
   },
   {
     category: "privacy",
-    question: "Is my video data secure?",
-    answer: "Yes, privacy is our top priority. All uploaded videos are processed securely and deleted immediately after analysis. We never store your videos permanently, ensuring your data remains private and protected.",
+    question: "Is my uploaded data secure?",
+    answer: "Yes. Uploaded media and documents are processed through secured backend services with account-scoped history access. Data handling follows privacy-first design so analyses stay tied to your account context.",
   },
   {
     category: "privacy",
-    question: "Where is my video processed?",
-    answer: "Your video is processed on our secure servers using encrypted connections. Once analysis is complete, the video file is permanently deleted from our systems within minutes of processing.",
+    question: "Where is processing performed?",
+    answer: "Processing is performed server-side through secured API services. Depending on the feature, RealEye may call model providers for inference (for example Hugging Face) while preserving your app-level auth and workflow controls.",
   },
   {
     category: "technical",
-    question: "How long does video analysis take?",
-    answer: "Analysis time depends on video length and resolution. Typical processing times range from a few seconds for short clips to a minute or two for longer videos. The system is optimized for fast and efficient processing.",
+    question: "How long does analysis take?",
+    answer: "Runtime depends on task type: image checks are usually fastest, video analysis depends on length and sampled frames, and Project Intel depends on document size plus web/context enrichment.",
   },
   {
     category: "technical",
     question: "What makes RealEye different from other detection tools?",
-    answer: "RealEye combines multiple advanced AI models (XceptionNet and EfficientNet) with facial feature analysis to provide comprehensive deepfake detection. Our system can identify subtle inconsistencies that indicate AI manipulation, providing detailed confidence scores and analysis reports.",
+    answer: "Most tools stop at detection. RealEye combines media authenticity checks with Project Intel, so you can validate content and also understand market overlap, competitors, and strategic direction in one place.",
   },
   {
     category: "technical",
-    question: "Can RealEye detect all types of deepfakes?",
-    answer: "RealEye is designed to detect various types of AI-generated and manipulated content, including face swaps, reenactments, and synthetic videos. However, as deepfake technology evolves, continuous model updates are necessary to maintain detection accuracy against new techniques.",
+    question: "Can RealEye detect every manipulation type?",
+    answer: "No tool can guarantee 100% coverage of every evolving manipulation technique. RealEye is designed to improve reliability with multiple detection paths and continuous model and pipeline updates.",
   },
   {
     category: "technical",
-    question: "Does RealEye work with audio as well?",
-    answer: "Currently, RealEye focuses on visual deepfake detection. Audio verification is under development and will be available in future updates. For now, the system analyzes video frames and facial features to detect manipulation.",
+    question: "What is Project Intel?",
+    answer: "Project Intel is RealEye's strategy analysis workspace (formerly labeled plagiarism). It includes smart similarity scoring, competitor discovery, SWOT, tech lens, recommendations, and devil's advocate prompts.",
   },
 ];
 
@@ -75,9 +75,9 @@ export default function Testimonials() {
           <h2 className="animate-[gradient_6s_linear_infinite] bg-[linear-gradient(to_right,var(--color-gray-200),var(--color-indigo-200),var(--color-gray-50),var(--color-indigo-300),var(--color-gray-200))] bg-[length:200%_auto] bg-clip-text pb-4 font-nacelle text-3xl font-semibold text-transparent md:text-4xl">
             Frequently Asked Questions
           </h2>
-          <p className="text-lg text-indigo-200/65">
-            Everything you need to know about RealEye's deepfake detection capabilities,
-            privacy features, and technical specifications.
+          <p className="text-lg text-indigo-100/90">
+            Everything you need to know about RealEye's detection and Project Intel capabilities,
+            privacy posture, and technical behavior.
           </p>
         </div>
 
@@ -87,9 +87,9 @@ export default function Testimonials() {
             {categories.map((category) => (
               <button
                 key={category.id}
-                className={`flex h-8 items-center gap-2.5 whitespace-nowrap rounded-full px-4 text-sm font-medium transition-colors focus-visible:outline-hidden focus-visible:ring-3 focus-visible:ring-indigo-200 ${activeCategory === category.id
-                  ? "relative bg-linear-to-b from-gray-900 via-gray-800/60 to-gray-900 before:pointer-events-none before:absolute before:inset-0 before:rounded-[inherit] before:border before:border-transparent before:[background:linear-gradient(to_bottom,--theme(--color-indigo-500/0),--theme(--color-indigo-500/.5))_border-box] before:[mask-composite:exclude_!important] before:[mask:linear-gradient(white_0_0)_padding-box,_linear-gradient(white_0_0)]"
-                  : "opacity-65 transition-opacity hover:opacity-90"
+                className={`flex h-8 items-center gap-2.5 whitespace-nowrap rounded-full px-4 text-sm font-medium text-[#e2e8f0] transition-colors focus-visible:outline-hidden focus-visible:ring-3 focus-visible:ring-indigo-200 ${activeCategory === category.id
+                  ? "bg-gray-800 border border-indigo-500/60 text-white"
+                  : "opacity-85 transition-opacity hover:opacity-100"
                   }`}
                 onClick={() => {
                   setActiveCategory(category.id);
@@ -107,13 +107,13 @@ export default function Testimonials() {
           {filteredFaqs.map((faq, index) => (
             <div
               key={index}
-              className="group relative overflow-hidden rounded-2xl bg-linear-to-br from-gray-900/50 via-gray-800/25 to-gray-900/50 backdrop-blur-xs transition-all before:pointer-events-none before:absolute before:inset-0 before:rounded-[inherit] before:border before:border-transparent before:[background:linear-gradient(to_right,var(--color-gray-800),var(--color-gray-700),var(--color-gray-800))_border-box] before:[mask-composite:exclude_!important] before:[mask:linear-gradient(white_0_0)_padding-box,_linear-gradient(white_0_0)] hover:bg-gray-800/40"
+              className="group overflow-hidden rounded-2xl border border-gray-700/70 bg-gray-900/60 backdrop-blur-xs transition-all hover:border-indigo-400/50 hover:bg-gray-800/50"
             >
               <button
-                className="flex w-full items-start justify-between gap-4 p-5 text-left"
+                className="flex w-full items-start justify-between gap-4 p-5 text-left text-[#e5e7eb]"
                 onClick={() => toggleQuestion(index)}
               >
-                <span className="text-lg font-medium text-gray-200 transition-colors group-hover:text-indigo-200">
+                <span className="text-lg font-medium text-[#f8fafc] transition-colors group-hover:text-white">
                   {faq.question}
                 </span>
                 <svg
@@ -127,7 +127,7 @@ export default function Testimonials() {
               </button>
               {openIndex === index && (
                 <div className="px-5 pb-5">
-                  <p className="text-indigo-200/65">{faq.answer}</p>
+                  <p className="text-[#cbd5e1]">{faq.answer}</p>
                 </div>
               )}
             </div>
@@ -136,7 +136,7 @@ export default function Testimonials() {
 
         {/* Contact CTA */}
         <div className="mt-12 text-center">
-          <p className="mb-4 text-indigo-200/65">
+          <p className="mb-4 text-indigo-100/90">
             Still have questions?
           </p>
           <Link

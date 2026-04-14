@@ -38,6 +38,12 @@ class StrategyBlock(BaseModel):
     monetization: List[str] = Field(default_factory=list)
 
 
+class SimilarProjectItem(BaseModel):
+    name: str = ""
+    link: str = ""
+    snippet: str = ""
+
+
 class AnalysisReport(BaseModel):
     id: str
     title: str
@@ -55,6 +61,10 @@ class AnalysisReport(BaseModel):
     market_search_snippet: Optional[str] = Field(
         default=None,
         description="Web/market text compared against your document (truncated)",
+    )
+    found_projects: List[SimilarProjectItem] = Field(
+        default_factory=list,
+        description="Named competitors/projects extracted from web search results",
     )
     similarity_hf_live: Optional[bool] = Field(
         default=None,

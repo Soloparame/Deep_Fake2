@@ -101,7 +101,7 @@ export default function Header() {
                     href="/plagiarism"
                     className="rounded-full px-4 py-1.5 text-sm font-medium text-gray-300 transition-colors hover:bg-white/5 hover:text-white"
                   >
-                    Plagiarism
+                    Project Intel
                   </Link>
                 </li>
                 <li>

@@ -123,3 +123,10 @@
     border-color: var(--color-gray-200, currentColor);
   }
 }
+
+@layer utilities {
+  /* Improve readability for legacy low-contrast text utility usage */
+  .text-indigo-200\/65 {
+    color: rgb(224 231 255 / 0.9) !important;
+  }
+}

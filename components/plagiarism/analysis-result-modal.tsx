@@ -35,6 +35,11 @@ function buildTextReport(report: AnalysisReport): string {
     report.market_search_snippet
       ? `\n--- Market / web text (comparison) ---\n${report.market_search_snippet}\n`
       : "",
+    report.found_projects?.length
+      ? `\n--- Similar projects found ---\n${report.found_projects
+          .map((p) => `• ${p.name}\n  ${p.snippet}\n  ${p.link}`)
+          .join("\n")}\n`
+      : "",
     ``,
     `--- SWOT ---`,
     `Strengths:`,
