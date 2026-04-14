@@ -19,9 +19,9 @@ export function SimilarityGauge({ report }: Props) {
   const offset = c - (pct / 100) * c;
 
   return (
-    <div className="relative overflow-hidden rounded-3xl border border-white/[0.08] bg-gradient-to-b from-zinc-900/60 to-zinc-950/90 p-6 shadow-xl ring-1 ring-white/[0.04] sm:p-8">
-      <div className="pointer-events-none absolute -right-12 -top-12 h-40 w-40 rounded-full bg-indigo-500/20 blur-3xl" />
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-indigo-500/20 to-transparent" />
+    <div className="group/gauge relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-b from-zinc-900/80 to-zinc-950/95 p-6 shadow-2xl transition-all duration-500 hover:shadow-indigo-500/10 hover:border-indigo-500/20 sm:p-8">
+      <div className="pointer-events-none absolute -right-12 -top-12 h-40 w-40 rounded-full bg-indigo-500/20 blur-3xl transition-opacity duration-500 group-hover/gauge:opacity-80" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-indigo-500/30 to-transparent transition-opacity duration-500 group-hover/gauge:via-indigo-400/50" />
 
       <div className="relative mb-6 flex items-center justify-between gap-3">
         <div>
@@ -33,34 +33,34 @@ export function SimilarityGauge({ report }: Props) {
         </div>
       </div>
 
-      <div className="relative mx-auto flex h-44 w-44 items-center justify-center">
-        <div className="absolute inset-0 rounded-full bg-indigo-500/10 blur-2xl" />
-        <div className="absolute inset-2 rounded-full border border-white/[0.06]" />
-        <svg className="relative -rotate-90 transform" viewBox="0 0 120 120" aria-hidden>
-          <circle cx="60" cy="60" r={r} fill="none" stroke="rgb(39 39 42)" strokeWidth="9" />
+      <div className="relative mx-auto flex h-48 w-48 items-center justify-center transition-transform duration-500 group-hover/gauge:scale-105">
+        <div className="absolute inset-0 rounded-full bg-indigo-500/15 blur-[30px] transition-all duration-500 group-hover/gauge:bg-indigo-500/25 group-hover/gauge:blur-[40px]" />
+        <div className="absolute inset-3 rounded-full border border-white/10" />
+        <svg className="relative -rotate-90 transform drop-shadow-xl" viewBox="0 0 120 120" aria-hidden>
+          <circle cx="60" cy="60" r={r} fill="none" stroke="rgba(255,255,255,0.03)" strokeWidth="10" />
           <circle
             cx="60"
             cy="60"
             r={r}
             fill="none"
             stroke={`url(#${gradId})`}
-            strokeWidth="9"
+            strokeWidth="10"
             strokeLinecap="round"
             strokeDasharray={c}
             strokeDashoffset={offset}
-            className="transition-[stroke-dashoffset] duration-1000 ease-out"
+            className="transition-[stroke-dashoffset] duration-[1.5s] ease-out shadow-lg shadow-indigo-500/50"
           />
           <defs>
             <linearGradient id={gradId} x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="rgb(129 140 248)" />
-              <stop offset="50%" stopColor="rgb(99 102 241)" />
-              <stop offset="100%" stopColor="rgb(167 139 250)" />
+              <stop offset="0%" stopColor="#818cf8" />
+              <stop offset="50%" stopColor="#6366f1" />
+              <stop offset="100%" stopColor="#c084fc" />
             </linearGradient>
           </defs>
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="font-nacelle text-4xl font-bold tracking-tight text-white">{Math.round(pct)}%</span>
-          <span className="text-[11px] font-medium uppercase tracking-wider text-indigo-300/70">{badge}</span>
+          <span className="font-nacelle text-5xl font-bold tracking-tight text-white drop-shadow-sm transition-all duration-300 group-hover/gauge:text-indigo-100">{Math.round(pct)}%</span>
+          <span className="mt-1 text-[11px] font-bold uppercase tracking-widest text-indigo-300/80 transition-colors group-hover/gauge:text-indigo-300">{badge}</span>
         </div>
       </div>
 
@@ -73,29 +73,39 @@ export function SimilarityGauge({ report }: Props) {
       <p className="relative mt-6 text-center text-xs leading-relaxed text-zinc-500">{blurb}</p>
 
       {report.found_projects?.length ? (
-        <div className="relative mt-5 rounded-2xl border border-indigo-400/20 bg-gradient-to-b from-indigo-500/[0.08] to-violet-500/[0.05] p-3 shadow-lg shadow-indigo-900/10">
-          <div className="mb-2 flex items-center justify-between gap-2">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-indigo-200/90">
-              Competitors Found
-            </p>
-            <span className="rounded-full border border-indigo-300/30 bg-indigo-500/10 px-2 py-0.5 text-[10px] font-medium text-indigo-200/80">
+        <div className="relative mt-6 overflow-hidden rounded-2xl border border-indigo-500/20 bg-gradient-to-b from-indigo-500/10 to-transparent p-4 shadow-[0_0_20px_rgba(99,102,241,0.05)] backdrop-blur-sm sm:p-5">
+          <div className="mb-4 flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-indigo-400 opacity-60"></span>
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-indigo-500"></span>
+              </span>
+              <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-indigo-200">
+                Competitors Found
+              </p>
+            </div>
+            <span className="rounded-full border border-indigo-400/30 bg-indigo-500/20 px-2.5 py-0.5 text-[11px] font-bold text-indigo-200">
               {report.found_projects.length}
             </span>
           </div>
-          <div className="space-y-2">
+          <div className="space-y-2.5">
             {report.found_projects.slice(0, 4).map((p, idx) => (
               <a
                 key={`${p.link}-${idx}`}
                 href={p.link}
                 target="_blank"
                 rel="noreferrer"
-                className="group block rounded-xl border border-white/[0.08] bg-black/20 px-3 py-2.5 transition hover:border-indigo-400/40 hover:bg-black/35"
+                className="group relative block overflow-hidden rounded-xl border border-white/10 bg-black/40 px-4 py-3 transition-all duration-300 hover:border-indigo-500/50 hover:bg-white/5 hover:shadow-[0_0_15px_rgba(99,102,241,0.1)] hover:-translate-y-0.5"
               >
-                <p className="truncate text-xs font-semibold text-indigo-100 transition group-hover:text-indigo-200">
+                <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/0 via-indigo-500/0 to-indigo-500/0 transition-all duration-500 group-hover:from-indigo-500/5 group-hover:to-purple-500/5" />
+                <p className="relative truncate text-sm font-semibold text-white transition-colors duration-300 group-hover:text-indigo-300">
                   {p.name}
+                  <svg className="ml-1.5 inline-block h-3 w-3 text-indigo-400/50 opacity-0 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
                 </p>
-                <p className="mt-1 line-clamp-2 text-[11px] leading-relaxed text-zinc-400">{p.snippet}</p>
-                <p className="mt-1 truncate text-[10px] text-zinc-500">{p.link}</p>
+                <p className="relative mt-1 line-clamp-2 text-xs leading-relaxed text-zinc-400 transition-colors group-hover:text-zinc-300">{p.snippet}</p>
+                <p className="relative mt-2 truncate text-[10px] text-zinc-500 group-hover:text-indigo-400/70">{p.link}</p>
               </a>
             ))}
           </div>
@@ -103,9 +113,17 @@ export function SimilarityGauge({ report }: Props) {
       ) : null}
 
       {report.market_search_snippet ? (
-        <details className="relative mt-4 rounded-xl border border-white/[0.06] bg-black/20 px-3 py-2 text-left">
-          <summary className="cursor-pointer text-[11px] font-medium text-zinc-400">Market / web text used for comparison</summary>
-          <p className="mt-2 max-h-32 overflow-y-auto text-[11px] leading-relaxed text-zinc-500">{report.market_search_snippet}</p>
+        <details className="group/details relative mt-5 rounded-xl border border-white/5 bg-black/30 px-4 py-3 text-left transition-all hover:border-white/10">
+          <summary className="cursor-pointer text-[12px] font-medium text-zinc-400 group-hover/details:text-zinc-300 list-none flex justify-between items-center [&::-webkit-details-marker]:hidden">
+            <span>Market & web reference text</span>
+            <svg className="h-4 w-4 transition-transform group-open/details:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </summary>
+          <div className="mt-3 overflow-hidden rounded-lg bg-black/40 border border-white/5 p-3 relative">
+             <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+             <p className="max-h-40 custom-scrollbar overflow-y-auto text-[11px] leading-relaxed text-zinc-400 pr-2">{report.market_search_snippet}</p>
+          </div>
         </details>
       ) : null}
     </div>
