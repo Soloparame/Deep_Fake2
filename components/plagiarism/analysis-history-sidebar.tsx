@@ -7,9 +7,10 @@ type Props = {
   loading: boolean;
   selectedId: string | null;
   onSelect: (id: string) => void;
+  onDelete?: (id: string) => void | Promise<void>;
 };
 
-export function AnalysisHistorySidebar({ items, loading, selectedId, onSelect }: Props) {
+export function AnalysisHistorySidebar({ items, loading, selectedId, onSelect, onDelete }: Props) {
   return (
     <aside className="relative overflow-hidden rounded-3xl border border-white/[0.08] bg-gradient-to-b from-zinc-900/90 to-zinc-950/98 p-5 shadow-2xl shadow-black/40 ring-1 ring-white/[0.05]">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-indigo-500/40 to-transparent" />
@@ -59,9 +60,7 @@ export function AnalysisHistorySidebar({ items, loading, selectedId, onSelect }:
             const active = selectedId === a.id;
             return (
               <li key={a.id}>
-                <button
-                  type="button"
-                  onClick={() => onSelect(a.id)}
+                <div
                   className={`group relative w-full overflow-hidden rounded-2xl border px-3.5 py-3 text-left transition-all ${
                     active
                       ? "border-indigo-500/40 bg-gradient-to-r from-indigo-500/15 to-violet-600/10 shadow-lg shadow-indigo-950/30"
@@ -73,16 +72,33 @@ export function AnalysisHistorySidebar({ items, loading, selectedId, onSelect }:
                       active ? "bg-gradient-to-b from-indigo-400 to-violet-500" : "bg-transparent group-hover:bg-zinc-600"
                     }`}
                   />
-                  <span className={`line-clamp-2 pl-1 text-sm font-medium ${active ? "text-white" : "text-zinc-300"}`}>
-                    {a.title}
-                  </span>
-                  <span className="mt-2 flex items-center justify-between pl-1 text-[11px] text-zinc-500">
-                    <span className="inline-flex items-center gap-1 rounded-md bg-black/25 px-1.5 py-0.5 font-mono text-zinc-400">
-                      {Math.round(a.similarity_score)}% match
-                    </span>
-                    {a.created_at && <span className="text-zinc-600">{new Date(a.created_at).toLocaleDateString()}</span>}
-                  </span>
-                </button>
+                  <div className="flex items-start gap-2">
+                    <button type="button" onClick={() => onSelect(a.id)} className="min-w-0 flex-1 text-left">
+                      <span className={`line-clamp-2 pl-1 text-sm font-medium ${active ? "text-white" : "text-zinc-300"}`}>
+                        {a.title}
+                      </span>
+                      <span className="mt-2 flex items-center justify-between pl-1 text-[11px] text-zinc-500">
+                        <span className="inline-flex items-center gap-1 rounded-md bg-black/25 px-1.5 py-0.5 font-mono text-zinc-400">
+                          {Math.round(a.similarity_score)}% match
+                        </span>
+                        {a.created_at && <span className="text-zinc-600">{new Date(a.created_at).toLocaleDateString()}</span>}
+                      </span>
+                    </button>
+                    {onDelete ? (
+                      <button
+                        type="button"
+                        aria-label={`Delete ${a.title}`}
+                        title="Delete"
+                        onClick={() => onDelete(a.id)}
+                        className="rounded-lg p-1.5 text-zinc-500 transition hover:bg-red-500/15 hover:text-red-300"
+                      >
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    ) : null}
+                  </div>
+                </div>
               </li>
             );
           })}

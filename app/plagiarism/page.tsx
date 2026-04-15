@@ -166,6 +166,31 @@ export default function PlagiarismPage() {
     }
   };
 
+  const deleteAnalysisById = async (id: string) => {
+    const ok = window.confirm("Delete this analysis from history? This cannot be undone.");
+    if (!ok) return;
+    setError(null);
+    try {
+      const res = await fetch(`${API_BASE}/api/analyses/${encodeURIComponent(id)}`, {
+        method: "DELETE",
+        headers: authHeaders(),
+      });
+      if (!res.ok) {
+        const txt = await res.text();
+        throw new Error(txt || "Could not delete analysis.");
+      }
+      if (selectedId === id) {
+        setSelectedId(null);
+        setReport(null);
+        setResultModalOpen(false);
+        setLastSubmittedFile(null);
+      }
+      await loadHistory();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to delete analysis.");
+    }
+  };
+
   const clearFile = () => {
     setFile(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
@@ -248,6 +273,7 @@ export default function PlagiarismPage() {
               loading={historyLoading}
               selectedId={selectedId}
               onSelect={(id) => loadAnalysisById(id)}
+              onDelete={(id) => deleteAnalysisById(id)}
             />
           </div>
 

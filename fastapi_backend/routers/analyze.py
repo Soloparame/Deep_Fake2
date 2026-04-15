@@ -268,3 +268,29 @@ async def get_analysis(request: Request, analysis_id: str):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Invalid stored record: {e}",
         )
+
+
+@router.delete("/analyses/{analysis_id}")
+async def delete_analysis(request: Request, analysis_id: str):
+    """
+    Delete one analysis owned by the signed-in user.
+    """
+    _, user_email = _user_from_request(request)
+    if not user_email:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Sign in required.")
+
+    try:
+        result = analyses_col.delete_one({"_id": analysis_id, "user_email": user_email})
+        if result.deleted_count == 0:
+            # Backward compatibility for records keyed with "id" field
+            result = analyses_col.delete_one({"id": analysis_id, "user_email": user_email})
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Analysis not found.")
+        return {"ok": True, "id": analysis_id}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Delete failed: {e}",
+        )
