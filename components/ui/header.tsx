@@ -8,6 +8,7 @@ import Logo from "./logo";
 export default function Header() {
   const router = useRouter();
   const [isAuthed, setIsAuthed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
     const checkAuth = () => {
@@ -30,26 +31,35 @@ export default function Header() {
     };
   }, []);
 
+  useEffect(() => {
+    const onResize = () => {
+      if (window.innerWidth >= 768) setMobileOpen(false);
+    };
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
   const handleLogout = () => {
     if (typeof window !== "undefined") {
       window.localStorage.removeItem("realeye_token");
       window.dispatchEvent(new Event("auth-change"));
     }
     setIsAuthed(false);
+    setMobileOpen(false);
     router.push("/signin");
   };
 
   return (
     <header className="fixed top-0 z-30 mt-4 w-full px-4 sm:px-6">
       <div className="mx-auto max-w-6xl">
-        <div className="relative flex h-14 items-center justify-between gap-3 rounded-full bg-gray-900/60 px-4 shadow-lg ring-1 ring-white/10 backdrop-blur-xl transition-all hover:bg-gray-900/70">
+        <div className="relative flex h-14 items-center justify-between gap-3 rounded-full bg-gray-900/60 px-4 shadow-lg ring-1 ring-white/10 backdrop-blur-xl transition-all hover:bg-gray-900/70 md:h-14">
           {/* Site branding */}
           <div className="flex flex-1 items-center">
             <Logo />
           </div>
 
           {/* Desktop links */}
-          <ul className="flex flex-1 items-center justify-end gap-3">
+          <ul className="hidden flex-1 items-center justify-end gap-3 md:flex">
             {!isAuthed && (
               <>
                 <li>
@@ -118,7 +128,95 @@ export default function Header() {
               </>
             )}
           </ul>
+
+          {/* Mobile menu button */}
+          <button
+            type="button"
+            aria-label={mobileOpen ? "Close menu" : "Open menu"}
+            aria-expanded={mobileOpen}
+            onClick={() => setMobileOpen((v) => !v)}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-gray-300 transition hover:bg-white/[0.08] hover:text-white md:hidden"
+          >
+            {mobileOpen ? (
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            ) : (
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            )}
+          </button>
         </div>
+
+        {/* Mobile menu panel */}
+        {mobileOpen && (
+          <div className="mt-3 overflow-hidden rounded-2xl border border-white/10 bg-gray-900/90 p-2 shadow-xl ring-1 ring-white/10 backdrop-blur-xl md:hidden">
+            {!isAuthed ? (
+              <div className="grid gap-1">
+                <Link
+                  href="/signin"
+                  onClick={() => setMobileOpen(false)}
+                  className="rounded-xl px-3 py-2.5 text-sm font-medium text-gray-200 transition hover:bg-white/[0.06] hover:text-white"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  href="/signup"
+                  onClick={() => setMobileOpen(false)}
+                  className="rounded-xl bg-indigo-600 px-3 py-2.5 text-sm font-medium text-white transition hover:bg-indigo-500"
+                >
+                  Register
+                </Link>
+              </div>
+            ) : (
+              <div className="grid gap-1">
+                <Link
+                  href="/community"
+                  onClick={() => setMobileOpen(false)}
+                  className="rounded-xl px-3 py-2.5 text-sm font-medium text-gray-200 transition hover:bg-white/[0.06] hover:text-white"
+                >
+                  Community
+                </Link>
+                <Link
+                  href="/chat"
+                  onClick={() => setMobileOpen(false)}
+                  className="rounded-xl px-3 py-2.5 text-sm font-medium text-gray-200 transition hover:bg-white/[0.06] hover:text-white"
+                >
+                  Chat
+                </Link>
+                <Link
+                  href="/upload"
+                  onClick={() => setMobileOpen(false)}
+                  className="rounded-xl px-3 py-2.5 text-sm font-medium text-gray-200 transition hover:bg-white/[0.06] hover:text-white"
+                >
+                  Upload
+                </Link>
+                <Link
+                  href="/plagiarism"
+                  onClick={() => setMobileOpen(false)}
+                  className="rounded-xl px-3 py-2.5 text-sm font-medium text-gray-200 transition hover:bg-white/[0.06] hover:text-white"
+                >
+                  Project Intel
+                </Link>
+                <Link
+                  href="/profile"
+                  onClick={() => setMobileOpen(false)}
+                  className="rounded-xl px-3 py-2.5 text-sm font-medium text-gray-200 transition hover:bg-white/[0.06] hover:text-white"
+                >
+                  Profile
+                </Link>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="rounded-xl px-3 py-2.5 text-left text-sm font-medium text-red-300 transition hover:bg-red-500/10 hover:text-red-200"
+                >
+                  Logout
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </header>
   );
