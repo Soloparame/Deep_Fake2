@@ -425,7 +425,7 @@ export default function ChatPage() {
                 </button>
               </form>
               <div className="mt-2 text-center text-[10px] text-slate-500">
-                RealEye AI can make mistakes. Verify important information.
+                Multi-modal AI Integrity Suite AI can make mistakes. Verify important information.
               </div>
             </div>
           </div>

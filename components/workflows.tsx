@@ -17,7 +17,7 @@ export default function Workflows() {
               </span>
             </div>
             <h2 className="pb-4 font-nacelle text-3xl font-semibold text-slate-900 md:text-4xl">
-              How RealEye Works
+              How Multi-modal AI Integrity Suite Works
             </h2>
             <p className="text-lg text-slate-600">
               A simple 3-step flow for deepfake video checks, image authenticity,
@@ -105,7 +105,7 @@ export default function Workflows() {
                     </span>
                   </div>
                   <p className="text-slate-700">
-                    RealEye runs the right pipeline: frame-level deepfake detection,
+                    Multi-modal AI Integrity Suite runs the right pipeline: frame-level deepfake detection,
                     image AI checks, or smart competitor-aware similarity analysis.
                   </p>
                 </div>

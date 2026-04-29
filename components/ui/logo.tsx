@@ -6,16 +6,16 @@ import logo from "@/public/images/logo.svg";
 
 export default function Logo() {
   return (
-    <Link href="/" className="inline-flex shrink-0 items-center gap-2" aria-label="RealEye">
+    <Link href="/" className="inline-flex shrink-0 items-center gap-2" aria-label="Multi-modal AI Integrity Suite">
       <Image
         src={logo}
-        alt="RealEye Logo"
+        alt="Multi-modal AI Integrity Suite Logo"
         width={32}
         height={32}
         className="h-8 w-8"
       />
       <span className="hidden bg-gradient-to-r from-slate-900 to-indigo-600 bg-clip-text text-sm font-semibold text-transparent sm:inline">
-        RealEye
+        Multi-modal AI Integrity Suite
       </span>
     </Link>
   );

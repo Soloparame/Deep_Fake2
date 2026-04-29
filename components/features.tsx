@@ -42,7 +42,7 @@ export default function Features() {
               Built for Detection and Strategic Insight
             </h2>
             <p className="text-lg text-indigo-200/65">
-              RealEye pairs media forensics with market-aware project analysis so you can
+              Multi-modal AI Integrity Suite pairs media forensics with market-aware project analysis so you can
               validate authenticity and evaluate originality in one place.
             </p>
           </div>

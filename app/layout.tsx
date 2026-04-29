@@ -39,7 +39,7 @@ const nacelle = localFont({
 });
 
 export const metadata = {
-  title: "RealEye - Deepfake, Image AI, and Project Intel",
+  title: "Multi-modal AI Integrity Suite - Deepfake, Image AI, and Project Intel",
   description:
     "Unified platform for deepfake video detection, AI image checks, and Project Intel analysis with similarity, competitor search, and strategic insights.",
 };

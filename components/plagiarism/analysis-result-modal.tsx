@@ -20,7 +20,7 @@ function safeFilenamePart(s: string) {
 
 function buildTextReport(report: AnalysisReport): string {
   const lines: string[] = [
-    `RealEye — Analysis report`,
+    `Multi-modal AI Integrity Suite — Analysis report`,
     `═══════════════════════`,
     ``,
     `Title: ${report.title}`,

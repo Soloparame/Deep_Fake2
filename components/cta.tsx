@@ -51,7 +51,7 @@ export default function Cta() {
                   onClick={handleStartClick}
                 >
                   <span className="relative inline-flex items-center">
-                    Start with RealEye
+                    Start with Multi-modal AI Integrity Suite
                     <span className="ml-1 tracking-normal text-white/50 transition-transform group-hover:translate-x-0.5">
                       -&gt;
                     </span>

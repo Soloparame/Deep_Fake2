@@ -146,7 +146,7 @@ const ResultCard = ({ result, mode }: { result: AnalysisResult; mode: string }) 
 
 export default function ToolsPage() {
   const router = useRouter();
-  const [tab, setTab] = useState<"video" | "image" | "intel">("video");
+  const [tab, setTab] = useState<"video" | "image" | "intel">("intel");
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -366,12 +366,12 @@ export default function ToolsPage() {
                 <span className="flex items-center gap-3">
                   <DocumentIcon /> Project Intel
                 </span>
+                <span className="rounded-full bg-indigo-100 px-1.5 py-0.5 text-[10px] font-semibold text-indigo-700">New</span>
               </button>
               <button type="button" onClick={() => setTab("video")} className={`${tabBtn(tab === "video")} justify-between`}>
                 <span className="flex items-center gap-3">
                   <VideoIcon /> Fake Video Detector
                 </span>
-                <span className="rounded-full bg-indigo-100 px-1.5 py-0.5 text-[10px] font-semibold text-indigo-700">New</span>
               </button>
               <button type="button" onClick={() => setTab("image")} className={tabBtn(tab === "image")}>
                 <ImageIcon /> Fake Image Detector

@@ -34,7 +34,7 @@ export default function HeroHome() {
                 Originality you can <span className="text-indigo-600">trust.</span>
               </h1>
               <p className="mb-10 text-lg leading-relaxed text-slate-600 md:text-2xl" data-aos="fade-up" data-aos-delay={200}>
-                RealEye combines fake video &amp; image tools plus Project Intel in one clean workspace.
+                Multi-modal AI Integrity Suite combines fake video &amp; image tools plus Project Intel in one clean workspace.
               </p>
               <div className="flex flex-wrap gap-3">
                 <a

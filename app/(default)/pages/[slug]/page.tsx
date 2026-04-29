@@ -68,7 +68,7 @@ function PremiumPage({ title, description, children }: { title: string, descript
 const pageContent: Record<string, { title: string; content: string }> = {
   "how-it-works": {
     title: "How It Works",
-    content: "RealEye uses advanced deep learning algorithms to analyze video frames for artifacts commonly found in deepfakes. Our model checks for inconsistencies in lighting, facial movements, and pixel-level details that are invisible to the human eye.",
+    content: "Multi-modal AI Integrity Suite uses advanced deep learning algorithms to analyze video frames for artifacts commonly found in deepfakes. Our model checks for inconsistencies in lighting, facial movements, and pixel-level details that are invisible to the human eye.",
   },
   features: {
     title: "Features",
@@ -80,15 +80,15 @@ const pageContent: Record<string, { title: string; content: string }> = {
   },
   "api-access": {
     title: "API Access",
-    content: "Integrate RealEye's detection capabilities into your own applications with our robust API. Read our documentation to get started.",
+    content: "Integrate Multi-modal AI Integrity Suite detection capabilities into your own applications with our robust API. Read our documentation to get started.",
   },
   documentation: {
     title: "Documentation",
-    content: "Comprehensive guides and references for using the RealEye platform and API.",
+    content: "Comprehensive guides and references for using the Multi-modal AI Integrity Suite platform and API.",
   },
   "about-us": {
     title: "About Us",
-    content: "RealEye is dedicated to combating misinformation and protecting digital authenticity. Our team consists of AI researchers and security experts.",
+    content: "Multi-modal AI Integrity Suite is dedicated to combating misinformation and protecting digital authenticity. Our team consists of AI researchers and security experts.",
   },
   research: {
     title: "Research",
@@ -96,7 +96,7 @@ const pageContent: Record<string, { title: string; content: string }> = {
   },
   blog: {
     title: "Blog",
-    content: "Stay updated with the latest news, trends, and insights from the RealEye team.",
+    content: "Stay updated with the latest news, trends, and insights from the Multi-modal AI Integrity Suite team.",
   },
   careers: {
     title: "Careers",
@@ -124,11 +124,11 @@ const pageContent: Record<string, { title: string; content: string }> = {
   },
   "help-center": {
     title: "Help Center",
-    content: "Find answers to common questions and learn how to use RealEye effectively.",
+    content: "Find answers to common questions and learn how to use Multi-modal AI Integrity Suite effectively.",
   },
   tutorials: {
     title: "Tutorials",
-    content: "Step-by-step tutorials to help you get the most out of RealEye.",
+    content: "Step-by-step tutorials to help you get the most out of Multi-modal AI Integrity Suite.",
   },
   faq: {
     title: "FAQ",
@@ -140,7 +140,7 @@ const pageContent: Record<string, { title: string; content: string }> = {
   },
   "learn-more": {
     title: "Learn More",
-    content: "Discover how RealEye is revolutionizing media authenticity. From individual creators to large enterprises, our tools provide the assurance you need in a digital world.",
+    content: "Discover how Multi-modal AI Integrity Suite is revolutionizing media authenticity. From individual creators to large enterprises, our tools provide the assurance you need in a digital world.",
   },
 };
 
@@ -160,7 +160,7 @@ export default async function Page({
     return (
       <PremiumPage
         title="How It Works"
-        description="Our platform analyzes videos using advanced AI models to detect manipulation and provide reliable authenticity results in seconds. Built for speed, accuracy, and transparency, RealEye uses deep learning to evaluate videos in a clear, explainable pipeline."
+        description="Our platform analyzes videos using advanced AI models to detect manipulation and provide reliable authenticity results in seconds. Built for speed, accuracy, and transparency, Multi-modal AI Integrity Suite uses deep learning to evaluate videos in a clear, explainable pipeline."
       >
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {/* Step 1: Upload the Video */}

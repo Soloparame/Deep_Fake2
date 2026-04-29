@@ -1,5 +1,5 @@
 export const metadata = {
-  title: "RealEye - Media Authenticity + Project Intel",
+  title: "Multi-modal AI Integrity Suite - Media Authenticity + Project Intel",
   description:
     "Detect deepfake videos and AI-generated images, then run Project Intel for similarity, competitor discovery, and strategy insights.",
 };
