@@ -47,10 +47,10 @@ export default function SignIn() {
       {/* Glow effect behind card */}
       <div className="absolute left-1/2 top-1/2 -z-10 h-[400px] w-[400px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-indigo-500/20 blur-[120px]"></div>
 
-      <div className="glass-card mx-auto w-full max-w-[420px] rounded-3xl p-8 backdrop-blur-2xl">
+      <div className="mx-auto w-full max-w-[420px] rounded-3xl border border-indigo-100 bg-white/90 p-8 shadow-xl backdrop-blur-2xl">
         {/* Section header */}
         <div className="mb-8 text-center">
-          <h1 className="bg-gradient-to-r from-gray-200 via-indigo-200 to-gray-200 bg-clip-text font-nacelle text-3xl font-semibold text-transparent md:text-4xl">
+          <h1 className="font-nacelle text-3xl font-semibold text-slate-900 md:text-4xl">
             Welcome back
           </h1>
           <p className="mt-2 text-sm text-indigo-200/60">
@@ -76,7 +76,7 @@ export default function SignIn() {
               <input
                 id="email"
                 type="email"
-                className="w-full rounded-xl border border-white/10 bg-gray-950/50 px-4 py-3 text-gray-200 outline-none transition-all placeholder:text-gray-600 focus:border-indigo-500/50 focus:bg-gray-950/80 focus:ring-4 focus:ring-indigo-500/10"
+                className="w-full rounded-xl border border-indigo-100 bg-white px-4 py-3 text-slate-800 outline-none transition-all placeholder:text-slate-400 focus:border-indigo-400 focus:bg-white focus:ring-4 focus:ring-indigo-200/60"
                 placeholder="name@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -101,7 +101,7 @@ export default function SignIn() {
               <input
                 id="password"
                 type="password"
-                className="w-full rounded-xl border border-white/10 bg-gray-950/50 px-4 py-3 text-gray-200 outline-none transition-all placeholder:text-gray-600 focus:border-indigo-500/50 focus:bg-gray-950/80 focus:ring-4 focus:ring-indigo-500/10"
+                className="w-full rounded-xl border border-indigo-100 bg-white px-4 py-3 text-slate-800 outline-none transition-all placeholder:text-slate-400 focus:border-indigo-400 focus:bg-white focus:ring-4 focus:ring-indigo-200/60"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}

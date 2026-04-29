@@ -52,13 +52,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.variable} ${nacelle.variable} bg-gray-950 font-inter text-base text-gray-200 antialiased selection:bg-indigo-500/30`}
+        className={`${inter.variable} ${nacelle.variable} bg-[#f5f4fb] font-inter text-base text-slate-800 antialiased selection:bg-indigo-200/70`}
       >
         {/* Global Background Effects */}
-        <div className="fixed inset-0 -z-10 h-full w-full bg-gray-950">
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
-          <div className="absolute left-0 right-0 top-0 -z-10 m-auto h-[310px] w-[310px] rounded-full bg-indigo-500 opacity-20 blur-[100px]"></div>
-          <div className="absolute right-0 top-0 -z-10 h-full w-full bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.3),rgba(255,255,255,0))]"></div>
+        <div className="fixed inset-0 -z-10 h-full w-full bg-[#f5f4fb]">
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,#6366f10f_1px,transparent_1px),linear-gradient(to_bottom,#6366f10f_1px,transparent_1px)] bg-[size:24px_24px]"></div>
+          <div className="absolute left-0 right-0 top-0 -z-10 m-auto h-[340px] w-[340px] rounded-full bg-indigo-300/35 blur-[110px]"></div>
+          <div className="absolute bottom-0 right-[-8%] -z-10 h-[420px] w-[420px] rounded-full bg-violet-300/30 blur-[120px]"></div>
+          <div className="absolute right-0 top-0 -z-10 h-full w-full bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(167,139,250,0.25),rgba(255,255,255,0))]"></div>
         </div>
 
         <div className="flex min-h-screen flex-col overflow-hidden supports-[overflow:clip]:overflow-clip">

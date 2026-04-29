@@ -213,7 +213,7 @@ export default function ChatPage() {
       <div className="absolute right-0 top-10 -z-10 h-96 w-96 rounded-full bg-indigo-500/10 blur-[120px]"></div>
 
       {/* Sidebar like ChatGPT */}
-      <aside className="hidden w-72 flex-shrink-0 flex-col border-r border-white/5 bg-gray-900/40 backdrop-blur-md p-4 md:flex h-full overflow-hidden">
+      <aside className="hidden h-full w-72 flex-shrink-0 flex-col overflow-hidden border-r border-indigo-100 bg-white/85 p-4 backdrop-blur-md md:flex">
         <button
           type="button"
           onClick={handleNewChat}
@@ -225,22 +225,22 @@ export default function ChatPage() {
           New Chat
         </button>
 
-        <div className="mb-3 px-2 text-xs font-semibold uppercase tracking-wider text-gray-500">
+        <div className="mb-3 px-2 text-xs font-semibold uppercase tracking-wider text-slate-500">
           Recent History
         </div>
 
         <div className="flex-1 space-y-2 overflow-y-auto pr-2 custom-scrollbar">
           {sessions.length === 0 ? (
-            <div className="rounded-lg border border-dashed border-white/5 p-4 text-center">
-              <p className="text-xs text-gray-500">No recent conversations.</p>
+            <div className="rounded-lg border border-dashed border-indigo-100 p-4 text-center">
+              <p className="text-xs text-slate-500">No recent conversations.</p>
             </div>
           ) : (
             sessions.map((session) => (
                 <div 
                     key={session.session_id}
                     onClick={() => loadSession(session.session_id)}
-                    className={`group flex cursor-pointer items-center gap-3 rounded-lg p-3 transition-colors hover:bg-white/10 ${
-                        currentSessionId === session.session_id ? "bg-white/10" : "bg-white/5"
+                    className={`group flex cursor-pointer items-center gap-3 rounded-lg p-3 transition-colors hover:bg-indigo-50 ${
+                        currentSessionId === session.session_id ? "bg-indigo-50" : "bg-white"
                     }`}
                 >
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-indigo-500/20 text-indigo-400">
@@ -249,8 +249,8 @@ export default function ChatPage() {
                         </svg>
                     </div>
                     <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm text-gray-300">{session.title || "New Chat"}</p>
-                        <p className="text-[10px] text-gray-500">
+                        <p className="truncate text-sm text-slate-700">{session.title || "New Chat"}</p>
+                        <p className="text-[10px] text-slate-500">
                             {new Date(session.updated_at).toLocaleDateString()}
                         </p>
                     </div>
@@ -259,12 +259,12 @@ export default function ChatPage() {
           )}
         </div>
 
-        <div className="mt-4 border-t border-white/5 pt-4">
-          <div className="flex items-center gap-3 rounded-xl bg-gray-950/50 p-3">
+        <div className="mt-4 border-t border-indigo-100 pt-4">
+          <div className="flex items-center gap-3 rounded-xl bg-indigo-50 p-3">
             <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500"></div>
             <div className="text-xs">
-              <p className="font-medium text-white">Pro Plan</p>
-              <p className="text-gray-500">Active</p>
+              <p className="font-medium text-slate-800">Pro Plan</p>
+              <p className="text-slate-500">Active</p>
             </div>
           </div>
         </div>
@@ -274,16 +274,16 @@ export default function ChatPage() {
       <div className="relative mx-auto flex w-full max-w-5xl flex-1 flex-col px-4 sm:px-6 overflow-hidden">
         <div className="py-6 flex-1 flex flex-col min-h-0">
           {/* Header */}
-          <div className="mb-6 flex items-center justify-between border-b border-white/5 pb-4">
+          <div className="mb-6 flex items-center justify-between border-b border-indigo-100 pb-4">
             <div>
-              <h1 className="font-nacelle text-2xl font-semibold text-white">
+              <h1 className="font-nacelle text-2xl font-semibold text-slate-900">
                 Deepfake Detective AI
               </h1>
-              <p className="text-sm text-gray-400">Powered by advanced computer vision models</p>
+              <p className="text-sm text-slate-600">Powered by advanced computer vision models</p>
             </div>
           </div>
 
-          <div className="flex flex-1 flex-col overflow-hidden rounded-3xl border border-white/5 bg-gray-900/40 backdrop-blur-sm shadow-2xl">
+          <div className="flex flex-1 flex-col overflow-hidden rounded-3xl border border-indigo-100 bg-white/95 backdrop-blur-sm shadow-xl">
             {/* Error Banner */}
             {error && (
               <div className="border-b border-red-500/20 bg-red-500/10 px-6 py-3 text-sm text-red-400">
@@ -309,8 +309,8 @@ export default function ChatPage() {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
                       </svg>
                     </div>
-                    <h3 className="text-xl font-medium text-white">How can I help you detect deepfakes?</h3>
-                    <p className="mt-2 mb-8 max-w-md text-sm text-gray-400">
+                    <h3 className="text-xl font-medium text-slate-900">How can I help you detect deepfakes?</h3>
+                    <p className="mb-8 mt-2 max-w-md text-sm text-slate-600">
                       Ask about artifacts, upload guidance, or technical details about the detection architecture.
                     </p>
                     
@@ -319,7 +319,7 @@ export default function ChatPage() {
                             <button
                                 key={i}
                                 onClick={(e) => handleSubmit(e as unknown as FormEvent, q)}
-                                className="rounded-xl border border-white/10 bg-white/5 p-3 text-left text-sm text-gray-300 transition-colors hover:border-indigo-500/50 hover:bg-white/10"
+                                className="rounded-xl border border-indigo-100 bg-white p-3 text-left text-sm text-slate-700 transition-colors hover:border-indigo-300 hover:bg-indigo-50"
                             >
                                 {q}
                             </button>
@@ -334,7 +334,7 @@ export default function ChatPage() {
                       }`}
                   >
                     <div className={`flex max-w-[80%] gap-3 ${m.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
-                      <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${m.role === "user" ? "bg-indigo-600" : "bg-gray-700"}`}>
+                      <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${m.role === "user" ? "bg-indigo-600" : "bg-slate-300"}`}>
                         {m.role === "user" ? (
                           <svg className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -349,7 +349,7 @@ export default function ChatPage() {
                       <div
                         className={`rounded-2xl px-5 py-3 text-sm shadow-md transition-all hover:shadow-lg ${m.role === "user"
                             ? "bg-gradient-to-br from-indigo-600 to-violet-600 text-white rounded-br-none"
-                            : "bg-gray-800 text-gray-100 rounded-bl-none border border-white/5"
+                            : "rounded-bl-none border border-indigo-100 bg-white text-slate-800"
                           }`}
                       >
                         <p className="leading-relaxed whitespace-pre-wrap break-words">{m.text}</p>
@@ -364,13 +364,13 @@ export default function ChatPage() {
                 {/* Show suggested questions after assistant's last message */}
                 {messages.length > 0 && messages[messages.length - 1]?.role === "assistant" && !loading && (
                   <div className="mt-6 flex flex-col items-center">
-                    <p className="mb-4 text-sm text-gray-400">Suggested questions:</p>
+                    <p className="mb-4 text-sm text-slate-600">Suggested questions:</p>
                     <div className="grid w-full max-w-lg grid-cols-1 gap-3 sm:grid-cols-2">
                       {suggestedQuestions.map((q, i) => (
                         <button
                           key={i}
                           onClick={(e) => handleSubmit(e as unknown as FormEvent, q)}
-                          className="rounded-xl border border-white/10 bg-white/5 p-3 text-left text-sm text-gray-300 transition-colors hover:border-indigo-500/50 hover:bg-white/10"
+                          className="rounded-xl border border-indigo-100 bg-white p-3 text-left text-sm text-slate-700 transition-colors hover:border-indigo-300 hover:bg-indigo-50"
                         >
                           {q}
                         </button>
@@ -385,11 +385,11 @@ export default function ChatPage() {
             </div>
 
             {/* Input Area - Fixed at bottom */}
-            <div className="flex-shrink-0 border-t border-white/5 bg-gray-900/60 p-4 backdrop-blur-lg">
+            <div className="flex-shrink-0 border-t border-indigo-100 bg-white p-4 backdrop-blur-lg">
               <form onSubmit={handleSubmit} className="relative flex items-end gap-2 text-sm">
                 <div className="relative flex-1">
                   <textarea
-                    className="form-input min-h-[50px] max-h-[200px] w-full resize-none rounded-xl border border-white/10 bg-gray-950/50 py-3 pr-12 pl-4 text-gray-200 placeholder:text-gray-600 focus:border-indigo-500/50 focus:bg-gray-950/80 focus:ring-0"
+                    className="form-input min-h-[50px] max-h-[200px] w-full resize-none rounded-xl border border-indigo-100 bg-white py-3 pl-4 pr-12 text-slate-800 placeholder:text-slate-400 focus:border-indigo-400 focus:bg-white focus:ring-0"
                     placeholder="Ask about your video analysis..."
                     value={input}
                     onChange={(e) => {
@@ -424,7 +424,7 @@ export default function ChatPage() {
                   )}
                 </button>
               </form>
-              <div className="mt-2 text-center text-[10px] text-gray-600">
+              <div className="mt-2 text-center text-[10px] text-slate-500">
                 RealEye AI can make mistakes. Verify important information.
               </div>
             </div>

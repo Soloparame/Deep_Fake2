@@ -52,7 +52,7 @@ export default function Header() {
   return (
     <header className="fixed top-0 z-30 mt-4 w-full px-4 sm:px-6">
       <div className="mx-auto max-w-6xl">
-        <div className="relative flex h-14 items-center justify-between gap-3 rounded-full bg-gray-900/60 px-4 shadow-lg ring-1 ring-white/10 backdrop-blur-xl transition-all hover:bg-gray-900/70 md:h-14">
+        <div className="relative flex h-14 items-center justify-between gap-3 rounded-full border border-indigo-200/60 bg-white/80 px-4 shadow-sm shadow-indigo-200/60 ring-1 ring-indigo-100 backdrop-blur-xl transition-all hover:bg-white md:h-14">
           {/* Site branding */}
           <div className="flex flex-1 items-center">
             <Logo />
@@ -64,8 +64,24 @@ export default function Header() {
               <>
                 <li>
                   <Link
+                    href="/"
+                    className="rounded-full px-3 py-1.5 text-sm font-medium text-slate-600 transition-colors hover:bg-indigo-50 hover:text-slate-900"
+                  >
+                    Product
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/pages/how-it-works"
+                    className="rounded-full px-3 py-1.5 text-sm font-medium text-slate-600 transition-colors hover:bg-indigo-50 hover:text-slate-900"
+                  >
+                    How it works
+                  </Link>
+                </li>
+                <li>
+                  <Link
                     href="/signin"
-                    className="btn-sm text-sm font-medium text-gray-300 transition-colors hover:text-white"
+                    className="btn-sm text-sm font-medium text-slate-600 transition-colors hover:text-slate-900"
                   >
                     Sign In
                   </Link>
@@ -85,7 +101,7 @@ export default function Header() {
                 <li>
                   <Link
                     href="/community"
-                    className="rounded-full px-4 py-1.5 text-sm font-medium text-gray-300 transition-colors hover:bg-white/5 hover:text-white"
+                    className="rounded-full px-4 py-1.5 text-sm font-medium text-slate-600 transition-colors hover:bg-indigo-50 hover:text-slate-900"
                   >
                     Community
                   </Link>
@@ -93,23 +109,23 @@ export default function Header() {
                 <li>
                   <Link
                     href="/chat"
-                    className="rounded-full px-4 py-1.5 text-sm font-medium text-gray-300 transition-colors hover:bg-white/5 hover:text-white"
+                    className="rounded-full px-4 py-1.5 text-sm font-medium text-slate-600 transition-colors hover:bg-indigo-50 hover:text-slate-900"
                   >
                     Chat
                   </Link>
                 </li>
                 <li>
                   <Link
-                    href="/upload"
-                    className="rounded-full px-4 py-1.5 text-sm font-medium text-gray-300 transition-colors hover:bg-white/5 hover:text-white"
+                    href="/tools"
+                    className="rounded-full px-4 py-1.5 text-sm font-medium text-slate-600 transition-colors hover:bg-indigo-50 hover:text-slate-900"
                   >
-                    Upload
+                    Tools
                   </Link>
                 </li>
                 <li>
                   <Link
                     href="/plagiarism"
-                    className="rounded-full px-4 py-1.5 text-sm font-medium text-gray-300 transition-colors hover:bg-white/5 hover:text-white"
+                    className="rounded-full px-4 py-1.5 text-sm font-medium text-slate-600 transition-colors hover:bg-indigo-50 hover:text-slate-900"
                   >
                     Project Intel
                   </Link>
@@ -135,7 +151,7 @@ export default function Header() {
             aria-label={mobileOpen ? "Close menu" : "Open menu"}
             aria-expanded={mobileOpen}
             onClick={() => setMobileOpen((v) => !v)}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-gray-300 transition hover:bg-white/[0.08] hover:text-white md:hidden"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-indigo-200 bg-indigo-50 text-slate-600 transition hover:bg-indigo-100 hover:text-slate-900 md:hidden"
           >
             {mobileOpen ? (
               <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -151,13 +167,27 @@ export default function Header() {
 
         {/* Mobile menu panel */}
         {mobileOpen && (
-          <div className="mt-3 overflow-hidden rounded-2xl border border-white/10 bg-gray-900/90 p-2 shadow-xl ring-1 ring-white/10 backdrop-blur-xl md:hidden">
+          <div className="mt-3 overflow-hidden rounded-2xl border border-indigo-200 bg-white/95 p-2 shadow-xl ring-1 ring-indigo-100 backdrop-blur-xl md:hidden">
             {!isAuthed ? (
               <div className="grid gap-1">
                 <Link
+                  href="/"
+                  onClick={() => setMobileOpen(false)}
+                  className="rounded-xl px-3 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-indigo-50 hover:text-slate-900"
+                >
+                  Product
+                </Link>
+                <Link
+                  href="/pages/how-it-works"
+                  onClick={() => setMobileOpen(false)}
+                  className="rounded-xl px-3 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-indigo-50 hover:text-slate-900"
+                >
+                  How it works
+                </Link>
+                <Link
                   href="/signin"
                   onClick={() => setMobileOpen(false)}
-                  className="rounded-xl px-3 py-2.5 text-sm font-medium text-gray-200 transition hover:bg-white/[0.06] hover:text-white"
+                  className="rounded-xl px-3 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-indigo-50 hover:text-slate-900"
                 >
                   Sign In
                 </Link>
@@ -186,11 +216,11 @@ export default function Header() {
                   Chat
                 </Link>
                 <Link
-                  href="/upload"
+                  href="/tools"
                   onClick={() => setMobileOpen(false)}
-                  className="rounded-xl px-3 py-2.5 text-sm font-medium text-gray-200 transition hover:bg-white/[0.06] hover:text-white"
+                  className="rounded-xl px-3 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-indigo-50 hover:text-slate-900"
                 >
-                  Upload
+                  Tools
                 </Link>
                 <Link
                   href="/plagiarism"

@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import VideoThumb from "@/public/images/hero-image-01.jpg";
 import ModalVideo from "@/components/modal-video";
@@ -14,7 +13,7 @@ export default function HeroHome() {
     if (typeof window !== "undefined") {
       const token = window.localStorage.getItem("realeye_token");
       if (token) {
-        router.push("/upload");
+        router.push("/tools");
       } else {
         router.push("/signin");
       }
@@ -26,45 +25,47 @@ export default function HeroHome() {
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         {/* Hero content */}
         <div className="py-12 md:py-20">
-          {/* Section header */}
-          <div className="pb-12 text-center md:pb-20">
-            <h1
-              className="animate-[gradient_6s_linear_infinite] bg-[linear-gradient(to_right,var(--color-gray-200),var(--color-indigo-200),var(--color-gray-50),var(--color-indigo-300),var(--color-gray-200))] bg-[length:200%_auto] bg-clip-text pb-5 font-nacelle text-4xl font-semibold text-transparent md:text-5xl"
-              data-aos="fade-up"
-            >
-              One Platform for Trust in Media and Ideas
-            </h1>
-            <div className="mx-auto max-w-3xl">
-              <p
-                className="mb-8 text-xl text-indigo-200/65"
-                data-aos="fade-up"
-                data-aos-delay={200}
-              >
-                RealEye combines deepfake video detection, AI image checks, and Project Intel analysis.
-                Verify media authenticity and benchmark your project against real competitors in one workflow.
+          <div className="grid items-start gap-12 pb-12 md:grid-cols-2 md:pb-20">
+            <div>
+              <div className="mb-6 inline-flex items-center rounded-full border border-indigo-200 bg-white px-4 py-1.5 text-xs font-semibold tracking-wide text-indigo-700">
+                New · Deepfake video &amp; image detection
+              </div>
+              <h1 className="pb-6 font-nacelle text-5xl font-semibold text-slate-900 md:text-7xl" data-aos="fade-up">
+                Originality you can <span className="text-indigo-600">trust.</span>
+              </h1>
+              <p className="mb-10 text-lg leading-relaxed text-slate-600 md:text-2xl" data-aos="fade-up" data-aos-delay={200}>
+                RealEye combines fake video &amp; image tools plus Project Intel in one clean workspace.
               </p>
-              <div className="mx-auto max-w-xs sm:flex sm:max-w-none sm:justify-center">
-                <div data-aos="fade-up" data-aos-delay={400}>
-                  <a
-                    className="btn group mb-4 w-full cursor-pointer bg-linear-to-t from-indigo-600 to-indigo-500 bg-[length:100%_100%] bg-[bottom] text-white shadow-[inset_0px_1px_0px_0px_--theme(--color-white/.16)] hover:bg-[length:100%_150%] sm:mb-0 sm:w-auto"
-                    href="#0"
-                    onClick={handleDetectClick}
-                  >
-                    <span className="relative inline-flex items-center">
-                      Start Analysis
-                      <span className="ml-1 tracking-normal text-white/50 transition-transform group-hover:translate-x-0.5">
-                        -&gt;
-                      </span>
-                    </span>
-                  </a>
+              <div className="flex flex-wrap gap-3">
+                <a
+                  className="btn group cursor-pointer rounded-lg bg-indigo-500 px-6 py-2.5 font-medium text-white shadow-sm transition-colors hover:bg-indigo-600"
+                  href="#0"
+                  onClick={handleDetectClick}
+                >
+                  Start checking — free
+                </a>
+                <Link className="btn rounded-lg border border-slate-200 bg-white px-6 py-2.5 font-medium text-slate-700 transition-all hover:bg-slate-50" href="/pages/how-it-works">
+                  See all tools
+                </Link>
+              </div>
+              <div className="mt-8 grid grid-cols-2 gap-3 text-sm text-slate-600">
+                <span>No credit card required</span>
+                <span>Free starter plan</span>
+                <span>Privacy-first scanning</span>
+                <span>Cancel anytime</span>
+              </div>
+            </div>
+            <div className="rounded-3xl border border-indigo-100 bg-white p-4 shadow-xl">
+              <div className="rounded-2xl border border-indigo-100 bg-indigo-50/60 p-4">
+                <p className="text-sm text-slate-500">Scan results</p>
+                <p className="mt-2 text-5xl font-semibold text-indigo-600">97% <span className="text-xl text-slate-700">original</span></p>
+                <div className="mt-4 h-2 rounded-full bg-indigo-100">
+                  <div className="h-full w-[97%] rounded-full bg-indigo-500" />
                 </div>
-                <div data-aos="fade-up" data-aos-delay={600}>
-                  <Link
-                    className="btn w-full border border-gray-700/70 bg-gray-900/60 text-[#f8fafc] transition-all hover:border-indigo-400/50 hover:bg-gray-800/50 sm:ml-4 sm:w-auto"
-                    href="/pages/how-it-works"
-                  >
-                    Explore How It Works
-                  </Link>
+                <div className="mt-4 space-y-2 text-sm">
+                  <div className="flex items-center justify-between rounded-lg bg-white px-3 py-2"><span>Web sources scanned</span><span className="font-semibold">62.4B</span></div>
+                  <div className="flex items-center justify-between rounded-lg bg-white px-3 py-2"><span>Academic papers</span><span className="font-semibold">Yes</span></div>
+                  <div className="flex items-center justify-between rounded-lg bg-white px-3 py-2"><span>AI text probability</span><span className="font-semibold">3%</span></div>
                 </div>
               </div>
             </div>

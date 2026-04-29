@@ -125,16 +125,16 @@ export function AnalysisResultModal(props: {
       <button
         type="button"
         aria-label="Close results"
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+        className="absolute inset-0 bg-slate-900/35 backdrop-blur-sm transition-opacity"
         onClick={onClose}
       />
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="analysis-result-title"
-        className="relative flex w-full max-w-7xl max-h-[94vh] flex-col overflow-hidden rounded-3xl border border-white/10 bg-zinc-950/80 backdrop-blur-2xl shadow-2xl shadow-black ring-1 ring-white/5"
+        className="relative flex w-full max-h-[94vh] max-w-7xl flex-col overflow-hidden rounded-3xl border border-indigo-100 bg-white/95 backdrop-blur-2xl shadow-2xl shadow-indigo-100 ring-1 ring-indigo-100"
       >
-        <div className="sticky top-0 z-20 shrink-0 border-b border-white/[0.05] bg-white/[0.02] backdrop-blur-xl">
+        <div className="sticky top-0 z-20 shrink-0 border-b border-indigo-100 bg-white/90 backdrop-blur-xl">
           <div className="flex flex-wrap items-center justify-between gap-4 px-5 py-4 sm:px-8">
             <div className="min-w-0 flex items-center gap-4">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-500/15 ring-1 ring-indigo-500/30 shadow-[0_0_15px_rgba(99,102,241,0.2)]">
@@ -144,7 +144,7 @@ export function AnalysisResultModal(props: {
               </div>
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-widest text-indigo-400">Intelligence Report</p>
-                <p id="analysis-result-title" className="truncate text-base font-semibold text-white drop-shadow-sm">
+                <p id="analysis-result-title" className="truncate text-base font-semibold text-slate-900">
                   {report.title}
                 </p>
               </div>
@@ -189,8 +189,8 @@ export function AnalysisResultModal(props: {
           </div>
         </div>
 
-        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-5 sm:px-8 sm:py-8 custom-scrollbar">
-          <div className="relative overflow-hidden rounded-3xl border border-white/[0.05] bg-gradient-to-b from-zinc-900/60 to-zinc-950/80 p-5 shadow-2xl ring-1 ring-white/10 sm:p-8">
+        <div className="custom-scrollbar min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-5 sm:px-8 sm:py-8">
+          <div className="relative overflow-hidden rounded-3xl border border-indigo-100 bg-gradient-to-b from-white to-indigo-50/50 p-5 shadow-xl ring-1 ring-indigo-100 sm:p-8">
             <div className="pointer-events-none absolute -right-20 top-0 h-64 w-64 rounded-full bg-violet-600/10 blur-[80px]" />
             <div className="pointer-events-none absolute -left-20 bottom-0 h-64 w-64 rounded-full bg-indigo-600/10 blur-[80px]" />
             
@@ -203,7 +203,7 @@ export function AnalysisResultModal(props: {
                   </span>
                   <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-indigo-300">Your Report</p>
                 </div>
-                <h2 className="font-nacelle text-2xl font-bold tracking-tight text-white drop-shadow-sm sm:text-3xl">{report.title}</h2>
+                <h2 className="font-nacelle text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">{report.title}</h2>
                 {report.description ? (
                   <p className="mt-3 max-w-3xl text-sm leading-relaxed text-zinc-400">{report.description}</p>
                 ) : null}

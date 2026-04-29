@@ -101,20 +101,20 @@ export default function ProfilePage() {
             </div>
 
             <div className="mx-auto max-w-6xl px-4 sm:px-6">
-                <div className="mb-8 flex flex-col items-start justify-between gap-4 border-b border-gray-800 pb-6 sm:flex-row sm:items-center">
+                <div className="mb-8 flex flex-col items-start justify-between gap-4 border-b border-indigo-100 pb-6 sm:flex-row sm:items-center">
                     <div>
-                        <h1 className="animate-[gradient_6s_linear_infinite] bg-[linear-gradient(to_right,var(--color-gray-200),var(--color-indigo-200),var(--color-gray-50),var(--color-indigo-300),var(--color-gray-200))] bg-[length:200%_auto] bg-clip-text pb-1 font-nacelle text-3xl font-semibold text-transparent md:text-4xl">
+                        <h1 className="pb-1 font-nacelle text-3xl font-semibold text-slate-900 md:text-4xl">
                             Profile Control Center
                         </h1>
-                        <p className="mt-2 text-indigo-200/65">Manage your identity, security, and data.</p>
+                        <p className="mt-2 text-slate-600">Manage your identity, security, and data.</p>
                     </div>
                     <div className="flex items-center gap-3">
-                        <div className="h-12 w-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-xl font-bold text-white ring-2 ring-white/20 shadow-lg shadow-indigo-500/30">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-xl font-bold text-white shadow-lg shadow-indigo-500/30 ring-2 ring-indigo-100">
                             {profile?.email?.[0].toUpperCase() || "U"}
                         </div>
-                        <div className="text-right hidden sm:block">
-                            <div className="text-sm font-medium text-white">{profile?.name || "User"}</div>
-                            <div className="text-xs text-gray-500">{profile?.email}</div>
+                        <div className="hidden text-right sm:block">
+                            <div className="text-sm font-medium text-slate-900">{profile?.name || "User"}</div>
+                            <div className="text-xs text-slate-500">{profile?.email}</div>
                         </div>
                     </div>
                 </div>
@@ -127,8 +127,8 @@ export default function ProfilePage() {
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
                                 className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-300 ${activeTab === tab.id
-                                    ? "bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-[0_0_20px_rgba(79,70,229,0.3)] ring-1 ring-white/20"
-                                    : "text-gray-400 hover:bg-white/5 hover:text-indigo-200"
+                                    ? "bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-md shadow-indigo-500/25 ring-1 ring-indigo-200"
+                                    : "text-slate-600 hover:bg-indigo-50 hover:text-slate-900"
                                     }`}
                             >
                                 <span>{tab.icon}</span>
@@ -136,10 +136,10 @@ export default function ProfilePage() {
                             </button>
                         ))}
 
-                        <div className="my-4 border-t border-gray-800 pt-4">
+                        <div className="my-4 border-t border-indigo-100 pt-4">
                             <button
                                 onClick={handleLogout}
-                                className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-red-400 transition-all hover:bg-red-500/10 hover:text-red-300 hover:shadow-lg hover:shadow-red-500/10"
+                                className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-red-600 transition-all hover:bg-red-50 hover:text-red-700"
                             >
                                 <span>🚪</span>
                                 Logout
@@ -148,31 +148,31 @@ export default function ProfilePage() {
                     </div>
 
                     {/* Main Content Area */}
-                    <div className="p-6 lg:col-span-3">
+                    <div className="rounded-2xl border border-indigo-100 bg-white p-6 shadow-sm lg:col-span-3">
 
                         {/* Identity Tab */}
                         {activeTab === "identity" && (
                             <div className="space-y-6">
-                                <h2 className="text-xl font-semibold text-white">Identity Information</h2>
-                                <div className="p-6">
+                                <h2 className="text-xl font-semibold text-slate-900">Identity Information</h2>
+                                <div className="p-0 sm:p-2">
                                     <div className="grid gap-6 md:grid-cols-2">
                                         <div className="space-y-2">
-                                            <label className="text-xs font-medium uppercase text-gray-500">Email Address</label>
-                                            <div className="rounded-lg border border-white/10 p-3 text-gray-300">
+                                            <label className="text-xs font-medium uppercase text-slate-500">Email Address</label>
+                                            <div className="rounded-lg border border-indigo-100 bg-slate-50/80 p-3 text-slate-800">
                                                 {profile?.email}
-                                                <span className="ml-2 inline-flex items-center rounded-full bg-green-500/10 px-2 py-0.5 text-xs font-medium text-green-400 ring-1 ring-green-500/20">Verified</span>
+                                                <span className="ml-2 inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700 ring-1 ring-emerald-200">Verified</span>
                                             </div>
-                                            <p className="text-xs text-indigo-200/50">Your email is your primary identity.</p>
+                                            <p className="text-xs text-slate-500">Your email is your primary identity.</p>
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-xs font-medium uppercase text-gray-500">Full Name</label>
-                                            <div className="rounded-lg border border-white/10 p-3 text-gray-300">
+                                            <label className="text-xs font-medium uppercase text-slate-500">Full Name</label>
+                                            <div className="rounded-lg border border-indigo-100 bg-slate-50/80 p-3 text-slate-800">
                                                 {profile?.name || "Not set"}
                                             </div>
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-xs font-medium uppercase text-gray-500">Account Created</label>
-                                            <div className="rounded-lg border border-white/10 p-3 text-gray-300">
+                                            <label className="text-xs font-medium uppercase text-slate-500">Account Created</label>
+                                            <div className="rounded-lg border border-indigo-100 bg-slate-50/80 p-3 text-slate-800">
                                                 {profile?.created_at ? new Date(profile.created_at).toLocaleDateString() : "Unknown"}
                                             </div>
                                         </div>
@@ -188,10 +188,10 @@ export default function ProfilePage() {
                                             ].map((row) => (
                                                 <div
                                                     key={row.label}
-                                                    className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-center"
+                                                    className="rounded-xl border border-indigo-100 bg-slate-50/80 px-4 py-3 text-center"
                                                 >
-                                                    <div className="text-2xl font-bold text-white">{row.value}</div>
-                                                    <div className="text-[10px] font-medium uppercase tracking-wider text-gray-500">{row.label}</div>
+                                                    <div className="text-2xl font-bold text-slate-900">{row.value}</div>
+                                                    <div className="text-[10px] font-medium uppercase tracking-wider text-slate-500">{row.label}</div>
                                                 </div>
                                             ))}
                                         </div>
@@ -204,34 +204,34 @@ export default function ProfilePage() {
                         {activeTab === "security" && (
                             <div className="space-y-8">
                                 <div>
-                                    <h2 className="text-xl font-semibold text-white">Security Settings</h2>
-                                    <p className="text-sm text-gray-400">Manage your password and session security.</p>
+                                    <h2 className="text-xl font-semibold text-slate-900">Security Settings</h2>
+                                    <p className="text-sm text-slate-600">Manage your password and session security.</p>
                                 </div>
 
-                                <div className="p-6">
+                                <div className="p-0 sm:p-2">
                                     <div className="space-y-3">
-                                        <h3 className="font-medium text-white">Change Password</h3>
+                                        <h3 className="font-medium text-slate-900">Change Password</h3>
                                         {pwdMsg && (
-                                            <div className={`rounded-lg border px-3 py-2 text-sm ${pwdMsg.includes("success") ? "border-green-500/20 bg-green-500/10 text-green-400" : "border-red-500/20 bg-red-500/10 text-red-400"}`}>
+                                            <div className={`rounded-lg border px-3 py-2 text-sm ${pwdMsg.includes("success") ? "border-emerald-200 bg-emerald-50 text-emerald-800" : "border-red-200 bg-red-50 text-red-700"}`}>
                                                 {pwdMsg}
                                             </div>
                                         )}
                                         <div className="grid gap-3 sm:grid-cols-2">
                                             <div>
-                                                <label className="text-xs font-medium uppercase text-gray-500">Current Password</label>
+                                                <label className="text-xs font-medium uppercase text-slate-500">Current Password</label>
                                                 <input
                                                     type="password"
-                                                    className="mt-1 w-full rounded-lg border border-white/10 px-3 py-2 text-gray-200 outline-none transition-all focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10"
+                                                    className="mt-1 w-full rounded-lg border border-indigo-100 bg-white px-3 py-2 text-slate-900 outline-none transition-all focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200"
                                                     value={pwdCurrent}
                                                     onChange={(e) => setPwdCurrent(e.target.value)}
                                                     placeholder="••••••••"
                                                 />
                                             </div>
                                             <div>
-                                                <label className="text-xs font-medium uppercase text-gray-500">New Password</label>
+                                                <label className="text-xs font-medium uppercase text-slate-500">New Password</label>
                                                 <input
                                                     type="password"
-                                                    className="mt-1 w-full rounded-lg border border-white/10 px-3 py-2 text-gray-200 outline-none transition-all focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10"
+                                                    className="mt-1 w-full rounded-lg border border-indigo-100 bg-white px-3 py-2 text-slate-900 outline-none transition-all focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200"
                                                     value={pwdNew}
                                                     onChange={(e) => setPwdNew(e.target.value)}
                                                     placeholder="At least 8 characters"
@@ -276,29 +276,29 @@ export default function ProfilePage() {
                                     </div>
                                 </div>
 
-                                <div className="rounded-xl border border-white/10 p-4">
+                                <div className="rounded-xl border border-indigo-100 bg-slate-50/50 p-4">
                                     <div className="flex items-center justify-between">
                                         <div>
-                                            <h3 className="font-medium text-white">Active Sessions</h3>
-                                            <p className="text-xs text-gray-400">You are currently logged in on this device.</p>
+                                            <h3 className="font-medium text-slate-900">Active Sessions</h3>
+                                            <p className="text-xs text-slate-600">You are currently logged in on this device.</p>
                                         </div>
                                         <button
                                             onClick={handleLogout}
-                                            className="rounded-lg border border-gray-600 px-3 py-1.5 text-xs font-medium text-gray-300 hover:bg-white/5 transition-colors"
+                                            className="rounded-lg border border-indigo-200 px-3 py-1.5 text-xs font-medium text-slate-700 transition-colors hover:bg-indigo-50"
                                         >
                                             Log out all sessions
                                         </button>
                                     </div>
                                 </div>
 
-                                <div className="border-t border-red-500/20 pt-6">
-                                    <h3 className="text-sm font-bold uppercase text-red-500">Danger Zone</h3>
-                                    <div className="mt-4 flex items-center justify-between rounded-xl border border-red-500/20 bg-red-500/5 p-4">
+                                <div className="border-t border-red-100 pt-6">
+                                    <h3 className="text-sm font-bold uppercase text-red-600">Danger Zone</h3>
+                                    <div className="mt-4 flex items-center justify-between rounded-xl border border-red-200 bg-red-50/50 p-4">
                                         <div>
-                                            <h4 className="font-medium text-red-400">Delete Account</h4>
-                                            <p className="text-xs text-gray-500">Permanently remove your data and access.</p>
+                                            <h4 className="font-medium text-red-700">Delete Account</h4>
+                                            <p className="text-xs text-slate-600">Permanently remove your data and access.</p>
                                         </div>
-                                        <button className="rounded-lg bg-red-500/10 px-4 py-2 text-sm font-medium text-red-500 hover:bg-red-500 hover:text-white">
+                                        <button type="button" className="rounded-lg bg-red-100 px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-200">
                                             Delete Account
                                         </button>
                                     </div>
@@ -311,40 +311,40 @@ export default function ProfilePage() {
                         {/* Data Tab */}
                         {activeTab === "data" && (
                             <div className="space-y-6">
-                                <h2 className="text-xl font-semibold text-white">Data Management</h2>
-                                <p className="text-gray-400">Access and control your personal data.</p>
+                                <h2 className="text-xl font-semibold text-slate-900">Data Management</h2>
+                                <p className="text-slate-600">Access and control your personal data.</p>
 
                                 <div className="space-y-3">
-                                    <Link href="/chat" className="group flex items-center justify-between rounded-xl border border-white/10 p-4 transition-all hover:bg-white/5">
+                                    <Link href="/chat" className="group flex items-center justify-between rounded-xl border border-indigo-100 bg-slate-50/30 p-4 transition-all hover:border-indigo-200 hover:bg-indigo-50/50">
                                         <div>
-                                            <h3 className="font-medium text-white group-hover:text-indigo-300 transition-colors">Chat History</h3>
-                                            <p className="text-xs text-gray-400">View and export your conversation logs.</p>
+                                            <h3 className="font-medium text-slate-900 group-hover:text-indigo-700 transition-colors">Chat History</h3>
+                                            <p className="text-xs text-slate-600">View and export your conversation logs.</p>
                                         </div>
                                         <span className="text-2xl transition-transform group-hover:scale-110">💬</span>
                                     </Link>
 
-                                    <Link href="/upload" className="group flex items-center justify-between rounded-xl border border-white/10 p-4 transition-all hover:bg-white/5">
+                                    <Link href="/tools" className="group flex items-center justify-between rounded-xl border border-indigo-100 bg-slate-50/30 p-4 transition-all hover:border-indigo-200 hover:bg-indigo-50/50">
                                         <div>
-                                            <h3 className="font-medium text-white group-hover:text-purple-300 transition-colors">Image & video analysis</h3>
-                                            <p className="text-xs text-gray-400">Review your past detection results stored in MongoDB.</p>
+                                            <h3 className="font-medium text-slate-900 group-hover:text-indigo-700 transition-colors">Tools — image, video &amp; Project Intel</h3>
+                                            <p className="text-xs text-slate-600">Review past detection results and analyses tied to your account.</p>
                                         </div>
                                         <span className="text-2xl transition-transform group-hover:scale-110">📹</span>
                                     </Link>
 
-                                    <Link href="/plagiarism" className="group flex items-center justify-between rounded-xl border border-white/10 p-4 transition-all hover:bg-white/5">
+                                    <Link href="/plagiarism" className="group flex items-center justify-between rounded-xl border border-indigo-100 bg-slate-50/30 p-4 transition-all hover:border-indigo-200 hover:bg-indigo-50/50">
                                         <div>
-                                            <h3 className="font-medium text-white group-hover:text-indigo-300 transition-colors">Plagiarism analyses</h3>
-                                            <p className="text-xs text-gray-400">Open the checker — history is tied to your account.</p>
+                                            <h3 className="font-medium text-slate-900 group-hover:text-indigo-700 transition-colors">Project Intel (standalone)</h3>
+                                            <p className="text-xs text-slate-600">Open the dedicated page — same engine as Tools → Project Intel.</p>
                                         </div>
                                         <span className="text-2xl transition-transform group-hover:scale-110">📄</span>
                                     </Link>
 
-                                    <div className="group flex items-center justify-between rounded-xl border border-white/10 p-4 transition-all hover:bg-white/5">
+                                    <div className="group flex items-center justify-between rounded-xl border border-indigo-100 bg-slate-50/30 p-4 transition-all hover:bg-indigo-50/30">
                                         <div>
-                                            <h3 className="font-medium text-white">Download All Data</h3>
-                                            <p className="text-xs text-gray-400">Get a copy of everything we know about you.</p>
+                                            <h3 className="font-medium text-slate-900">Download All Data</h3>
+                                            <p className="text-xs text-slate-600">Get a copy of everything we know about you.</p>
                                         </div>
-                                        <button className="rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-indigo-700 transition-colors">
+                                        <button type="button" className="rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-indigo-700">
                                             Request Archive
                                         </button>
                                     </div>
@@ -355,25 +355,25 @@ export default function ProfilePage() {
                         {/* Preferences Tab */}
                         {activeTab === "preferences" && (
                             <div className="space-y-6">
-                                <h2 className="text-xl font-semibold text-white">Preferences</h2>
+                                <h2 className="text-xl font-semibold text-slate-900">Preferences</h2>
 
                                 <div className="space-y-4">
                                     <div className="flex items-center justify-between">
                                         <div>
-                                            <h3 className="font-medium text-gray-200">Email Notifications</h3>
-                                            <p className="text-xs text-gray-500">Receive updates about your analysis results.</p>
+                                            <h3 className="font-medium text-slate-900">Email Notifications</h3>
+                                            <p className="text-xs text-slate-600">Receive updates about your analysis results.</p>
                                         </div>
-                                        <div className="h-6 w-11 rounded-full bg-indigo-600 relative cursor-pointer">
+                                        <div className="relative h-6 w-11 cursor-pointer rounded-full bg-indigo-600">
                                             <div className="absolute right-1 top-1 h-4 w-4 rounded-full bg-white shadow-sm" />
                                         </div>
                                     </div>
 
                                     <div className="flex items-center justify-between">
                                         <div>
-                                            <h3 className="font-medium text-gray-200">Theme</h3>
-                                            <p className="text-xs text-gray-500">Currently stuck on Dark Mode (it's cooler).</p>
+                                            <h3 className="font-medium text-slate-900">Theme</h3>
+                                            <p className="text-xs text-slate-600">Light theme is the default for readability.</p>
                                         </div>
-                                        <div className="rounded-lg bg-gray-800 px-3 py-1 text-xs text-gray-400">Dark Only</div>
+                                        <div className="rounded-lg border border-indigo-100 bg-slate-100 px-3 py-1 text-xs text-slate-600">Light</div>
                                     </div>
                                 </div>
                             </div>

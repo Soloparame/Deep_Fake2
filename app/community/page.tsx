@@ -62,7 +62,7 @@ export default function CommunityPage() {
     return (
       <section className="relative min-h-screen pt-24 pb-12">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 text-center">
-          <h1 className="font-nacelle text-3xl md:text-4xl text-white">Community Challenge</h1>
+          <h1 className="font-nacelle text-3xl text-slate-900 md:text-4xl">Community Challenge</h1>
           <p className="text-indigo-200/65">Finished. Score {score}/{videos.length}</p>
           <button
             className="btn bg-indigo-600 text-white mt-4"
@@ -84,10 +84,10 @@ export default function CommunityPage() {
     <section className="relative min-h-screen pt-24 pb-12">
       <div className="mx-auto max-w-4xl px-4 sm:px-6">
         <div className="mb-6 text-center">
-          <h1 className="font-nacelle text-3xl md:text-4xl text-white">Community Challenge</h1>
+          <h1 className="font-nacelle text-3xl text-slate-900 md:text-4xl">Community Challenge</h1>
           <p className="text-indigo-200/65">Video {idx + 1} of {videos.length} • Score {score}</p>
         </div>
-        <div className="rounded-xl border border-white/10 p-4">
+        <div className="rounded-xl border border-indigo-100 bg-white p-4 shadow-sm">
           <video
             src={`http://localhost:8000${current.url}`}
             controls 

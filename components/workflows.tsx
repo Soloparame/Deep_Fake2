@@ -12,14 +12,14 @@ export default function Workflows() {
           {/* Section header */}
           <div className="mx-auto max-w-3xl pb-12 text-center md:pb-20">
             <div className="inline-flex items-center gap-3 pb-3 before:h-px before:w-8 before:bg-linear-to-r before:from-transparent before:to-indigo-200/50 after:h-px after:w-8 after:bg-linear-to-l after:from-transparent after:to-indigo-200/50">
-              <span className="inline-flex bg-linear-to-r from-indigo-500 to-indigo-200 bg-clip-text text-transparent">
+              <span className="inline-flex text-indigo-600">
                 Simple Process
               </span>
             </div>
-            <h2 className="animate-[gradient_6s_linear_infinite] bg-[linear-gradient(to_right,var(--color-gray-200),var(--color-indigo-200),var(--color-gray-50),var(--color-indigo-300),var(--color-gray-200))] bg-[length:200%_auto] bg-clip-text pb-4 font-nacelle text-3xl font-semibold text-transparent md:text-4xl">
+            <h2 className="pb-4 font-nacelle text-3xl font-semibold text-slate-900 md:text-4xl">
               How RealEye Works
             </h2>
-            <p className="text-lg text-indigo-200/65">
+            <p className="text-lg text-slate-600">
               A simple 3-step flow for deepfake video checks, image authenticity,
               and Project Intel analysis.
             </p>
@@ -28,13 +28,13 @@ export default function Workflows() {
           <Spotlight className="group mx-auto grid max-w-sm items-start gap-6 lg:max-w-none lg:grid-cols-3">
             {/* Card 1 */}
             <a
-              className="group/card relative h-full overflow-hidden rounded-2xl bg-gray-800 p-px before:pointer-events-none before:absolute before:-left-40 before:-top-40 before:z-10 before:h-80 before:w-80 before:translate-x-[var(--mouse-x)] before:translate-y-[var(--mouse-y)] before:rounded-full before:bg-indigo-500/80 before:opacity-0 before:blur-3xl before:transition-opacity before:duration-500 after:pointer-events-none after:absolute after:-left-48 after:-top-48 after:z-30 after:h-64 after:w-64 after:translate-x-[var(--mouse-x)] after:translate-y-[var(--mouse-y)] after:rounded-full after:bg-indigo-500 after:opacity-0 after:blur-3xl after:transition-opacity after:duration-500 hover:after:opacity-20 group-hover:before:opacity-100"
+              className="group/card relative h-full overflow-hidden rounded-2xl border border-indigo-100 bg-white p-px shadow-sm before:pointer-events-none before:absolute before:-left-40 before:-top-40 before:z-10 before:h-80 before:w-80 before:translate-x-[var(--mouse-x)] before:translate-y-[var(--mouse-y)] before:rounded-full before:bg-indigo-500/25 before:opacity-0 before:blur-3xl before:transition-opacity before:duration-500 after:pointer-events-none after:absolute after:-left-48 after:-top-48 after:z-30 after:h-64 after:w-64 after:translate-x-[var(--mouse-x)] after:translate-y-[var(--mouse-y)] after:rounded-full after:bg-indigo-300 after:opacity-0 after:blur-3xl after:transition-opacity after:duration-500 hover:after:opacity-20 group-hover:before:opacity-100"
               href="#0"
             >
-              <div className="relative z-20 h-full overflow-hidden rounded-[inherit] bg-gray-950 after:absolute after:inset-0 after:bg-linear-to-br after:from-gray-900/50 after:via-gray-800/25 after:to-gray-900/50">
+              <div className="relative z-20 h-full overflow-hidden rounded-[inherit] bg-white after:pointer-events-none after:absolute after:inset-0 after:z-0 after:bg-linear-to-br after:from-indigo-50/70 after:via-white after:to-indigo-50/30">
                 {/* Arrow */}
                 <div
-                  className="absolute right-6 top-6 flex h-8 w-8 items-center justify-center rounded-full border border-gray-700/50 bg-gray-800/65 text-gray-200 opacity-0 transition-opacity group-hover/card:opacity-100"
+                  className="absolute right-6 top-6 z-[3] flex h-8 w-8 items-center justify-center rounded-full border border-indigo-200 bg-white text-indigo-600 opacity-0 transition-opacity group-hover/card:opacity-100"
                   aria-hidden="true"
                 >
                   <svg
@@ -49,24 +49,20 @@ export default function Workflows() {
                     />
                   </svg>
                 </div>
-                {/* Image */}
-                <Image
-                  className="inline-flex"
-                  src={WorflowImg01}
-                  width={350}
-                  height={288}
-                  alt="Workflow 01"
-                />
+                {/* Image — above gradient overlay */}
+                <div className="relative z-[2] w-full">
+                  <Image className="h-auto w-full" src={WorflowImg01} width={350} height={288} alt="Workflow 01" />
+                </div>
                 {/* Content */}
-                <div className="p-6">
+                <div className="relative z-10 p-6">
                   <div className="mb-3">
-                    <span className="btn-sm relative rounded-full bg-gray-800/40 px-2.5 py-0.5 text-xs font-normal before:pointer-events-none before:absolute before:inset-0 before:rounded-[inherit] before:border before:border-transparent before:[background:linear-gradient(to_bottom,--theme(--color-gray-700/.15),--theme(--color-gray-700/.5))_border-box] before:[mask-composite:exclude_!important] before:[mask:linear-gradient(white_0_0)_padding-box,_linear-gradient(white_0_0)] hover:bg-gray-800/60">
-                      <span className="bg-linear-to-r from-indigo-500 to-indigo-200 bg-clip-text text-transparent">
+                    <span className="btn-sm relative rounded-full border border-indigo-100 bg-indigo-50 px-2.5 py-0.5 text-xs font-semibold text-indigo-700">
+                      <span>
                         Step 1
                       </span>
                     </span>
                   </div>
-                  <p className="text-indigo-200/65">
+                  <p className="text-slate-700">
                     Choose your input: upload a video, upload an image, or paste/upload
                     project content for Project Intel.
                   </p>
@@ -75,13 +71,13 @@ export default function Workflows() {
             </a>
             {/* Card 2 */}
             <a
-              className="group/card relative h-full overflow-hidden rounded-2xl bg-gray-800 p-px before:pointer-events-none before:absolute before:-left-40 before:-top-40 before:z-10 before:h-80 before:w-80 before:translate-x-[var(--mouse-x)] before:translate-y-[var(--mouse-y)] before:rounded-full before:bg-indigo-500/80 before:opacity-0 before:blur-3xl before:transition-opacity before:duration-500 after:pointer-events-none after:absolute after:-left-48 after:-top-48 after:z-30 after:h-64 after:w-64 after:translate-x-[var(--mouse-x)] after:translate-y-[var(--mouse-y)] after:rounded-full after:bg-indigo-500 after:opacity-0 after:blur-3xl after:transition-opacity after:duration-500 hover:after:opacity-20 group-hover:before:opacity-100"
+              className="group/card relative h-full overflow-hidden rounded-2xl border border-indigo-100 bg-white p-px shadow-sm before:pointer-events-none before:absolute before:-left-40 before:-top-40 before:z-10 before:h-80 before:w-80 before:translate-x-[var(--mouse-x)] before:translate-y-[var(--mouse-y)] before:rounded-full before:bg-indigo-500/25 before:opacity-0 before:blur-3xl before:transition-opacity before:duration-500 after:pointer-events-none after:absolute after:-left-48 after:-top-48 after:z-30 after:h-64 after:w-64 after:translate-x-[var(--mouse-x)] after:translate-y-[var(--mouse-y)] after:rounded-full after:bg-indigo-300 after:opacity-0 after:blur-3xl after:transition-opacity after:duration-500 hover:after:opacity-20 group-hover:before:opacity-100"
               href="#0"
             >
-              <div className="relative z-20 h-full overflow-hidden rounded-[inherit] bg-gray-950 after:absolute after:inset-0 after:bg-linear-to-br after:from-gray-900/50 after:via-gray-800/25 after:to-gray-900/50">
+              <div className="relative z-20 h-full overflow-hidden rounded-[inherit] bg-white after:pointer-events-none after:absolute after:inset-0 after:z-0 after:bg-linear-to-br after:from-indigo-50/70 after:via-white after:to-indigo-50/30">
                 {/* Arrow */}
                 <div
-                  className="absolute right-6 top-6 flex h-8 w-8 items-center justify-center rounded-full border border-gray-700/50 bg-gray-800/65 text-gray-200 opacity-0 transition-opacity group-hover/card:opacity-100"
+                  className="absolute right-6 top-6 z-[3] flex h-8 w-8 items-center justify-center rounded-full border border-indigo-200 bg-white text-indigo-600 opacity-0 transition-opacity group-hover/card:opacity-100"
                   aria-hidden="true"
                 >
                   <svg
@@ -96,24 +92,19 @@ export default function Workflows() {
                     />
                   </svg>
                 </div>
-                {/* Image */}
-                <Image
-                  className="inline-flex"
-                  src={WorflowImg02}
-                  width={350}
-                  height={288}
-                  alt="Workflow 02"
-                />
+                <div className="relative z-[2] w-full">
+                  <Image className="h-auto w-full" src={WorflowImg02} width={350} height={288} alt="Workflow 02" />
+                </div>
                 {/* Content */}
-                <div className="p-6">
+                <div className="relative z-10 p-6">
                   <div className="mb-3">
-                    <span className="btn-sm relative rounded-full bg-gray-800/40 px-2.5 py-0.5 text-xs font-normal before:pointer-events-none before:absolute before:inset-0 before:rounded-[inherit] before:border before:border-transparent before:[background:linear-gradient(to_bottom,--theme(--color-gray-700/.15),--theme(--color-gray-700/.5))_border-box] before:[mask-composite:exclude_!important] before:[mask:linear-gradient(white_0_0)_padding-box,_linear-gradient(white_0_0)] hover:bg-gray-800/60">
-                      <span className="bg-linear-to-r from-indigo-500 to-indigo-200 bg-clip-text text-transparent">
+                    <span className="btn-sm relative rounded-full border border-indigo-100 bg-indigo-50 px-2.5 py-0.5 text-xs font-semibold text-indigo-700">
+                      <span>
                         Step 2
                       </span>
                     </span>
                   </div>
-                  <p className="text-indigo-200/65">
+                  <p className="text-slate-700">
                     RealEye runs the right pipeline: frame-level deepfake detection,
                     image AI checks, or smart competitor-aware similarity analysis.
                   </p>
@@ -122,13 +113,13 @@ export default function Workflows() {
             </a>
             {/* Card 3 */}
             <a
-              className="group/card relative h-full overflow-hidden rounded-2xl bg-gray-800 p-px before:pointer-events-none before:absolute before:-left-40 before:-top-40 before:z-10 before:h-80 before:w-80 before:translate-x-[var(--mouse-x)] before:translate-y-[var(--mouse-y)] before:rounded-full before:bg-indigo-500/80 before:opacity-0 before:blur-3xl before:transition-opacity before:duration-500 after:pointer-events-none after:absolute after:-left-48 after:-top-48 after:z-30 after:h-64 after:w-64 after:translate-x-[var(--mouse-x)] after:translate-y-[var(--mouse-y)] after:rounded-full after:bg-indigo-500 after:opacity-0 after:blur-3xl after:transition-opacity after:duration-500 hover:after:opacity-20 group-hover:before:opacity-100"
+              className="group/card relative h-full overflow-hidden rounded-2xl border border-indigo-100 bg-white p-px shadow-sm before:pointer-events-none before:absolute before:-left-40 before:-top-40 before:z-10 before:h-80 before:w-80 before:translate-x-[var(--mouse-x)] before:translate-y-[var(--mouse-y)] before:rounded-full before:bg-indigo-500/25 before:opacity-0 before:blur-3xl before:transition-opacity before:duration-500 after:pointer-events-none after:absolute after:-left-48 after:-top-48 after:z-30 after:h-64 after:w-64 after:translate-x-[var(--mouse-x)] after:translate-y-[var(--mouse-y)] after:rounded-full after:bg-indigo-300 after:opacity-0 after:blur-3xl after:transition-opacity after:duration-500 hover:after:opacity-20 group-hover:before:opacity-100"
               href="#0"
             >
-              <div className="relative z-20 h-full overflow-hidden rounded-[inherit] bg-gray-950 after:absolute after:inset-0 after:bg-linear-to-br after:from-gray-900/50 after:via-gray-800/25 after:to-gray-900/50">
+              <div className="relative z-20 h-full overflow-hidden rounded-[inherit] bg-white after:pointer-events-none after:absolute after:inset-0 after:z-0 after:bg-linear-to-br after:from-indigo-50/70 after:via-white after:to-indigo-50/30">
                 {/* Arrow */}
                 <div
-                  className="absolute right-6 top-6 flex h-8 w-8 items-center justify-center rounded-full border border-gray-700/50 bg-gray-800/65 text-gray-200 opacity-0 transition-opacity group-hover/card:opacity-100"
+                  className="absolute right-6 top-6 z-[3] flex h-8 w-8 items-center justify-center rounded-full border border-indigo-200 bg-white text-indigo-600 opacity-0 transition-opacity group-hover/card:opacity-100"
                   aria-hidden="true"
                 >
                   <svg
@@ -143,24 +134,19 @@ export default function Workflows() {
                     />
                   </svg>
                 </div>
-                {/* Image */}
-                <Image
-                  className="inline-flex"
-                  src={WorflowImg03}
-                  width={350}
-                  height={288}
-                  alt="Workflow 03"
-                />
+                <div className="relative z-[2] w-full">
+                  <Image className="h-auto w-full" src={WorflowImg03} width={350} height={288} alt="Workflow 03" />
+                </div>
                 {/* Content */}
-                <div className="p-6">
+                <div className="relative z-10 p-6">
                   <div className="mb-3">
-                    <span className="btn-sm relative rounded-full bg-gray-800/40 px-2.5 py-0.5 text-xs font-normal before:pointer-events-none before:absolute before:inset-0 before:rounded-[inherit] before:border before:border-transparent before:[background:linear-gradient(to_bottom,--theme(--color-gray-700/.15),--theme(--color-gray-700/.5))_border-box] before:[mask-composite:exclude_!important] before:[mask:linear-gradient(white_0_0)_padding-box,_linear-gradient(white_0_0)] hover:bg-gray-800/60">
-                      <span className="bg-linear-to-r from-indigo-500 to-indigo-200 bg-clip-text text-transparent">
+                    <span className="btn-sm relative rounded-full border border-indigo-100 bg-indigo-50 px-2.5 py-0.5 text-xs font-semibold text-indigo-700">
+                      <span>
                         Step 3
                       </span>
                     </span>
                   </div>
-                  <p className="text-indigo-200/65">
+                  <p className="text-slate-700">
                     Review clear outputs with confidence, competitors found, strategy
                     insights, and export-ready reports.
                   </p>

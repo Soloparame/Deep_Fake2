@@ -4,11 +4,11 @@
 
 /* Glassmorphism Utilities */
 @utility glass {
-  @apply backdrop-blur-md bg-white/5 border border-white/10;
+  @apply border border-indigo-200/20 bg-indigo-500/10 backdrop-blur-md;
 }
 
 @utility glass-card {
-  @apply backdrop-blur-xl bg-gray-900/60 border border-white/10 shadow-2xl;
+  @apply border border-indigo-200/20 bg-slate-900/75 shadow-2xl backdrop-blur-xl;
 }
 
 @utility glow-text {
@@ -16,7 +16,7 @@
 }
 
 @utility glow-box {
-  box-shadow: 0 0 40px -10px rgba(79, 70, 229, 0.3);
+  box-shadow: 0 0 45px -10px rgba(99, 102, 241, 0.45);
 }
 
 /* Custom Scrollbar */
@@ -28,7 +28,7 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  @apply bg-gray-800 rounded-full hover:bg-gray-700;
+  @apply rounded-full bg-indigo-900/70 hover:bg-indigo-700/80;
 }
 
 
@@ -125,8 +125,44 @@
 }
 
 @layer utilities {
-  /* Improve readability for legacy low-contrast text utility usage */
+  /* Improve readability for light theme */
   .text-indigo-200\/65 {
-    color: rgb(224 231 255 / 0.9) !important;
+    color: rgb(51 65 85 / 0.82) !important;
+  }
+
+  .text-indigo-100\/90 {
+    color: rgb(30 41 59 / 0.9) !important;
+  }
+
+  .text-indigo-100\/80 {
+    color: rgb(51 65 85 / 0.82) !important;
+  }
+
+  .text-indigo-100\/70 {
+    color: rgb(71 85 105 / 0.82) !important;
+  }
+
+  .text-indigo-200\/60 {
+    color: rgb(71 85 105 / 0.8) !important;
+  }
+
+  .text-gray-200 {
+    color: rgb(30 41 59) !important;
+  }
+
+  .text-gray-300 {
+    color: rgb(51 65 85) !important;
+  }
+
+  .text-gray-400 {
+    color: rgb(71 85 105) !important;
+  }
+
+  .text-gray-500 {
+    color: rgb(100 116 139) !important;
+  }
+
+  .text-gray-600 {
+    color: rgb(100 116 139) !important;
   }
 }

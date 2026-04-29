@@ -12,7 +12,7 @@ type Props = {
 
 export function AnalysisHistorySidebar({ items, loading, selectedId, onSelect, onDelete }: Props) {
   return (
-    <aside className="relative overflow-hidden rounded-3xl border border-white/[0.08] bg-gradient-to-b from-zinc-900/90 to-zinc-950/98 p-5 shadow-2xl shadow-black/40 ring-1 ring-white/[0.05]">
+    <aside className="relative overflow-hidden rounded-3xl border border-indigo-100 bg-gradient-to-b from-white to-indigo-50/35 p-5 shadow-xl shadow-indigo-100/60 ring-1 ring-indigo-100">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-indigo-500/40 to-transparent" />
       <div className="mb-5 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2.5">
@@ -27,8 +27,8 @@ export function AnalysisHistorySidebar({ items, loading, selectedId, onSelect, o
             </svg>
           </div>
           <div>
-            <h2 className="text-xs font-bold uppercase tracking-[0.2em] text-zinc-400">History</h2>
-            <p className="text-[11px] text-zinc-600">Saved runs</p>
+            <h2 className="text-xs font-bold uppercase tracking-[0.2em] text-slate-600">History</h2>
+            <p className="text-[11px] text-slate-500">Saved runs</p>
           </div>
         </div>
         {items.length > 0 && (
@@ -63,8 +63,8 @@ export function AnalysisHistorySidebar({ items, loading, selectedId, onSelect, o
                 <div
                   className={`group relative w-full overflow-hidden rounded-2xl border px-3.5 py-3 text-left transition-all ${
                     active
-                      ? "border-indigo-500/40 bg-gradient-to-r from-indigo-500/15 to-violet-600/10 shadow-lg shadow-indigo-950/30"
-                      : "border-white/[0.06] bg-zinc-950/40 hover:border-white/15 hover:bg-zinc-900/60"
+                      ? "border-indigo-300 bg-gradient-to-r from-indigo-50 to-violet-50 shadow-sm"
+                      : "border-indigo-100 bg-white/80 hover:border-indigo-200 hover:bg-indigo-50/50"
                   }`}
                 >
                   <span
@@ -74,7 +74,7 @@ export function AnalysisHistorySidebar({ items, loading, selectedId, onSelect, o
                   />
                   <div className="flex items-start gap-2">
                     <button type="button" onClick={() => onSelect(a.id)} className="min-w-0 flex-1 text-left">
-                      <span className={`line-clamp-2 pl-1 text-sm font-medium ${active ? "text-white" : "text-zinc-300"}`}>
+                      <span className={`line-clamp-2 pl-1 text-sm font-medium ${active ? "text-slate-900" : "text-slate-700"}`}>
                         {a.title}
                       </span>
                       <span className="mt-2 flex items-center justify-between pl-1 text-[11px] text-zinc-500">

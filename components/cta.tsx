@@ -13,7 +13,7 @@ export default function Cta() {
     if (typeof window !== "undefined") {
       const token = window.localStorage.getItem("realeye_token");
       if (token) {
-        router.push("/upload");
+        router.push("/tools");
       } else {
         router.push("/signin");
       }
