@@ -6,7 +6,6 @@ export const metadata = {
 
 import PageIllustration from "@/components/page-illustration";
 import Hero from "@/components/hero-home";
-import TrustedStrip from "@/components/trusted-strip";
 import Workflows from "@/components/workflows";
 import Features from "@/components/features";
 import Testimonials from "@/components/testimonials";
@@ -16,7 +15,6 @@ export default function Home() {
     <>
       <PageIllustration />
       <Hero />
-      <TrustedStrip />
       <Workflows />
       <Features />
       <Testimonials />
