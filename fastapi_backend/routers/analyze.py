@@ -5,6 +5,7 @@ import datetime
 from typing import Optional, Tuple
 
 from fastapi import APIRouter, File, Form, HTTPException, Request, UploadFile, status
+from fastapi.responses import Response
 
 from fastapi_backend.database import analyses_col, new_id
 from fastapi_backend.services.auth_service import AuthService
@@ -25,6 +26,8 @@ from fastapi_backend.schemas.analysis import (
     TechComparisonRow,
 )
 from fastapi_backend.utils.document_text import extract_text_from_upload, merge_content_snippet
+from fastapi_backend.services import project_intel_docx, project_intel_ppt
+from fastapi_backend.services.competitor_map_service import build_competitor_map
 
 router = APIRouter()
 
@@ -54,18 +57,22 @@ def _build_report(
     devils_advocate: list[str],
     strategy: StrategyBlock,
 ) -> AnalysisReport:
+    display_title = (title or "Untitled project").strip() or "Untitled project"
+    found_list = [
+        SimilarProjectItem(name=p.name, link=p.link, snippet=p.snippet) for p in sim.found_projects
+    ]
     return AnalysisReport(
         id=analysis_id,
-        title=title or "Untitled project",
+        title=display_title,
         description=description,
         file_content=file_content[:8000] + ("..." if len(file_content) > 8000 else ""),
         similarity_score=sim.score,
         similarity_label=sim.label,
         similarity_description=sim.description,
         market_search_snippet=sim.market_snippet,
-        found_projects=[
-            SimilarProjectItem(name=p.name, link=p.link, snippet=p.snippet) for p in sim.found_projects
-        ],
+        found_projects=found_list,
+        company_name=display_title,
+        competitor_map=build_competitor_map(display_title, description.strip(), found_list),
         similarity_hf_live=sim.hf_ok,
         swot=swot,
         tech_comparison=tech_comparison,
@@ -211,6 +218,58 @@ async def analyze_project(
     return report
 
 
+@router.post("/analyses/export-ppt")
+async def export_analysis_ppt(request: Request, report: AnalysisReport):
+    """
+    Build a .pptx from the same JSON shape as AnalysisReport (Project Intel modal).
+    Requires sign-in; body is the report payload (compatible with JSON export from the UI).
+    """
+    _, user_email = _user_from_request(request)
+    if not user_email:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Sign in to export this report as PowerPoint.",
+        )
+    try:
+        data, fname = await asyncio.to_thread(project_intel_ppt.build_ppt_bytes, report)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"PPT generation failed: {e}",
+        ) from e
+    return Response(
+        content=data,
+        media_type="application/vnd.openxmlformats-officedocument.presentationml.presentation",
+        headers={"Content-Disposition": f'attachment; filename="{fname}"'},
+    )
+
+
+@router.post("/analyses/export-docx")
+async def export_analysis_docx(request: Request, report: AnalysisReport):
+    """
+    Build a .docx from the same JSON shape as AnalysisReport (Project Intel modal).
+    Requires sign-in; body is the report payload (compatible with JSON export from the UI).
+    """
+    _, user_email = _user_from_request(request)
+    if not user_email:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Sign in to export this report as Word.",
+        )
+    try:
+        data, fname = await asyncio.to_thread(project_intel_docx.build_docx_bytes, report)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Word export failed: {e}",
+        ) from e
+    return Response(
+        content=data,
+        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        headers={"Content-Disposition": f'attachment; filename="{fname}"'},
+    )
+
+
 @router.get("/analyses", response_model=AnalysisHistoryResponse)
 async def list_analyses(request: Request, limit: int = 30):
     """Recent analyses for the signed-in user (newest first)."""
@@ -262,12 +321,21 @@ async def get_analysis(request: Request, analysis_id: str):
     if "id" not in doc and analysis_id:
         doc["id"] = analysis_id
     try:
-        return AnalysisReport(**doc)
+        report = AnalysisReport(**doc)
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Invalid stored record: {e}",
         )
+    if not report.competitor_map:
+        cn = (report.company_name or report.title or "").strip() or "Untitled project"
+        report = report.model_copy(
+            update={
+                "company_name": cn,
+                "competitor_map": build_competitor_map(cn, report.description or "", list(report.found_projects)),
+            }
+        )
+    return report
 
 
 @router.delete("/analyses/{analysis_id}")

@@ -44,6 +44,19 @@ class SimilarProjectItem(BaseModel):
     snippet: str = ""
 
 
+class CompetitorMapEntry(BaseModel):
+    name: str = ""
+    description: str = ""
+    url: str = ""
+    price_score: float = Field(ge=0, le=100, default=50)
+    quality_score: float = Field(ge=0, le=100, default=50)
+    local_support_score: float = Field(ge=0, le=100, default=50)
+    market_share_score: float = Field(ge=0, le=100, default=50)
+    color: str = "#64748b"
+    is_you: bool = False
+    tag: Literal["Competitor", "Global player"] = "Competitor"
+
+
 class AnalysisReport(BaseModel):
     id: str
     title: str
@@ -65,6 +78,14 @@ class AnalysisReport(BaseModel):
     found_projects: List[SimilarProjectItem] = Field(
         default_factory=list,
         description="Named competitors/projects extracted from web search results",
+    )
+    company_name: str = Field(
+        default="",
+        description="Display name for the user's company on positioning map (usually same as title)",
+    )
+    competitor_map: List[CompetitorMapEntry] = Field(
+        default_factory=list,
+        description="Points for competitive scatter chart (user + extracted competitors)",
     )
     similarity_hf_live: Optional[bool] = Field(
         default=None,

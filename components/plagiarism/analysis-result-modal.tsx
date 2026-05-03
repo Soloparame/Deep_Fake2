@@ -1,14 +1,24 @@
 "use client";
 
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { SimilarityGauge } from "@/components/plagiarism/similarity-gauge";
 import { DevilsAdvocateCard } from "@/components/plagiarism/devils-advocate-card";
 import { StrategyPanel } from "@/components/plagiarism/strategy-panel";
 import { SwotGrid } from "@/components/plagiarism/swot-grid";
 import { TechLensSection } from "@/components/plagiarism/tech-lens-section";
+import { CompetitorMap } from "@/components/plagiarism/competitor-map";
 import type { AnalysisReport } from "@/types/analysis";
 
 type Tab = "overview" | "strategy";
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+
+/** Visible on white modal header (avoid zinc-on-white). */
+const headerBtnClass =
+  "flex items-center justify-center rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-900";
+
+const headerBtnAccentClass =
+  "flex items-center justify-center rounded-xl border border-indigo-200 bg-indigo-50 px-3.5 py-2 text-xs font-semibold text-indigo-900 shadow-sm transition hover:border-indigo-400 hover:bg-indigo-100 disabled:cursor-not-allowed disabled:opacity-60";
 
 function safeFilenamePart(s: string) {
   return s
@@ -79,6 +89,8 @@ export function AnalysisResultModal(props: {
   originalUploadedFile?: File | null;
 }) {
   const { open, onClose, report, resultTab, onTabChange, originalUploadedFile } = props;
+  const [exportLoading, setExportLoading] = useState<null | "ppt" | "docx">(null);
+  const [exportError, setExportError] = useState<string | null>(null);
 
   const downloadJson = useCallback(() => {
     const blob = new Blob([JSON.stringify(report, null, 2)], { type: "application/json;charset=utf-8" });
@@ -108,6 +120,60 @@ export function AnalysisResultModal(props: {
     a.click();
     URL.revokeObjectURL(a.href);
   }, [originalUploadedFile]);
+
+  const downloadServerExport = useCallback(
+    async (kind: "ppt" | "docx") => {
+      setExportError(null);
+      const token = typeof window !== "undefined" ? window.localStorage.getItem("realeye_token") : null;
+      if (!token) {
+        setExportError("Sign in to export PowerPoint or Word.");
+        return;
+      }
+      const path = kind === "ppt" ? "/api/analyses/export-ppt" : "/api/analyses/export-docx";
+      const fallbackExt = kind === "ppt" ? "pptx" : "docx";
+      setExportLoading(kind);
+      try {
+        const res = await fetch(`${API_BASE}${path}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(report),
+        });
+        if (!res.ok) {
+          let msg = `Export failed (${res.status})`;
+          try {
+            const err = await res.json();
+            if (err?.detail) msg = typeof err.detail === "string" ? err.detail : JSON.stringify(err.detail);
+          } catch {
+            /* ignore */
+          }
+          setExportError(msg);
+          return;
+        }
+        const blob = await res.blob();
+        const cd = res.headers.get("Content-Disposition");
+        let filename = `realeye_${safeFilenamePart(report.title)}_${report.id.slice(0, 8)}.${fallbackExt}`;
+        const m = cd?.match(/filename="([^"]+)"/);
+        if (m?.[1]) filename = m[1];
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(a.href);
+      } catch (e) {
+        setExportError(e instanceof Error ? e.message : "Network error");
+      } finally {
+        setExportLoading(null);
+      }
+    },
+    [report],
+  );
+
+  useEffect(() => {
+    if (open) setExportError(null);
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -149,36 +215,51 @@ export function AnalysisResultModal(props: {
                 </p>
               </div>
             </div>
-            <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-              <button
-                type="button"
-                onClick={downloadJson}
-                className="group flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-3.5 py-2 text-xs font-semibold text-zinc-300 transition-all hover:bg-indigo-500/20 hover:text-indigo-200 hover:border-indigo-500/40 hover:shadow-[0_0_15px_rgba(99,102,241,0.2)]"
-              >
+            <div className="flex min-w-0 flex-[1_1_auto] flex-wrap items-center justify-end gap-2 sm:gap-3">
+              <button type="button" onClick={downloadJson} className={`${headerBtnClass} group`}>
                 <span>JSON</span>
               </button>
-              <button
-                type="button"
-                onClick={downloadTxt}
-                className="group flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-3.5 py-2 text-xs font-semibold text-zinc-300 transition-all hover:bg-indigo-500/20 hover:text-indigo-200 hover:border-indigo-500/40 hover:shadow-[0_0_15px_rgba(99,102,241,0.2)]"
-              >
+              <button type="button" onClick={downloadTxt} className={`${headerBtnClass} group`}>
                 <span>Text</span>
               </button>
               {originalUploadedFile ? (
                 <button
                   type="button"
                   onClick={downloadOriginal}
-                  className="group flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-3.5 py-2 text-xs font-semibold text-zinc-300 transition-all hover:bg-indigo-500/20 hover:text-indigo-200 hover:border-indigo-500/40 hover:shadow-[0_0_15px_rgba(99,102,241,0.2)]"
+                  className={`${headerBtnClass} group`}
                   title={originalUploadedFile.name}
                 >
                   <span>Original</span>
                 </button>
               ) : null}
-              <div className="h-6 w-px bg-white/10 mx-1"></div>
+              <button
+                type="button"
+                onClick={() => void downloadServerExport("ppt")}
+                disabled={exportLoading !== null}
+                title="Generate .pptx from this report (server)"
+                className={headerBtnAccentClass}
+              >
+                <span>{exportLoading === "ppt" ? "PPT…" : "Generate PPT"}</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => void downloadServerExport("docx")}
+                disabled={exportLoading !== null}
+                title="Generate .docx from this report (server)"
+                className={headerBtnAccentClass}
+              >
+                <span>{exportLoading === "docx" ? "Word…" : "Generate Word"}</span>
+              </button>
+              {exportError ? (
+                <span className="max-w-[min(16rem,40vw)] truncate text-[11px] font-medium text-red-600" title={exportError}>
+                  {exportError}
+                </span>
+              ) : null}
+              <div className="mx-1 h-6 w-px shrink-0 bg-slate-200" aria-hidden />
               <button
                 type="button"
                 onClick={onClose}
-                className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/5 text-zinc-400 transition-all hover:bg-red-500/20 hover:text-red-400 hover:border-red-500/30 border border-transparent"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:border-red-200 hover:bg-red-50 hover:text-red-600"
                 aria-label="Close"
               >
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -243,6 +324,10 @@ export function AnalysisResultModal(props: {
                   <SimilarityGauge report={report} />
                   <SwotGrid swot={report.swot} />
                 </div>
+                <CompetitorMap
+                  data={report.competitor_map ?? []}
+                  companyName={report.company_name?.trim() || report.title}
+                />
                 <TechLensSection report={report} />
                 <DevilsAdvocateCard questions={report.devils_advocate} />
                 <details className="group rounded-2xl border border-white/5 bg-zinc-950/40 transition-colors open:bg-zinc-900/40 hover:border-white/10">

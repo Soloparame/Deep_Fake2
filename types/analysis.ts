@@ -36,6 +36,21 @@ export interface SimilarProjectItem {
   snippet: string;
 }
 
+export type CompetitorMapTag = "Competitor" | "Global player";
+
+export interface CompetitorMapEntry {
+  name: string;
+  description: string;
+  url: string;
+  price_score: number;
+  quality_score: number;
+  local_support_score: number;
+  market_share_score: number;
+  color: string;
+  is_you: boolean;
+  tag: CompetitorMapTag;
+}
+
 export interface AnalysisReport {
   id: string;
   title: string;
@@ -50,6 +65,10 @@ export interface AnalysisReport {
   market_search_snippet?: string | null;
   /** Extracted real-world projects/competitors from market search text */
   found_projects: SimilarProjectItem[];
+  /** User-facing name for positioning map (usually same as title) */
+  company_name?: string;
+  /** Scatter chart: you + competitors with synthetic axis scores */
+  competitor_map?: CompetitorMapEntry[];
   /** True when the score came from Hugging Face Inference */
   similarity_hf_live?: boolean | null;
   swot: SwotBlock;
