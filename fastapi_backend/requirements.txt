@@ -12,7 +12,7 @@ python-multipart==0.0.6
 # If startup fails with Keras TypeError (metaclass / api_export): uninstall standalone keras —
 #   pip uninstall keras
 # TensorFlow 2.10 ships keras inside tf.keras; a separate Keras 3 install breaks imports.
-tensorflow==2.10.0
+tensorflow==2.15.0
 numpy==1.23.5
 
 # Computer Vision

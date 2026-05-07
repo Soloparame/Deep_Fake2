@@ -27,9 +27,6 @@ export default function HeroHome() {
         <div className="py-12 md:py-20">
           <div className="grid items-start gap-12 pb-12 md:grid-cols-2 md:pb-20">
             <div>
-              <div className="mb-6 inline-flex items-center rounded-full border border-indigo-200 bg-white px-4 py-1.5 text-xs font-semibold tracking-wide text-indigo-700">
-                New · Deepfake video &amp; image detection
-              </div>
               <h1 className="pb-6 font-nacelle text-5xl font-semibold text-slate-900 md:text-7xl" data-aos="fade-up">
                 Originality you can <span className="text-indigo-600">trust.</span>
               </h1>
@@ -47,12 +44,6 @@ export default function HeroHome() {
                 <Link className="btn rounded-lg border border-slate-200 bg-white px-6 py-2.5 font-medium text-slate-700 transition-all hover:bg-slate-50" href="/pages/how-it-works">
                   See all tools
                 </Link>
-              </div>
-              <div className="mt-8 grid grid-cols-2 gap-3 text-sm text-slate-600">
-                <span>No credit card required</span>
-                <span>Free starter plan</span>
-                <span>Privacy-first scanning</span>
-                <span>Cancel anytime</span>
               </div>
             </div>
             <div className="rounded-3xl border border-indigo-100 bg-white p-4 shadow-xl">

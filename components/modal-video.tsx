@@ -76,7 +76,7 @@ export default function ModalVideo({
 
         {/* Play icon with enhanced styling */}
         <span className="pointer-events-none absolute">
-          <div className="rounded-full border border-gray-700/50 bg-gray-900/80 backdrop-blur-sm p-4 shadow-xl shadow-black/50 transition-transform group-hover:scale-110 group-hover:border-indigo-500/50">
+          <div className="rounded-full border border-indigo-300 bg-white backdrop-blur-sm p-4 shadow-xl shadow-indigo-500/20 transition-transform group-hover:scale-110 group-hover:border-indigo-500/50">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width={24}
@@ -104,9 +104,9 @@ export default function ModalVideo({
               </defs>
             </svg>
           </div>
-          <span className="absolute left-1/2 top-full mt-4 -translate-x-1/2 whitespace-nowrap rounded-full bg-gray-900/80 px-4 py-2 text-sm font-medium leading-tight text-gray-200 backdrop-blur-sm shadow-lg shadow-black/50">
+          <span className="absolute left-1/2 top-full mt-4 -translate-x-1/2 whitespace-nowrap rounded-full bg-white px-4 py-2 text-sm font-medium leading-tight text-slate-900 backdrop-blur-sm shadow-lg shadow-indigo-500/20">
             Watch Demo
-            <span className="text-gray-500"> - </span>
+            <span className="text-indigo-400"> - </span>
             3:47
           </span>
         </span>

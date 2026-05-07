@@ -176,27 +176,6 @@ export default function Features() {
                 intelligence you can use immediately.
               </p>
             </article>
-            <article className="rounded-2xl border border-indigo-100 bg-white p-5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg">
-              <svg
-                className="mb-3 fill-indigo-500"
-                xmlns="http://www.w3.org/2000/svg"
-                width={24}
-                height={24}
-              >
-                <path
-                  fillOpacity=".48"
-                  d="M19 8h5v2h-5V8Zm-4 5h9v2h-9v-2Zm9 5H11v2h13v-2Z"
-                />
-                <path d="M19.406 3.844 6.083 20.497.586 15 2 13.586l3.917 3.917L17.844 2.595l1.562 1.25Z" />
-              </svg>
-              <h3 className="mb-1 font-nacelle text-[1rem] font-semibold text-slate-800">
-                Exportable Results
-              </h3>
-              <p className="text-indigo-200/65">
-                Download JSON and text reports for audit trails, collaboration, or downstream
-                tooling.
-              </p>
-            </article>
           </div>
         </div>
       </div>
