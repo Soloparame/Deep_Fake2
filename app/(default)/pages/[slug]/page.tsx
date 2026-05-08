@@ -28,31 +28,41 @@ export async function generateStaticParams() {
   }));
 }
 
-function ContentCard({ children, className = "" }: { children: React.ReactNode, className?: string }) {
+function ContentCard({ step, title, children }: { step?: number; title: string; children: React.ReactNode }) {
   return (
-    <div className={`group relative overflow-hidden rounded-2xl border border-white/10 bg-gray-900/60 backdrop-blur-xl p-1 transition-all hover:-translate-y-1 hover:border-indigo-500/30 hover:shadow-2xl ${className}`}>
-      <div className="h-full rounded-xl bg-gray-950/80 p-6">
-        {children}
+    <article className="group relative overflow-hidden rounded-[2rem] border border-slate-200/70 bg-white shadow-[0_25px_80px_-80px_rgba(15,23,42,0.15)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_30px_100px_-30px_rgba(15,23,42,0.18)]">
+      <div className="relative h-full overflow-hidden rounded-[1.75rem] bg-slate-50 p-6 ring-1 ring-slate-200/40 backdrop-blur-xl">
+        <div className="pointer-events-none absolute -right-10 top-6 h-28 w-28 rounded-full bg-indigo-600/10 blur-3xl" />
+        <div className="pointer-events-none absolute -left-10 bottom-10 h-32 w-32 rounded-full bg-violet-600/10 blur-3xl" />
+        <div className="relative z-10">
+          {step != null ? (
+            <div className="inline-flex items-center rounded-full border border-indigo-500/20 bg-indigo-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.35em] text-indigo-700 shadow-sm shadow-indigo-500/10">
+              Step {step}
+            </div>
+          ) : null}
+          <h2 className="mt-5 text-2xl font-semibold text-slate-950 tracking-tight">{title}</h2>
+          <div className="mt-4 text-sm leading-7 text-slate-700">{children}</div>
+        </div>
       </div>
-    </div>
+    </article>
   );
 }
 
 function PremiumPage({ title, description, children }: { title: string, description: string, children: React.ReactNode }) {
   return (
-    <section className="relative min-h-screen overflow-hidden pt-32 pb-12 md:pt-40 md:pb-20">
-      {/* Background Decor - matching upload page style */}
+    <section className="relative min-h-screen overflow-hidden bg-white text-slate-950 pt-24 pb-16 md:pt-32 md:pb-24">
+      {/* Background Decor - light page style */}
       <div className="absolute inset-0 -z-10">
-        <div className="absolute left-[20%] top-[20%] h-96 w-96 rounded-full bg-indigo-600/10 blur-[100px] animate-pulse"></div>
-        <div className="absolute right-[20%] bottom-[20%] h-64 w-64 rounded-full bg-violet-600/10 blur-[80px]"></div>
+        <div className="absolute left-[16%] top-[16%] h-96 w-96 rounded-full bg-indigo-600/5 blur-[100px]" />
+        <div className="absolute right-[16%] bottom-[16%] h-64 w-64 rounded-full bg-violet-600/5 blur-[80px]" />
       </div>
       
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <div className="mx-auto max-w-3xl text-center mb-16">
-          <h1 className="animate-[gradient_6s_linear_infinite] bg-[linear-gradient(to_right,var(--color-gray-200),var(--color-indigo-200),var(--color-gray-50),var(--color-indigo-300),var(--color-gray-200))] bg-[length:200%_auto] bg-clip-text pb-4 font-nacelle text-4xl font-bold text-transparent md:text-5xl">
+          <h1 className="font-nacelle text-4xl font-bold tracking-tight text-slate-950 sm:text-5xl">
             {title}
           </h1>
-          <p className="text-xl text-indigo-100/90">{description}</p>
+          <p className="mt-5 text-xl leading-8 text-slate-600">{description}</p>
         </div>
 
         <div className="mx-auto">
@@ -163,136 +173,95 @@ export default async function Page({
         description="Our platform analyzes videos using advanced AI models to detect manipulation and provide reliable authenticity results in seconds. Built for speed, accuracy, and transparency, Multi-modal AI Integrity Suite uses deep learning to evaluate videos in a clear, explainable pipeline."
       >
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {/* Step 1: Upload the Video */}
-          <ContentCard>
-            <h2 className="text-xl font-semibold text-white">Step 1: Upload the Video</h2>
-            <p className="mt-2 text-sm text-gray-300">
-              Upload via the website or API. Supported formats include MP4, MOV, AVI, and WebM. File sizes are limited for performance and reliability.
-            </p>
-            <ul className="mt-3 list-disc pl-4 text-sm text-indigo-100/90">
-              <li>Simple upload process with progress feedback</li>
-              <li>Data encryption in transit</li>
-              <li>Private and secure handling of uploads</li>
+          <ContentCard step={1} title="Upload the Video">
+            Upload via the website or API. Supported formats include MP4, MOV, AVI, and WebM. File sizes are limited for performance and reliability.
+            <ul className="mt-4 space-y-2 text-sm text-slate-700">
+              <li className="rounded-xl bg-slate-100/80 px-3 py-2">Simple upload process with progress feedback</li>
+              <li className="rounded-xl bg-slate-100/80 px-3 py-2">Data encryption in transit</li>
+              <li className="rounded-xl bg-slate-100/80 px-3 py-2">Private and secure handling of uploads</li>
             </ul>
           </ContentCard>
 
-          {/* Step 2: Video Preprocessing */}
-          <ContentCard>
-            <h2 className="text-xl font-semibold text-white">Step 2: Video Preprocessing</h2>
-            <p className="mt-2 text-sm text-gray-300">
-              Videos are standardized and cleaned for consistent model input. Resolution, frame rate, and basic quality checks are aligned to ensure dependable analysis.
-            </p>
-            <p className="mt-2 text-xs text-indigo-200/65">
+          <ContentCard step={2} title="Video Preprocessing">
+            Videos are standardized and cleaned for consistent model input. Resolution, frame rate, and quality checks are aligned to ensure dependable analysis.
+            <p className="mt-4 rounded-2xl bg-indigo-500/10 px-3 py-2 text-sm text-slate-900">
               This step improves detection performance and accuracy across a wide range of sources.
             </p>
           </ContentCard>
 
-          {/* Step 3: Frame Extraction */}
-          <ContentCard>
-            <h2 className="text-xl font-semibold text-white">Step 3: Frame Extraction</h2>
-            <p className="mt-2 text-sm text-gray-300">
-              The video is split into frames and key frames are selected for analysis. Working at the frame level helps catch subtle manipulations.
-            </p>
-            <ul className="mt-3 list-disc pl-4 text-sm text-indigo-100/90">
-              <li>Key-frame selection to focus on meaningful frames</li>
-              <li>Performance-optimized sampling for fast processing</li>
+          <ContentCard step={3} title="Frame Extraction">
+            The video is split into frames and key frames are selected for analysis. Working at the frame level helps catch subtle manipulations.
+            <ul className="mt-4 space-y-2 text-sm text-slate-700">
+              <li className="rounded-xl bg-slate-100/80 px-3 py-2">Key-frame selection to focus on meaningful frames</li>
+              <li className="rounded-xl bg-slate-100/80 px-3 py-2">Performance-optimized sampling for fast processing</li>
             </ul>
           </ContentCard>
 
-          {/* Step 4: Face Detection & Tracking */}
-          <ContentCard>
-            <h2 className="text-xl font-semibold text-white">Step 4: Face Detection & Tracking</h2>
-            <p className="mt-2 text-sm text-gray-300">
-              Faces are detected and tracked across frames to focus analysis on regions most commonly manipulated in deepfakes.
-            </p>
-            <ul className="mt-3 list-disc pl-4 text-sm text-indigo-100/90">
-              <li>Multi-face support</li>
-              <li>Face alignment for consistent evaluation</li>
-              <li>Stability across movements and scene changes</li>
+          <ContentCard step={4} title="Face Detection & Tracking">
+            Faces are detected and tracked across frames to focus analysis on regions most commonly manipulated in deepfakes.
+            <ul className="mt-4 space-y-2 text-sm text-slate-700">
+              <li className="rounded-xl bg-slate-100/80 px-3 py-2">Multi-face support</li>
+              <li className="rounded-xl bg-slate-100/80 px-3 py-2">Face alignment for consistent evaluation</li>
+              <li className="rounded-xl bg-slate-100/80 px-3 py-2">Stability across movements and scene changes</li>
             </ul>
           </ContentCard>
 
-          {/* Step 5: Deepfake AI Analysis */}
-          <ContentCard>
-            <h2 className="text-xl font-semibold text-white">Step 5: Deepfake AI Analysis</h2>
-            <p className="mt-2 text-sm text-gray-300">
-              Core AI models analyze facial patterns to detect artifacts and inconsistencies, trained on real and fake datasets for robust generalization.
-            </p>
-            <ul className="mt-3 list-disc pl-4 text-sm text-indigo-100/90">
-              <li>Texture and pixel-level inconsistency checks</li>
-              <li>Lip-sync and eye-blinking patterns</li>
-              <li>Confidence aggregation across frames</li>
+          <ContentCard step={5} title="Deepfake AI Analysis">
+            Core AI models analyze facial patterns to detect artifacts and inconsistencies, trained on real and fake datasets for robust generalization.
+            <ul className="mt-4 space-y-2 text-sm text-slate-700">
+              <li className="rounded-xl bg-slate-100/80 px-3 py-2">Texture and pixel-level inconsistency checks</li>
+              <li className="rounded-xl bg-slate-100/80 px-3 py-2">Lip-sync and eye-blinking pattern detection</li>
+              <li className="rounded-xl bg-slate-100/80 px-3 py-2">Confidence aggregation across frames</li>
             </ul>
           </ContentCard>
 
-          {/* Step 6: Confidence Score Generation */}
-          <ContentCard>
-            <h2 className="text-xl font-semibold text-white">Step 6: Confidence Score Generation</h2>
-            <p className="mt-2 text-sm text-gray-300">
-              Results across frames are combined into a final probability score, reflecting the likelihood of manipulation.
-            </p>
-            <ul className="mt-3 list-disc pl-4 text-sm text-indigo-100/90">
-              <li>Score meaning: Real / Suspicious / Fake</li>
-              <li>High transparency in how decisions are made</li>
+          <ContentCard step={6} title="Confidence Score Generation">
+            Results across frames are combined into a final probability score, reflecting the likelihood of manipulation.
+            <ul className="mt-4 space-y-2 text-sm text-slate-700">
+              <li className="rounded-xl bg-slate-100/80 px-3 py-2">Score meaning: Real / Suspicious / Fake</li>
+              <li className="rounded-xl bg-slate-100/80 px-3 py-2">High transparency in how decisions are made</li>
             </ul>
           </ContentCard>
 
-          {/* Step 7: Authenticity Report */}
-          <ContentCard>
-            <h2 className="text-xl font-semibold text-white">Step 7: Authenticity Report</h2>
-            <p className="mt-2 text-sm text-gray-300">
-              A full report is generated with the confidence score, summary of analysis, and highlighted frames that triggered suspicious indicators.
-            </p>
-            <ul className="mt-3 list-disc pl-4 text-sm text-indigo-100/90">
-              <li>Detailed analysis summary</li>
-              <li>Highlighted suspicious frames</li>
-              <li>Downloadable PDF for documentation or verification</li>
+          <ContentCard step={7} title="Authenticity Report">
+            A full report is generated with the confidence score, summary of analysis, and highlighted frames that triggered suspicious indicators.
+            <ul className="mt-4 space-y-2 text-sm text-slate-700">
+              <li className="rounded-xl bg-slate-100/80 px-3 py-2">Detailed analysis summary</li>
+              <li className="rounded-xl bg-slate-100/80 px-3 py-2">Highlighted suspicious frames</li>
+              <li className="rounded-xl bg-slate-100/80 px-3 py-2">Downloadable PDF for documentation or verification</li>
             </ul>
           </ContentCard>
 
-          {/* Step 8: Result Storage & History */}
-          <ContentCard>
-            <h2 className="text-xl font-semibold text-white">Step 8: Result Storage & History</h2>
-            <p className="mt-2 text-sm text-gray-300">
-              Results are saved per user to enable history access and evidence tracking, with strong privacy safeguards.
-            </p>
-            <ul className="mt-3 list-disc pl-4 text-xs text-indigo-200/65">
-              <li>Detection history per account</li>
-              <li>Re-access previous reports</li>
-              <li>Privacy-first storage policies</li>
+          <ContentCard title="Result Storage & History">
+            Results are saved per user to enable history access and evidence tracking, with strong privacy safeguards.
+            <ul className="mt-4 space-y-2 text-sm text-slate-700">
+              <li className="rounded-xl bg-slate-100/80 px-3 py-2">Detection history per account</li>
+              <li className="rounded-xl bg-slate-100/80 px-3 py-2">Re-access previous reports</li>
+              <li className="rounded-xl bg-slate-100/80 px-3 py-2">Privacy-first storage policies</li>
             </ul>
           </ContentCard>
 
-          {/* Step 9: API Workflow (Optional) */}
-          <ContentCard>
-            <h2 className="text-xl font-semibold text-white">Step 9: API Workflow (Optional)</h2>
-            <p className="mt-2 text-sm text-gray-300">
-              The same pipeline is available via API for integrations, returning JSON results suitable for automation.
-            </p>
-            <ul className="mt-3 list-disc pl-4 text-xs text-indigo-200/65">
-              <li>JSON output with scores and labels</li>
-              <li>Easy integration into apps and services</li>
-              <li>Support for automated workflows</li>
+          <ContentCard title="API Workflow (Optional)">
+            The same pipeline is available via API for integrations, returning JSON results suitable for automation.
+            <ul className="mt-4 space-y-2 text-sm text-slate-700">
+              <li className="rounded-xl bg-slate-100/80 px-3 py-2">JSON output with scores and labels</li>
+              <li className="rounded-xl bg-slate-100/80 px-3 py-2">Easy integration into apps and services</li>
+              <li className="rounded-xl bg-slate-100/80 px-3 py-2">Support for automated workflows</li>
             </ul>
           </ContentCard>
 
-          {/* Ethical & Trust */}
-          <ContentCard>
-            <h2 className="text-xl font-semibold text-white">Ethical & Trust</h2>
-            <p className="mt-2 text-sm text-gray-300">
-              We practice responsible AI and transparent decision-making. Data is never misused and our training procedures are bias-aware.
-            </p>
-            <ul className="mt-3 list-disc pl-4 text-xs text-indigo-200/65">
-              <li>Privacy-first approach</li>
-              <li>Transparent decision process</li>
-              <li>Bias-aware training methodologies</li>
+          <ContentCard title="Ethical & Trust">
+            We practice responsible AI and transparent decision-making. Data is never misused and our training procedures are bias-aware.
+            <ul className="mt-4 space-y-2 text-sm text-slate-700">
+              <li className="rounded-xl bg-slate-100/80 px-3 py-2">Privacy-first approach</li>
+              <li className="rounded-xl bg-slate-100/80 px-3 py-2">Transparent decision process</li>
+              <li className="rounded-xl bg-slate-100/80 px-3 py-2">Bias-aware training methodologies</li>
             </ul>
           </ContentCard>
 
-          {/* Visual Flow Diagram */}
-          <div className="md:col-span-2 lg:col-span-3 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 p-6 text-center">
-            <h2 className="text-xl font-semibold text-white">Pipeline Overview</h2>
-            <p className="mt-2 text-indigo-200">
+          <div className="md:col-span-2 lg:col-span-3 rounded-[2rem] border border-slate-200/80 bg-gradient-to-r from-indigo-50 via-violet-50 to-slate-100 p-6 shadow-[0_25px_80px_-50px_rgba(15,23,42,0.12)] backdrop-blur-xl">
+            <h2 className="text-xl font-semibold text-slate-950">Pipeline Overview</h2>
+            <p className="mt-3 text-sm leading-7 text-slate-700">
               Upload → Preprocess → Extract Frames → Detect Faces → AI Analysis → Score → Report → Save
             </p>
           </div>
