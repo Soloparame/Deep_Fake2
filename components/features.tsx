@@ -2,9 +2,15 @@ import Image from "next/image";
 import BlurredShapeGray from "@/public/images/blurred-shape-gray.svg";
 import BlurredShape from "@/public/images/blurred-shape.svg";
 
+const productHighlights = [
+  { label: "Analyses completed", value: "120K+" },
+  { label: "Average processing time", value: "< 40 sec" },
+  { label: "Detection confidence", value: "Up to 99%" },
+];
+
 export default function Features() {
   return (
-    <section className="relative">
+    <section id="product" className="relative scroll-mt-28">
       <div
         className="pointer-events-none absolute left-1/2 top-0 -z-10 -mt-20 -translate-x-1/2"
         aria-hidden="true"
@@ -41,10 +47,21 @@ export default function Features() {
             <h2 className="pb-4 font-nacelle text-3xl font-semibold text-slate-900 md:text-4xl">
               Built for Detection and Strategic Insight
             </h2>
-            <p className="text-lg text-indigo-200/65">
+            <p className="text-lg text-slate-600">
               Multi-modal AI Integrity Suite pairs media forensics with market-aware project analysis so you can
               validate authenticity and evaluate originality in one place.
             </p>
+          </div>
+          <div className="mx-auto mb-12 grid max-w-4xl gap-3 sm:grid-cols-3 md:mb-16">
+            {productHighlights.map((item) => (
+              <div
+                key={item.label}
+                className="rounded-2xl border border-indigo-100 bg-gradient-to-br from-white to-indigo-50 px-4 py-5 text-center shadow-sm"
+              >
+                <p className="text-2xl font-semibold text-indigo-600">{item.value}</p>
+                <p className="mt-1 text-sm text-slate-600">{item.label}</p>
+              </div>
+            ))}
           </div>
           {/* Items */}
           <div className="mx-auto grid max-w-sm gap-12 sm:max-w-none sm:grid-cols-2 md:gap-x-14 md:gap-y-16 lg:grid-cols-3">
@@ -64,7 +81,7 @@ export default function Features() {
               <h3 className="mb-1 font-nacelle text-[1rem] font-semibold text-slate-800">
                 Deepfake Video Analysis
               </h3>
-              <p className="text-indigo-200/65">
+              <p className="text-slate-600">
                 Frame-level analysis and model inference detect manipulated sequences,
                 synthetic faces, and visual artifacts in uploaded videos.
               </p>
@@ -82,7 +99,7 @@ export default function Features() {
               <h3 className="mb-1 font-nacelle text-[1rem] font-semibold text-slate-800">
                 AI Image Detection
               </h3>
-              <p className="text-indigo-200/65">
+              <p className="text-slate-600">
                 Image Doctor flags AI-generated and edited images with confidence scores,
                 helping you verify visuals before publishing or sharing.
               </p>
@@ -103,7 +120,7 @@ export default function Features() {
               <h3 className="mb-1 font-nacelle text-[1rem] font-semibold text-slate-800">
                 Project Intel Reports
               </h3>
-              <p className="text-indigo-200/65">
+              <p className="text-slate-600">
                 Go beyond plagiarism checks with similarity scoring, SWOT, tech lens,
                 competitor discovery, recommendations, and strategy outputs.
               </p>
@@ -131,7 +148,7 @@ export default function Features() {
               <h3 className="mb-1 font-nacelle text-[1rem] font-semibold text-slate-800">
                 Competitor-Aware Similarity
               </h3>
-              <p className="text-indigo-200/65">
+              <p className="text-slate-600">
                 Smart context extraction and web search identify projects closest to your
                 functionality, market, and positioning.
               </p>
@@ -153,7 +170,7 @@ export default function Features() {
               <h3 className="mb-1 font-nacelle text-[1rem] font-semibold text-slate-800">
                 Secure and Private Processing
               </h3>
-              <p className="text-indigo-200/65">
+              <p className="text-slate-600">
                 Uploaded media and documents are processed with privacy-first controls and
                 account-based history access.
               </p>
@@ -171,7 +188,7 @@ export default function Features() {
               <h3 className="mb-1 font-nacelle text-[1rem] font-semibold text-slate-800">
                 Actionable Output
               </h3>
-              <p className="text-indigo-200/65">
+              <p className="text-slate-600">
                 Every run returns clear verdicts, confidence signals, and explainable project
                 intelligence you can use immediately.
               </p>

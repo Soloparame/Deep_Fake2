@@ -25,9 +25,9 @@ if os.path.exists(ENV_PATH):
             if v is not None:
                 os.environ[k] = v
     load_dotenv(ENV_PATH, override=True)
-    print(f"✅ Loaded .env file from: {ENV_PATH}")
+    print(f"[OK] Loaded .env file from: {ENV_PATH}")
 else:
-    print(f"⚠️  .env file not found at: {ENV_PATH}")
+    print(f"[WARN] .env file not found at: {ENV_PATH}")
     load_dotenv()
 
 class Settings:
@@ -85,16 +85,18 @@ class Settings:
 settings = Settings()
 
 # Print email config status on startup (for debugging)
-print(f"📧 Email Configuration Status:")
+print("Email Configuration Status:")
 print(f"   SMTP_HOST: {settings.SMTP_HOST}")
 print(f"   SMTP_PORT: {settings.SMTP_PORT}")
-print(f"   SMTP_USER: {settings.SMTP_USER if settings.SMTP_USER else '❌ Not set'}")
-print(f"   SMTP_PASSWORD: {'✅ Set (' + str(len(settings.SMTP_PASSWORD)) + ' chars)' if settings.SMTP_PASSWORD else '❌ Not set'}")
+print(f"   SMTP_USER: {settings.SMTP_USER if settings.SMTP_USER else '[NOT SET]'}")
+print(
+    f"   SMTP_PASSWORD: {'[SET] (' + str(len(settings.SMTP_PASSWORD)) + ' chars)' if settings.SMTP_PASSWORD else '[NOT SET]'}"
+)
 print(f"   SMTP_FROM: {settings.SMTP_FROM}")
 print(f"   FRONTEND_URL: {settings.FRONTEND_URL}")
 
 # Debug: Show raw environment variables
-print(f"\n🔍 Debug - Raw Environment Variables:")
+print("\nDebug - Raw Environment Variables:")
 print(f"   os.getenv('SMTP_USER'): {os.getenv('SMTP_USER', 'NOT FOUND')}")
 print(f"   os.getenv('SMTP_PASSWORD'): {'FOUND (' + str(len(os.getenv('SMTP_PASSWORD', ''))) + ' chars)' if os.getenv('SMTP_PASSWORD') else 'NOT FOUND'}")
 print(f"   os.getenv('SMTP_HOST'): {os.getenv('SMTP_HOST', 'NOT FOUND')}")

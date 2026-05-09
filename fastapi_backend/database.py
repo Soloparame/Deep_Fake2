@@ -23,7 +23,7 @@ def _load_env() -> None:
             print(f"Loading env from: {path}")
             return
     load_dotenv(override=True)
-    print("⚠️  No .env file found next to fastapi_backend or repo root — using existing environment variables only.")
+    print("[WARN] No .env file found next to fastapi_backend or repo root - using existing environment variables only.")
 
 
 _load_env()
@@ -42,7 +42,7 @@ MONGO_URI = _normalize_mongo_uri(os.getenv("MONGO_URI"))
 print(f"MONGO_URI loaded: {'Yes' if MONGO_URI else 'No'}")
 
 if not MONGO_URI:
-    print("⚠️  MONGO_URI not found — MongoDB will be disabled. Set MONGO_URI in fastapi_backend/.env")
+    print("[WARN] MONGO_URI not found - MongoDB will be disabled. Set MONGO_URI in fastapi_backend/.env")
 
 
 def _mongo_client_kwargs(uri: str) -> dict:
@@ -66,7 +66,7 @@ try:
 
     client = MongoClient(MONGO_URI, **_mongo_client_kwargs(MONGO_URI))
     client.admin.command("ping")
-    print("✅ MongoDB connection successful")
+    print("[OK] MongoDB connection successful")
 
     db = client["deepfake_db"]
 
@@ -78,8 +78,8 @@ try:
     analyses_col = db["analyses"]
 
 except Exception as e:
-    print(f"⚠️  MongoDB connection failed: {e}")
-    print("⚠️  Running without MongoDB — data will not be persisted")
+    print(f"[WARN] MongoDB connection failed: {e}")
+    print("[WARN] Running without MongoDB - data will not be persisted")
     print("   Local fix checklist:")
     print("   • Atlas: Network Access → add your current IP (or 0.0.0.0/0 for testing)")
     print("   • Atlas: Database Access → user/password matches MONGO_URI")
@@ -102,13 +102,13 @@ except Exception as e:
     class DummyCollection:
         def insert_one(self, *args, **kwargs):
             if not _dummy_logged["insert"]:
-                print("⚠️  MongoDB not connected — write operations are skipped until the DB is reachable.")
+                print("[WARN] MongoDB not connected - write operations are skipped until the DB is reachable.")
                 _dummy_logged["insert"] = True
             return type("obj", (object,), {"inserted_id": None})()
 
         def insert_many(self, *args, **kwargs):
             if not _dummy_logged["insert_many"]:
-                print("⚠️  MongoDB not connected — skipping bulk inserts.")
+                print("[WARN] MongoDB not connected - skipping bulk inserts.")
                 _dummy_logged["insert_many"] = True
             return type("obj", (object,), {"inserted_ids": []})()
 
@@ -123,13 +123,13 @@ except Exception as e:
 
         def update_one(self, *args, **kwargs):
             if not _dummy_logged["update"]:
-                print("⚠️  MongoDB not connected — skipping updates.")
+                print("[WARN] MongoDB not connected - skipping updates.")
                 _dummy_logged["update"] = True
             return type("obj", (object,), {"matched_count": 0})()
 
         def delete_one(self, *args, **kwargs):
             if not _dummy_logged["delete"]:
-                print("⚠️  MongoDB not connected — skipping deletes.")
+                print("[WARN] MongoDB not connected - skipping deletes.")
                 _dummy_logged["delete"] = True
             return type("obj", (object,), {"deleted_count": 0})()
 

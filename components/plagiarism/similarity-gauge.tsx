@@ -110,7 +110,36 @@ export function SimilarityGauge({ report }: Props) {
             ))}
           </div>
         </div>
-      ) : null}
+      ) : (
+        <div className="relative mt-6 overflow-hidden rounded-2xl border border-amber-400/25 bg-gradient-to-b from-amber-500/10 to-transparent p-4 shadow-[0_0_20px_rgba(245,158,11,0.08)] backdrop-blur-sm sm:p-5">
+          <div className="mb-3 flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="absolute inline-flex h-full w-full animate-pulse rounded-full bg-amber-300/70"></span>
+                <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-amber-400"></span>
+              </span>
+              <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-amber-200">
+                Competitor Discovery
+              </p>
+            </div>
+            <span className="rounded-full border border-amber-300/40 bg-amber-400/15 px-2.5 py-0.5 text-[11px] font-bold text-amber-100">
+              0 found
+            </span>
+          </div>
+          <p className="text-sm leading-relaxed text-zinc-300">
+            No competitor links were confidently extracted for this run. This can happen with short inputs,
+            low-coverage market snippets, or temporary search/rate-limit issues.
+          </p>
+          <div className="mt-3 grid gap-2 sm:grid-cols-2">
+            <div className="rounded-lg border border-white/10 bg-black/30 px-3 py-2.5 text-[11px] text-zinc-300">
+              <span className="font-semibold text-amber-200">Tip 1:</span> add a clearer domain description and target market.
+            </div>
+            <div className="rounded-lg border border-white/10 bg-black/30 px-3 py-2.5 text-[11px] text-zinc-300">
+              <span className="font-semibold text-amber-200">Tip 2:</span> include your tech stack and user segment details.
+            </div>
+          </div>
+        </div>
+      )}
 
       {report.market_search_snippet ? (
         <details className="group/details relative mt-5 rounded-xl border border-white/5 bg-black/30 px-4 py-3 text-left transition-all hover:border-white/10">

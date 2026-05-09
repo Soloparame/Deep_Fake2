@@ -64,7 +64,7 @@ export default function Header() {
               <>
                 <li>
                   <Link
-                    href="/"
+                    href="/product"
                     className="rounded-full px-3 py-1.5 text-sm font-medium text-slate-600 transition-colors hover:bg-indigo-50 hover:text-slate-900"
                   >
                     Product
@@ -163,7 +163,7 @@ export default function Header() {
             {!isAuthed ? (
               <div className="grid gap-1">
                 <Link
-                  href="/"
+                  href="/product"
                   onClick={() => setMobileOpen(false)}
                   className="rounded-xl px-3 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-indigo-50 hover:text-slate-900"
                 >
