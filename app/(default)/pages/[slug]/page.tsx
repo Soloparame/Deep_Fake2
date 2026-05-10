@@ -30,27 +30,21 @@ export async function generateStaticParams() {
 
 function ContentCard({ step, title, children }: { step?: number; title: string; children: React.ReactNode }) {
   return (
-    <article className="group relative overflow-hidden rounded-[2rem] border border-slate-200/70 bg-white shadow-[0_25px_80px_-80px_rgba(15,23,42,0.15)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_30px_100px_-30px_rgba(15,23,42,0.18)]">
-      <div className="relative h-full overflow-hidden rounded-[1.75rem] bg-slate-50 p-6 ring-1 ring-slate-200/40 backdrop-blur-xl">
-        <div className="pointer-events-none absolute -right-10 top-6 h-28 w-28 rounded-full bg-indigo-600/10 blur-3xl" />
-        <div className="pointer-events-none absolute -left-10 bottom-10 h-32 w-32 rounded-full bg-violet-600/10 blur-3xl" />
-        <div className="relative z-10">
-          {step != null ? (
-            <div className="inline-flex items-center rounded-full border border-indigo-500/20 bg-indigo-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.35em] text-indigo-700 shadow-sm shadow-indigo-500/10">
-              Step {step}
-            </div>
-          ) : null}
-          <h2 className="mt-5 text-2xl font-semibold text-slate-950 tracking-tight">{title}</h2>
-          <div className="mt-4 text-sm leading-7 text-slate-700">{children}</div>
+    <article className="group overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 p-4 transition-all duration-300 hover:-translate-y-1 hover:border-indigo-400/40">
+      {step != null ? (
+        <div className="inline-flex items-center rounded-full border border-indigo-500/20 bg-indigo-500/10 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-[0.35em] text-indigo-700 shadow-sm shadow-indigo-500/10">
+          Step {step}
         </div>
-      </div>
+      ) : null}
+      <h2 className="mt-3 text-lg font-semibold text-slate-950 tracking-tight">{title}</h2>
+      <div className="mt-2 text-sm leading-6 text-slate-700">{children}</div>
     </article>
   );
 }
 
 function PremiumPage({ title, description, children }: { title: string, description: string, children: React.ReactNode }) {
   return (
-    <section className="relative min-h-screen overflow-hidden bg-white text-slate-950 pt-24 pb-16 md:pt-32 md:pb-24">
+    <section className="relative min-h-screen overflow-hidden bg-white text-slate-950 pt-16 pb-16 md:pt-20 md:pb-24">
       {/* Background Decor - light page style */}
       <div className="absolute inset-0 -z-10">
         <div className="absolute left-[16%] top-[16%] h-96 w-96 rounded-full bg-indigo-600/5 blur-[100px]" />
@@ -58,11 +52,11 @@ function PremiumPage({ title, description, children }: { title: string, descript
       </div>
       
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
-        <div className="mx-auto max-w-3xl text-center mb-16">
+        <div className="mx-auto max-w-2xl text-center mb-12">
           <h1 className="font-nacelle text-4xl font-bold tracking-tight text-slate-950 sm:text-5xl">
             {title}
           </h1>
-          <p className="mt-5 text-xl leading-8 text-slate-600">{description}</p>
+          <p className="mx-auto mt-3 max-w-[42rem] text-lg leading-8 text-slate-600">{description}</p>
         </div>
 
         <div className="mx-auto">
@@ -170,9 +164,9 @@ export default async function Page({
     return (
       <PremiumPage
         title="How It Works"
-        description="Our platform analyzes videos using advanced AI models to detect manipulation and provide reliable authenticity results in seconds. Built for speed, accuracy, and transparency, Multi-modal AI Integrity Suite uses deep learning to evaluate videos in a clear, explainable pipeline."
+        description="Our platform analyzes videos for manipulation and delivers clear authenticity results in seconds with fast, explainable AI processing."
       >
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           <ContentCard step={1} title="Upload the Video">
             Upload via the website or API. Supported formats include MP4, MOV, AVI, and WebM. File sizes are limited for performance and reliability.
             <ul className="mt-4 space-y-2 text-sm text-slate-700">

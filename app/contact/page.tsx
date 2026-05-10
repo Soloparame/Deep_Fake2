@@ -11,10 +11,10 @@ export default function ContactPage() {
 
             <div className="mx-auto max-w-4xl px-4 sm:px-6">
                 <div className="text-center py-12">
-                    <h1 className="animate-[gradient_6s_linear_infinite] bg-[linear-gradient(to_right,var(--color-gray-200),var(--color-indigo-200),var(--color-gray-50),var(--color-indigo-300),var(--color-gray-200))] bg-[length:200%_auto] bg-clip-text pb-4 font-nacelle text-4xl font-semibold text-transparent md:text-5xl">
+                    <h1 className="pb-4 font-nacelle text-4xl font-semibold text-slate-950 md:text-5xl">
                         Contact Support
                     </h1>
-                    <p className="mx-auto max-w-xl text-lg text-indigo-200/65">
+                    <p className="mx-auto max-w-xl text-lg text-slate-600">
                         Have questions or need assistance? We're here to help. Reach out to our team directly.
                     </p>
                 </div>
@@ -27,12 +27,12 @@ export default function ContactPage() {
                         </div>
 
                         <div className="space-y-2">
-                            <h3 className="text-xl font-semibold text-white">Email Us</h3>
-                            <p className="text-sm text-gray-400">Our team typically responds within 24 hours.</p>
+                            <h3 className="text-xl font-semibold text-slate-950">Email Us</h3>
+                            <p className="text-sm text-slate-600">Our team typically responds within 24 hours.</p>
                         </div>
 
                         <div className="w-full rounded-xl border border-white/10 p-4">
-                            <a href="mailto:techsisters9@gmail.com" className="text-xl font-medium text-indigo-300 hover:text-indigo-200 transition-colors">
+                            <a href="mailto:techsisters9@gmail.com" className="text-xl font-semibold text-indigo-300 hover:text-indigo-200 transition-colors">
                                 techsisters9@gmail.com
                             </a>
                         </div>
