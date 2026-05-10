@@ -388,10 +388,10 @@ export default function ToolsPage() {
           <div>
             <h3 className="mb-3 px-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Account</h3>
             <nav className="flex flex-col gap-1">
-              <button type="button" className={tabBtn(false)}>
+              <button type="button" onClick={() => router.push("/profile")} className={tabBtn(false)}>
                 <SettingsIcon /> Settings
               </button>
-              <button type="button" className={tabBtn(false)}>
+              <button type="button" onClick={() => router.push("/chat")} className={tabBtn(false)}>
                 <HelpIcon /> Help
               </button>
             </nav>
