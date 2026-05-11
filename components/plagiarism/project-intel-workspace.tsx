@@ -321,24 +321,29 @@ export default function ProjectIntelWorkspace({ embedded = false }: Props) {
             </div>
 
             <div className="space-y-5">
-              <div>
-                <label htmlFor={`plag-title${idSuffix}`} className={labelClass}>
-                  <span className="h-1 w-1 rounded-full bg-indigo-400" />
-                  Title
-                </label>
-                <input
-                  id={`plag-title${idSuffix}`}
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Project or thesis title"
-                  className={inputClass}
-                />
-              </div>
+            <div>
+              <label htmlFor={`plag-title${idSuffix}`} className={labelClass}>
+               <span className="h-1 w-1 rounded-full bg-indigo-400" />
+                 Title
+              </label>
+
+              <input
+                   id={`plag-title${idSuffix}`}
+                   value={title}
+                   onChange={(e) => setTitle(e.target.value)}
+                   placeholder="Project or thesis title"
+                   className={inputClass}
+              />
+            </div>
               <div>
                 <label htmlFor={`plag-desc${idSuffix}`} className={labelClass}>
                   <span className="h-1 w-1 rounded-full bg-violet-400" />
                   Description
+                  <span className="font-normal normal-case tracking-normal text-slate-600">
+                    (optional)
+                  </span>
                 </label>
+
                 <textarea
                   id={`plag-desc${idSuffix}`}
                   value={description}
