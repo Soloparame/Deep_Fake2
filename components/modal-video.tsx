@@ -120,9 +120,9 @@ export default function ModalVideo({
       >
         <DialogBackdrop
           transition
-          className="fixed inset-0 z-99999 bg-black/70 transition-opacity duration-300 ease-out data-closed:opacity-0"
+          className="fixed inset-0 z-[99999] bg-black/70 transition-opacity duration-300 ease-out data-closed:opacity-0"
         />
-        <div className="fixed inset-0 z-99999 flex px-4 py-6 sm:px-6">
+        <div className="fixed inset-0 z-[99999] flex px-4 py-6 sm:px-6">
           <div className="mx-auto flex h-full max-w-6xl items-center">
             <DialogPanel
               transition
@@ -134,6 +134,7 @@ export default function ModalVideo({
                 height={videoHeight}
                 loop
                 controls
+                className="h-full w-full"
               >
                 <source src={video} type="video/mp4" />
                 Your browser does not support the video tag.
