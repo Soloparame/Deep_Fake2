@@ -28,7 +28,7 @@ export async function generateStaticParams() {
   }));
 }
 
-function ContentCard({ step, title, children }: { step?: number; title: string; children: React.ReactNode }) {
+function ContentCard({ step, title, children }: { step?: number; title?: string; children: React.ReactNode }) {
   return (
     <article className="group overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 p-4 transition-all duration-300 hover:-translate-y-1 hover:border-indigo-400/40">
       {step != null ? (
@@ -36,8 +36,8 @@ function ContentCard({ step, title, children }: { step?: number; title: string; 
           Step {step}
         </div>
       ) : null}
-      <h2 className="mt-3 text-lg font-semibold text-slate-950 tracking-tight">{title}</h2>
-      <div className="mt-2 text-sm leading-6 text-slate-700">{children}</div>
+      {title ? <h2 className="mt-3 text-lg font-semibold text-slate-950 tracking-tight">{title}</h2> : null}
+      <div className={`text-sm leading-6 text-slate-700 ${title || step != null ? "mt-2" : ""}`}>{children}</div>
     </article>
   );
 }

@@ -4,6 +4,8 @@ import { FormEvent, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { deepfakeDetector, DetectionResult, VideoVerdict } from "@/utils/deepfakeDetector";
 import ProjectIntelWorkspace from "@/components/plagiarism/project-intel-workspace";
+import VideoDetectorPaymentModal, { hasVideoDetectorPaymentPassed } from "@/components/tools/video-detector-payment-modal";
+import ImageDetectorPaymentModal, { hasImageDetectorPaymentPassed } from "@/components/tools/image-detector-payment-modal";
 
 interface AnalysisResult {
   label: string;
@@ -160,6 +162,24 @@ export default function ToolsPage() {
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [historyLoading, setHistoryLoading] = useState(false);
   const [historyError, setHistoryError] = useState<string | null>(null);
+  const [videoPaymentOpen, setVideoPaymentOpen] = useState(false);
+  const [imagePaymentOpen, setImagePaymentOpen] = useState(false);
+
+  const openFakeVideoDetector = () => {
+    if (typeof window !== "undefined" && hasVideoDetectorPaymentPassed()) {
+      setTab("video");
+      return;
+    }
+    setVideoPaymentOpen(true);
+  };
+
+  const openFakeImageDetector = () => {
+    if (typeof window !== "undefined" && hasImageDetectorPaymentPassed()) {
+      setTab("image");
+      return;
+    }
+    setImagePaymentOpen(true);
+  };
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -357,6 +377,22 @@ export default function ToolsPage() {
 
   return (
     <section className="relative mx-auto min-h-[calc(100vh-80px)] w-full max-w-[1600px] px-4 py-8 sm:px-6 lg:px-8">
+      <VideoDetectorPaymentModal
+        open={videoPaymentOpen}
+        onClose={() => setVideoPaymentOpen(false)}
+        onSuccess={() => {
+          setVideoPaymentOpen(false);
+          setTab("video");
+        }}
+      />
+      <ImageDetectorPaymentModal
+        open={imagePaymentOpen}
+        onClose={() => setImagePaymentOpen(false)}
+        onSuccess={() => {
+          setImagePaymentOpen(false);
+          setTab("image");
+        }}
+      />
       <div className="flex flex-col gap-8 md:flex-row">
         <div className="flex w-full shrink-0 flex-col gap-8 md:w-64">
           <div>
@@ -368,12 +404,12 @@ export default function ToolsPage() {
                 </span>
                 <span className="rounded-full bg-indigo-100 px-1.5 py-0.5 text-[10px] font-semibold text-indigo-700">New</span>
               </button>
-              <button type="button" onClick={() => setTab("video")} className={`${tabBtn(tab === "video")} justify-between`}>
+              <button type="button" onClick={openFakeVideoDetector} className={`${tabBtn(tab === "video")} justify-between`}>
                 <span className="flex items-center gap-3">
                   <VideoIcon /> Fake Video Detector
                 </span>
               </button>
-              <button type="button" onClick={() => setTab("image")} className={tabBtn(tab === "image")}>
+              <button type="button" onClick={openFakeImageDetector} className={tabBtn(tab === "image")}>
                 <ImageIcon /> Fake Image Detector
               </button>
             </nav>

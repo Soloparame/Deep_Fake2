@@ -208,17 +208,17 @@ export function CompetitorMap(props: { data: CompetitorMapEntry[]; companyName: 
           backgroundColor: data.map((e) => e.color),
           borderColor: data.map(() => "#ffffff"),
           borderWidth: 2,
-          pointRadius: (ctx) => {
+          pointRadius: (ctx: { dataIndex?: number }) => {
             const i = ctx.dataIndex;
             if (i === undefined || !data[i]) return 12;
             return data[i].is_you ? 16 : 12;
           },
-          pointHoverRadius: (ctx) => {
+          pointHoverRadius: (ctx: { dataIndex?: number }) => {
             const i = ctx.dataIndex;
             if (i === undefined || !data[i]) return 15;
             return data[i].is_you ? 20 : 15;
           },
-          pointStyle: (ctx) => {
+          pointStyle: (ctx: { dataIndex?: number }) => {
             const i = ctx.dataIndex;
             if (i === undefined || !data[i]) return "circle";
             return data[i].is_you ? "rectRounded" : "circle";
@@ -244,14 +244,14 @@ export function CompetitorMap(props: { data: CompetitorMapEntry[]; companyName: 
         x: {
           min: 0,
           max: 100,
-          title: { display: true, text: xLabel, color: "#475569", font: { size: 12, weight: "600" } },
+          title: { display: true, text: xLabel, color: "#475569", font: { size: 12, weight: 600 } },
           ticks: { color: "#64748b", stepSize: 20 },
           grid: { color: "rgba(148, 163, 184, 0.35)" },
         },
         y: {
           min: 0,
           max: 100,
-          title: { display: true, text: yLabel, color: "#475569", font: { size: 12, weight: "600" } },
+          title: { display: true, text: yLabel, color: "#475569", font: { size: 12, weight: 600 } },
           ticks: { color: "#64748b", stepSize: 20 },
           grid: { color: "rgba(148, 163, 184, 0.35)" },
         },
