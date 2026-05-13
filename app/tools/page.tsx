@@ -4,8 +4,8 @@ import { FormEvent, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { deepfakeDetector, DetectionResult, VideoVerdict } from "@/utils/deepfakeDetector";
 import ProjectIntelWorkspace from "@/components/plagiarism/project-intel-workspace";
-import VideoDetectorPaymentModal, { hasVideoDetectorPaymentPassed } from "@/components/tools/video-detector-payment-modal";
-import ImageDetectorPaymentModal, { hasImageDetectorPaymentPassed } from "@/components/tools/image-detector-payment-modal";
+import VideoDetectorPaymentModal from "@/components/tools/video-detector-payment-modal";
+import ImageDetectorPaymentModal from "@/components/tools/image-detector-payment-modal";
 
 interface AnalysisResult {
   label: string;
@@ -166,18 +166,10 @@ export default function ToolsPage() {
   const [imagePaymentOpen, setImagePaymentOpen] = useState(false);
 
   const openFakeVideoDetector = () => {
-    if (typeof window !== "undefined" && hasVideoDetectorPaymentPassed()) {
-      setTab("video");
-      return;
-    }
     setVideoPaymentOpen(true);
   };
 
   const openFakeImageDetector = () => {
-    if (typeof window !== "undefined" && hasImageDetectorPaymentPassed()) {
-      setTab("image");
-      return;
-    }
     setImagePaymentOpen(true);
   };
 
