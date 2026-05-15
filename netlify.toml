@@ -1,0 +1,12 @@
+# Frontend only (Next.js). Backend stays on Render — do not add runtime.txt here;
+# Render uses PYTHON_VERSION=3.10.13 in the dashboard instead.
+
+[build]
+  command = "pnpm run build"
+  publish = ".next"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+[build.environment]
+  NODE_VERSION = "20"

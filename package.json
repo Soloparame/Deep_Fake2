@@ -12,7 +12,6 @@
   },
   "dependencies": {
     "@headlessui/react": "^2.2.0",
-    "@next/swc-win32-x64-msvc": "15.1.6",
     "@tensorflow/tfjs": "^4.22.0",
     "@types/node": "^22.13.0",
     "@types/react": "19.0.8",
