@@ -7,7 +7,7 @@ import os
 import uuid
 import requests
 import datetime
-from fastapi_backend.database import predictions_col
+from fastapi_backend.database import mongo_is_connected, predictions_col
 
 router = APIRouter()
 
@@ -51,11 +51,10 @@ async def save_video_prediction(request: Request, video: UploadFile = File(...),
     }
     
     try:
-        if predictions_col:
+        if mongo_is_connected():
             predictions_col.insert_one(record)
             return {"message": "Prediction saved successfully", "id": record["id"]}
-        else:
-            return {"message": "MongoDB not connected, prediction not saved"}
+        return {"message": "MongoDB not connected, prediction not saved"}
     except Exception as e:
         print(f"Failed to save prediction: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to save prediction: {str(e)}")
@@ -192,7 +191,7 @@ async def detect_image(request: Request, file: UploadFile = File(...)):
             "message": f"AI-generated" if label == "FAKE" else "Human-captured",
             "created_at": datetime.datetime.utcnow(),
         }
-        if predictions_col:
+        if mongo_is_connected():
             try:
                 predictions_col.insert_one(record)
             except Exception as e:
@@ -321,11 +320,11 @@ async def detect_video(request: Request, file: UploadFile = File(...)):
         }
         try:
             print(f"Attempting to save record to DB: {record}")
-            if predictions_col:
+            if mongo_is_connected():
                 insert_result = predictions_col.insert_one(record)
                 print(f"✅ Record saved with ID: {insert_result.inserted_id}")
             else:
-                print("⚠️  predictions_col is None, skipping save")
+                print("⚠️  MongoDB not connected, skipping save")
         except Exception as e:
             print(f"❌ Failed to save to MongoDB: {e}")
 

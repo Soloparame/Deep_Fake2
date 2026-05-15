@@ -54,11 +54,18 @@ def _mongo_client_kwargs(uri: str) -> dict:
 
 
 # Create MongoDB client (optional connection)
+MONGO_CONNECTED = False
 client = None
 db = None
 users_col = None
 predictions_col = None
 chats_col = None
+
+
+def mongo_is_connected() -> bool:
+    """True when a real MongoDB client is active (not DummyCollection fallback)."""
+    return MONGO_CONNECTED
+
 
 try:
     if MONGO_URI is None:
@@ -67,6 +74,7 @@ try:
     client = MongoClient(MONGO_URI, **_mongo_client_kwargs(MONGO_URI))
     client.admin.command("ping")
     print("[OK] MongoDB connection successful")
+    MONGO_CONNECTED = True
 
     db = client["deepfake_db"]
 

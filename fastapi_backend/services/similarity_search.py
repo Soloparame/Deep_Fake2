@@ -60,11 +60,40 @@ def _clean_text(text: str) -> str:
 
 
 def _duckduckgo_summary(query: str) -> str:
+    """Web search for competitor context. Tries duckduckgo-search first (works better on servers)."""
+    q = (query or "").strip()
+    if not q:
+        return ""
+
+    # Primary: duckduckgo-search (more reliable on Render/datacenter IPs than langchain wrapper)
+    try:
+        from duckduckgo_search import DDGS
+
+        with DDGS() as ddgs:
+            results = list(ddgs.text(q, max_results=6))
+        if results:
+            parts = []
+            for r in results:
+                title = (r.get("title") or "").strip()
+                body = (r.get("body") or "").strip()
+                href = (r.get("href") or "").strip()
+                if title or body:
+                    line = title
+                    if body:
+                        line = f"{line}: {body}" if line else body
+                    if href:
+                        line = f"{line} {href}".strip()
+                    parts.append(line)
+            if parts:
+                return "\n".join(parts)
+    except Exception as e:
+        print(f"similarity_search: duckduckgo_search.DDGS failed: {e}")
+
     try:
         from langchain_community.tools import DuckDuckGoSearchRun
 
         tool = DuckDuckGoSearchRun()
-        out = tool.run(query)
+        out = tool.run(q)
         return (out or "").strip()
     except Exception as e:
         print(f"similarity_search: DuckDuckGoSearchRun failed: {e}")
@@ -234,6 +263,58 @@ def _extract_projects_fallback(search_text: str) -> list[SimilarProject]:
     return projects
 
 
+def _groq_competitors_from_project(
+    title: str, description: str, ctx: SmartContext
+) -> list[SimilarProject]:
+    """When web search is empty/blocked, ask Groq for real competitor names + links."""
+    api_key = (getattr(settings, "GROQ_API_KEY", "") or "").strip()
+    if not api_key:
+        return []
+    try:
+        from groq import Groq
+
+        client = Groq(api_key=api_key)
+        prompt = f"""
+List 3-4 real, existing software products or companies that compete with this project.
+Use well-known products where possible and valid https:// official site URLs.
+
+Title: {title}
+Description: {(description or "")[:1500]}
+Functionality: {ctx.functionality}
+Industry: {ctx.industry}
+Location/market: {ctx.location}
+
+Return only JSON: {{"projects": [{{"name": "...", "link": "https://...", "snippet": "one sentence"}}]}}
+""".strip()
+        completion = client.chat.completions.create(
+            model=settings.GROQ_MODEL,
+            messages=[
+                {"role": "system", "content": "Output only valid JSON with real competitor companies."},
+                {"role": "user", "content": prompt},
+            ],
+            temperature=0.2,
+            response_format={"type": "json_object"},
+        )
+        raw = completion.choices[0].message.content or "{}"
+        data = json.loads(raw)
+        items = data.get("projects", []) if isinstance(data, dict) else []
+        out: list[SimilarProject] = []
+        for item in items:
+            if not isinstance(item, dict):
+                continue
+            name = str(item.get("name", "")).strip()[:120]
+            link = str(item.get("link", "")).strip()
+            snippet = str(item.get("snippet", "")).strip()[:240]
+            if name and link.startswith("http"):
+                out.append(SimilarProject(name=name, link=link, snippet=snippet or name))
+            if len(out) >= 4:
+                break
+        return out
+    except Exception as e:
+        print(f"similarity_search: Groq competitor fallback failed: {e}")
+        return []
+
+
 def _extract_project_list(search_text: str, ctx: SmartContext) -> list[SimilarProject]:
     api_key = (getattr(settings, "GROQ_API_KEY", "") or "").strip()
     if not api_key or not search_text.strip():
@@ -307,6 +388,14 @@ def compute_similarity_overlap(title: str, description: str, file_content: str) 
     search_text = _duckduckgo_smart_search(smart_ctx)
     search_ok = bool(search_text and len(search_text) > 48)
     found_projects = _extract_project_list(search_text, smart_ctx) if search_ok else []
+    if not found_projects:
+        found_projects = _groq_competitors_from_project(title, description, smart_ctx)
+        if found_projects and not search_ok:
+            search_ok = True
+            search_text = (
+                f"Competitor context for {smart_ctx.functionality} in {smart_ctx.industry} "
+                f"({smart_ctx.location}), sourced via Groq when live web search was unavailable."
+            )
 
     if search_ok:
         market_snippet = _truncate(search_text, MAX_MARKET_CHARS)
