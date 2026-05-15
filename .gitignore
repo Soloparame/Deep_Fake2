@@ -54,7 +54,7 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
+# Do not ignore top-level lib/ — Next.js uses lib/api.ts (Python env libs live under venv/)
 lib64/
 parts/
 sdist/
