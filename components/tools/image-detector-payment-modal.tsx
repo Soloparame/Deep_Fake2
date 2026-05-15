@@ -2,18 +2,12 @@
 
 import DetectorUpgradePaymentModal, { type DetectorPaymentConfig } from "@/components/tools/detector-upgrade-payment-modal";
 
-export const IMAGE_DETECTOR_PAYMENT_KEY = "realeye_fake_image_payment_gate_v1";
-
-export function hasImageDetectorPaymentPassed(): boolean {
-  if (typeof window === "undefined") return false;
-  return window.localStorage.getItem(IMAGE_DETECTOR_PAYMENT_KEY) === "1";
-}
-
 const IMAGE_CONFIG: DetectorPaymentConfig = {
-  storageKey: IMAGE_DETECTOR_PAYMENT_KEY,
+  persistCompletion: false,
   heroSrc: "/images/fake-image-detector-hero.png",
   heroAlt: "Image authenticity and forensic analysis preview",
-  panelStyle: "dark",
+  panelStyle: "light",
+  leftPanel: "light",
   subtitle: "Full-scale image integrity checks with EXIF intelligence, temporal signals, and unlimited team seats.",
   features: [
     "200+ video avatars",

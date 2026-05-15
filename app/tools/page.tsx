@@ -3,9 +3,15 @@
 import { FormEvent, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { deepfakeDetector, DetectionResult, VideoVerdict } from "@/utils/deepfakeDetector";
+import {
+  markDetectorPaymentSuccess,
+  markToolsDetectorTabVisited,
+  shouldSkipDetectorPaywall,
+} from "@/utils/toolsMediaProSession";
 import ProjectIntelWorkspace from "@/components/plagiarism/project-intel-workspace";
-import VideoDetectorPaymentModal, { hasVideoDetectorPaymentPassed } from "@/components/tools/video-detector-payment-modal";
-import ImageDetectorPaymentModal, { hasImageDetectorPaymentPassed } from "@/components/tools/image-detector-payment-modal";
+import VideoDetectorPaymentModal from "@/components/tools/video-detector-payment-modal";
+import ImageDetectorPaymentModal from "@/components/tools/image-detector-payment-modal";
+import ProPlanModal from "@/components/tools/pro-plan-modal";
 import { API_BASE } from "@/lib/api";
 
 interface AnalysisResult {
@@ -163,9 +169,10 @@ export default function ToolsPage() {
   const [historyError, setHistoryError] = useState<string | null>(null);
   const [videoPaymentOpen, setVideoPaymentOpen] = useState(false);
   const [imagePaymentOpen, setImagePaymentOpen] = useState(false);
+  const [proPlanOpen, setProPlanOpen] = useState(false);
 
   const openFakeVideoDetector = () => {
-    if (typeof window !== "undefined" && hasVideoDetectorPaymentPassed()) {
+    if (shouldSkipDetectorPaywall()) {
       setTab("video");
       return;
     }
@@ -173,12 +180,17 @@ export default function ToolsPage() {
   };
 
   const openFakeImageDetector = () => {
-    if (typeof window !== "undefined" && hasImageDetectorPaymentPassed()) {
+    if (shouldSkipDetectorPaywall()) {
       setTab("image");
       return;
     }
     setImagePaymentOpen(true);
   };
+
+  useEffect(() => {
+    if (tab === "video") markToolsDetectorTabVisited("video");
+    if (tab === "image") markToolsDetectorTabVisited("image");
+  }, [tab]);
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -380,6 +392,7 @@ export default function ToolsPage() {
         open={videoPaymentOpen}
         onClose={() => setVideoPaymentOpen(false)}
         onSuccess={() => {
+          markDetectorPaymentSuccess("video");
           setVideoPaymentOpen(false);
           setTab("video");
         }}
@@ -388,10 +401,12 @@ export default function ToolsPage() {
         open={imagePaymentOpen}
         onClose={() => setImagePaymentOpen(false)}
         onSuccess={() => {
+          markDetectorPaymentSuccess("image");
           setImagePaymentOpen(false);
           setTab("image");
         }}
       />
+      <ProPlanModal open={proPlanOpen} onClose={() => setProPlanOpen(false)} />
       <div className="flex flex-col gap-8 md:flex-row">
         <div className="flex w-full shrink-0 flex-col gap-8 md:w-64">
           <div>
@@ -430,14 +445,17 @@ export default function ToolsPage() {
                 <HelpIcon /> Help
               </button>
             </nav>
-          </div>
-
-          <div className="mt-auto rounded-xl border border-indigo-100 bg-indigo-50/80 p-4">
-            <h4 className="mb-1 font-semibold text-slate-900">Upgrade to Pro</h4>
-            <p className="mb-3 text-xs text-slate-600">Unlimited scans, deeper detection, priority queue.</p>
-            <button type="button" className="w-full rounded-lg bg-indigo-600 py-1.5 text-sm font-medium text-white transition-colors hover:bg-indigo-700">
-              Try Pro for $0
-            </button>
+            <div className="mt-4 rounded-xl border border-indigo-100 bg-indigo-50/80 p-4">
+              <h4 className="mb-1 font-semibold text-slate-900">Upgrade to Pro</h4>
+              <p className="mb-3 text-xs text-slate-600">Unlimited scans, deeper detection, priority queue.</p>
+              <button
+                type="button"
+                onClick={() => setProPlanOpen(true)}
+                className="w-full rounded-lg border border-slate-900/15 bg-indigo-600 py-1.5 text-sm font-medium text-white transition-colors hover:bg-indigo-700"
+              >
+                Try Pro for $0
+              </button>
+            </div>
           </div>
         </div>
 
