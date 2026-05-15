@@ -31,8 +31,9 @@ export default function SignUp() {
       }
       if (data.access_token) {
         window.localStorage.setItem("realeye_token", data.access_token);
+        window.dispatchEvent(new Event("auth-change"));
       }
-      router.push("/chat");
+      router.push("/");
     } catch (err: any) {
       console.error(err);
       setError(err.message || "Sign-up failed.");

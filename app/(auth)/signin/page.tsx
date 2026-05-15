@@ -33,7 +33,7 @@ export default function SignIn() {
         window.localStorage.setItem("realeye_token", data.access_token);
         window.dispatchEvent(new Event("auth-change"));
         setTimeout(() => window.dispatchEvent(new Event("auth-change")), 100);
-        router.push("/chat");
+        router.push("/");
       }
     } catch (err: any) {
       console.error(err);
