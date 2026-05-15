@@ -4,15 +4,10 @@ fastapi==0.104.1
 uvicorn[standard]==0.24.0
 python-multipart==0.0.6
 
-# Machine Learning
-# NOTE: Model was saved with very old TensorFlow version (uses batch_shape)
-# Using TensorFlow 2.10 which still supports old model formats
-# If you get DLL errors on Windows, use: pip install tensorflow-cpu==2.10.0
-#
-# If startup fails with Keras TypeError (metaclass / api_export): uninstall standalone keras —
-#   pip uninstall keras
-# TensorFlow 2.10 ships keras inside tf.keras; a separate Keras 3 install breaks imports.
-tensorflow==2.15.0
+# Machine Learning (local .keras model only; Render uses requirements-render.txt + HF API)
+# TensorFlow needs Python 3.9–3.11. On Render set PYTHON_VERSION=3.10.13 or use requirements-render.txt.
+# Windows DLL issues: pip install tensorflow-cpu==2.10.0
+tensorflow==2.15.0; python_version < "3.12"
 numpy==1.23.5
 
 # Computer Vision

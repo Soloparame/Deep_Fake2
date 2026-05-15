@@ -1,0 +1,27 @@
+# Render / production: Hugging Face API mode (VIDEO_USE_HF_API=true).
+# No TensorFlow — avoids Python 3.12+ wheel errors and saves RAM on free tier.
+# Local dev with a local .keras model: use requirements.txt instead.
+
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+python-multipart==0.0.6
+
+numpy>=1.23.5,<2.0.0
+opencv-python-headless==4.8.1.78
+
+requests>=2.28.0
+huggingface_hub>=0.26.0
+langchain-community>=0.2.0
+duckduckgo-search>=6.0.0
+groq>=0.11.0
+
+pydantic>=2.0.0,<3.0.0
+python-dotenv==1.0.0
+
+pymupdf>=1.23.0
+python-docx>=1.1.0
+python-pptx>=0.6.21
+
+pymongo>=4.6.0
+dnspython>=2.4.2
+certifi>=2023.0.0
