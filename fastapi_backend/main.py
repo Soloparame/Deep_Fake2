@@ -1,3 +1,5 @@
+import os
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
@@ -51,16 +53,28 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# CORS: browser + file uploads send Authorization → preflight OPTIONS must succeed.
-# If you still see "No Access-Control-Allow-Origin", the backend often crashed or refused
-# the connection (check terminal); browsers mis-report that as CORS.
-origins = [
+# CORS: localhost always allowed for local dev. Set ALLOWED_ORIGINS on Render for production
+# (comma-separated), e.g. https://your-app.vercel.app — no change needed in fastapi_backend/.env locally.
+_DEFAULT_CORS_ORIGINS = [
     "http://localhost:3000",
     "http://localhost:3001",
     "http://127.0.0.1:3000",
     "http://127.0.0.1:3001",
 ]
 
+
+def _cors_origins() -> list[str]:
+    origins = list(_DEFAULT_CORS_ORIGINS)
+    extra = os.getenv("ALLOWED_ORIGINS", "").strip()
+    if extra:
+        for origin in extra.split(","):
+            o = origin.strip().rstrip("/")
+            if o and o not in origins:
+                origins.append(o)
+    return origins
+
+
+origins = _cors_origins()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,

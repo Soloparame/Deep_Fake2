@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { FormEvent, useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { apiUrl } from "@/lib/api";
 
 function ResetPasswordForm() {
   const router = useRouter();
@@ -30,7 +31,7 @@ function ResetPasswordForm() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:8000/api/auth/forgot-password", {
+      const res = await fetch(apiUrl("/api/auth/forgot-password"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
@@ -78,7 +79,7 @@ function ResetPasswordForm() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:8000/api/auth/reset-password", {
+      const res = await fetch(apiUrl("/api/auth/reset-password"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token: resetToken, new_password: newPassword }),

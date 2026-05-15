@@ -1,3 +1,5 @@
+import { apiUrl } from "@/lib/api";
+
 export interface VideoVerdict {
   status: "Suspicious" | "Likely Real" | "Uncertain";
   averageFakeProbabilityPercent: number;
@@ -167,7 +169,7 @@ export function summarizeHfMultiModelVideo(res: HfVideoApiResponse): VideoVerdic
 
 class DeepfakeDetector {
   private _isModelLoaded = false;
-  private readonly BACKEND_URL = "http://localhost:8000/api";
+  private readonly BACKEND_URL = apiUrl("/api");
 
   isModelLoaded(): boolean {
     return this._isModelLoaded;

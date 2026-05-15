@@ -6,6 +6,7 @@ import { deepfakeDetector, DetectionResult, VideoVerdict } from "@/utils/deepfak
 import ProjectIntelWorkspace from "@/components/plagiarism/project-intel-workspace";
 import VideoDetectorPaymentModal, { hasVideoDetectorPaymentPassed } from "@/components/tools/video-detector-payment-modal";
 import ImageDetectorPaymentModal, { hasImageDetectorPaymentPassed } from "@/components/tools/image-detector-payment-modal";
+import { API_BASE } from "@/lib/api";
 
 interface AnalysisResult {
   label: string;
@@ -22,8 +23,6 @@ interface HistoryItem {
   created_at: string;
   type?: string;
 }
-
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 function authHeaders(): HeadersInit {
   if (typeof window === "undefined") return {};

@@ -8,10 +8,9 @@ import { SwotGrid } from "@/components/plagiarism/swot-grid";
 import { TechLensSection } from "@/components/plagiarism/tech-lens-section";
 import { CompetitorMap } from "@/components/plagiarism/competitor-map";
 import type { AnalysisReport } from "@/types/analysis";
+import { API_BASE } from "@/lib/api";
 
 type Tab = "overview" | "strategy";
-
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 /** Visible on white modal header (avoid zinc-on-white). */
 const headerBtnClass =

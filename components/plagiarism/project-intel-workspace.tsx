@@ -6,8 +6,7 @@ import { useRouter } from "next/navigation";
 import { AnalysisHistorySidebar } from "@/components/plagiarism/analysis-history-sidebar";
 import { AnalysisResultModal } from "@/components/plagiarism/analysis-result-modal";
 import type { AnalysisListItem, AnalysisReport } from "@/types/analysis";
-
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+import { API_BASE } from "@/lib/api";
 const ACCEPT_FILES =
   ".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 

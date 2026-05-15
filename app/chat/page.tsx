@@ -2,6 +2,7 @@
 
 import { useEffect, useState, FormEvent, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { apiUrl } from "@/lib/api";
 
 interface ChatMessage {
   id: string;
@@ -32,7 +33,7 @@ export default function ChatPage() {
 
   // Load suggested questions
   useEffect(() => {
-    fetch("http://localhost:8000/api/chat/questions")
+    fetch(apiUrl("/api/chat/questions"))
       .then(res => {
         if (res.ok) return res.json();
         return [];
@@ -51,7 +52,7 @@ export default function ChatPage() {
 
     const loadSessions = async () => {
       try {
-        const res = await fetch("http://localhost:8000/api/chat/sessions", {
+        const res = await fetch(apiUrl("/api/chat/sessions"), {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (res.ok) {
@@ -81,7 +82,7 @@ export default function ChatPage() {
     setCurrentSessionId(sessionId);
     setLoading(true);
     try {
-      const res = await fetch(`http://localhost:8000/api/chat/sessions/${sessionId}`, {
+      const res = await fetch(apiUrl(`/api/chat/sessions/${sessionId}`), {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
@@ -144,7 +145,7 @@ export default function ChatPage() {
     setInput("");
 
     try {
-      const res = await fetch("http://localhost:8000/api/chat", {
+      const res = await fetch(apiUrl("/api/chat"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -165,7 +166,7 @@ export default function ChatPage() {
       if (data.session_id && !currentSessionId) {
           setCurrentSessionId(data.session_id);
           // Refresh sessions list to show the new one in sidebar
-          fetch("http://localhost:8000/api/chat/sessions", {
+          fetch(apiUrl("/api/chat/sessions"), {
              headers: { Authorization: `Bearer ${token}` }
           })
           .then(r => r.json())

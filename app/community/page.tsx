@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { apiUrl } from "@/lib/api";
 
 type VideoItem = { id: string; url: string; label: "REAL" | "FAKE" };
 
@@ -19,7 +20,7 @@ export default function CommunityPage() {
       router.push("/signin");
       return;
     }
-    fetch("http://localhost:8000/api/community/videos", {
+    fetch(apiUrl("/api/community/videos"), {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(async (r) => {
@@ -89,7 +90,7 @@ export default function CommunityPage() {
         </div>
         <div className="rounded-xl border border-indigo-100 bg-white p-4 shadow-sm">
           <video
-            src={`http://localhost:8000${current.url}`}
+            src={apiUrl(current.url)}
             controls 
             className="w-full rounded-lg aspect-video object-cover" 
             style={{ maxHeight: '600px', minHeight: '400px' }}
