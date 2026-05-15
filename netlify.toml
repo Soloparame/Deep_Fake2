@@ -2,7 +2,7 @@
 # Render uses PYTHON_VERSION=3.10.13 in the dashboard instead.
 
 [build]
-  command = "pnpm run build"
+  command = "npm run build"
   publish = ".next"
 
 [[plugins]]
