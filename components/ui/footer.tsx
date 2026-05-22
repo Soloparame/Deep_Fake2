@@ -5,7 +5,7 @@ import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer>
+    <footer className="relative z-10 mt-16 border-t border-indigo-200/50 bg-white/80 shadow-[0_-8px_30px_-10px_rgba(30,27,75,0.12),0_-2px_12px_-4px_rgba(99,102,241,0.1)] backdrop-blur-md">
       <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
         {/* Footer illustration */}
         <div

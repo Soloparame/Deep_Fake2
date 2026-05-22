@@ -5,6 +5,12 @@ import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { apiUrl } from "@/lib/api";
 
+const inputClassName =
+  "w-full rounded-xl border border-indigo-100 bg-white px-4 py-3 text-slate-800 outline-none transition-all placeholder:text-slate-400 focus:border-indigo-400 focus:bg-white focus:ring-4 focus:ring-indigo-200/60";
+
+const labelClassName =
+  "mb-1 block text-xs font-medium uppercase tracking-wider text-gray-500 transition-colors group-focus-within:text-indigo-400";
+
 export default function SignUp() {
   const router = useRouter();
   const [name, setName] = useState("");
@@ -43,113 +49,110 @@ export default function SignUp() {
   };
 
   return (
-    <section>
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="py-12 md:py-20">
-          {/* Section header */}
-          <div className="pb-12 text-center">
-            <h1 className="font-nacelle text-3xl font-semibold text-slate-900 md:text-4xl">
-              Create an account
-            </h1>
-          </div>
-          {/* Contact form */}
-          <form className="mx-auto max-w-[400px]" onSubmit={handleSubmit}>
-            <div className="space-y-5">
-              {error && <p className="text-sm text-red-400">{error}</p>}
-              <div>
-                <label
-                  className="mb-1 block text-sm font-medium text-indigo-200/65"
-                  htmlFor="name"
-                >
-                  Name <span className="text-red-500">*</span>
-                </label>
-                <input
-                  id="name"
-                  type="text"
-                  className="form-input w-full"
-                  placeholder="Your full name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                />
+    <section className="relative flex min-h-[80vh] items-center justify-center overflow-hidden">
+      <div className="absolute left-1/2 top-1/2 -z-10 h-[400px] w-[400px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-indigo-500/20 blur-[120px]"></div>
+
+      <div className="mx-auto w-full max-w-[420px] rounded-3xl border border-indigo-100 bg-white/90 p-8 shadow-xl backdrop-blur-2xl">
+        <div className="mb-8 text-center">
+          <h1 className="font-nacelle text-3xl font-semibold text-slate-900 md:text-4xl">
+            Create an account
+          </h1>
+          <p className="mt-2 text-sm text-indigo-200/60">
+            Enter your details to get started with the secure area
+          </p>
+        </div>
+
+        <form onSubmit={handleSubmit}>
+          <div className="space-y-5">
+            {error && (
+              <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+                {error}
               </div>
-              <div>
-                <label
-                  className="mb-1 block text-sm font-medium text-indigo-200/65"
-                  htmlFor="company"
-                >
-                  Company Name
-                </label>
-                <input
-                  id="company"
-                  type="text"
-                  className="form-input w-full"
-                  placeholder="Your company name (optional)"
-                  value={company}
-                  onChange={(e) => setCompany(e.target.value)}
-                />
-              </div>
-              <div>
-                <label
-                  className="mb-1 block text-sm font-medium text-indigo-200/65"
-                  htmlFor="email"
-                >
-                  Work Email <span className="text-red-500">*</span>
-                </label>
-                <input
-                  id="email"
-                  type="email"
-                  className="form-input w-full"
-                  placeholder="Your work email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
-              <div>
-                <label
-                  className="block text-sm font-medium text-indigo-200/65"
-                  htmlFor="password"
-                >
-                  Password <span className="text-red-500">*</span>
-                </label>
-                <input
-                  id="password"
-                  type="password"
-                  className="form-input w-full"
-                  placeholder="Password (at least 10 characters)"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-              </div>
+            )}
+            <div className="group relative">
+              <label className={labelClassName} htmlFor="name">
+                Name
+              </label>
+              <input
+                id="name"
+                type="text"
+                className={inputClassName}
+                placeholder="Your full name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
             </div>
-            <div className="mt-6 space-y-5">
-              <button
-                type="submit"
-                className="btn w-full bg-linear-to-t from-indigo-600 to-indigo-500 bg-[length:100%_100%] bg-[bottom] text-white shadow-[inset_0px_1px_0px_0px_--theme(--color-white/.16)] hover:bg-[length:100%_150%] disabled:opacity-60"
-                disabled={loading}
-              >
-                {loading ? "Creating account..." : "Register"}
-              </button>
-              <div className="flex items-center gap-3 text-center text-sm italic text-gray-600 before:h-px before:flex-1 before:bg-linear-to-r before:from-transparent before:via-gray-400/25 after:h-px after:flex-1 after:bg-linear-to-r after:from-transparent after:via-gray-400/25">
-                or
-              </div>
-              <button
-                type="button"
-                className="btn relative w-full bg-linear-to-b from-gray-800 to-gray-800/60 bg-[length:100%_100%] bg-[bottom] text-gray-300 before:pointer-events-none before:absolute before:inset-0 before:rounded-[inherit] before:border before:border-transparent before:[background:linear-gradient(to_right,var(--color-gray-800),var(--color-gray-700),var(--color-gray-800))_border-box] before:[mask-composite:exclude_!important] before:[mask:linear-gradient(white_0_0)_padding-box,_linear-gradient(white_0_0)] hover:bg-[length:100%_150%]"
-              >
-                Sign Up with Google (coming soon)
-              </button>
+            <div className="group relative">
+              <label className={labelClassName} htmlFor="company">
+                Company name
+              </label>
+              <input
+                id="company"
+                type="text"
+                className={inputClassName}
+                placeholder="Your company (optional)"
+                value={company}
+                onChange={(e) => setCompany(e.target.value)}
+              />
             </div>
-          </form>
-          {/* Bottom link */}
-          <div className="mt-6 text-center text-sm text-indigo-200/65">
-            Already have an account?{" "}
-            <Link className="font-medium text-indigo-500" href="/signin">
-              Sign in
-            </Link>
+            <div className="group relative">
+              <label className={labelClassName} htmlFor="email">
+                Email
+              </label>
+              <input
+                id="email"
+                type="email"
+                className={inputClassName}
+                placeholder="name@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div className="group relative">
+              <label className={labelClassName} htmlFor="password">
+                Password
+              </label>
+              <input
+                id="password"
+                type="password"
+                className={inputClassName}
+                placeholder="At least 10 characters"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
           </div>
+          <div className="mt-8 space-y-4">
+            <button
+              type="submit"
+              className="w-full rounded-xl bg-gradient-to-t from-indigo-600 to-indigo-500 px-4 py-3 font-medium text-white shadow-lg shadow-indigo-500/25 transition-all hover:scale-[1.02] hover:shadow-indigo-500/40 disabled:opacity-60 disabled:hover:scale-100"
+              disabled={loading}
+            >
+              {loading ? "Creating account..." : "Register"}
+            </button>
+            <div className="flex items-center gap-3 text-center text-sm text-gray-400 before:h-px before:flex-1 before:bg-indigo-100 after:h-px after:flex-1 after:bg-indigo-100">
+              <span className="shrink-0">or</span>
+            </div>
+            <button
+              type="button"
+              className="w-full rounded-xl border border-indigo-100 bg-white px-4 py-3 font-medium text-slate-600 transition-all hover:border-indigo-200 hover:bg-indigo-50/50"
+            >
+              Sign up with Google (coming soon)
+            </button>
+          </div>
+        </form>
+
+        <div className="mt-6 text-center text-sm text-gray-400">
+          Already have an account?{" "}
+          <Link
+            className="font-medium text-indigo-400 transition-colors hover:text-indigo-300"
+            href="/signin"
+          >
+            Sign in
+          </Link>
         </div>
       </div>
     </section>
