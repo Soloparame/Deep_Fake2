@@ -39,7 +39,7 @@ export default function HeroHome() {
                   href="#0"
                   onClick={handleDetectClick}
                 >
-                  Start checking — free
+                  Start checking  (free)
                 </a>
                 <Link className="btn rounded-lg border border-slate-200 bg-white px-6 py-2.5 font-medium text-slate-700 transition-all hover:bg-slate-50" href="/pages/how-it-works">
                   See all tools
