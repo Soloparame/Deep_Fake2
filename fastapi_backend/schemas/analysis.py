@@ -44,6 +44,32 @@ class SimilarProjectItem(BaseModel):
     snippet: str = ""
 
 
+class SimilarDocumentItem(BaseModel):
+    id: str = ""
+    title: str = ""
+    url: str = ""
+    snippet: str = ""
+    document_type: str = "web"
+    source: str = ""
+    paper_id: str = ""
+    s2_url: str = Field(default="", description="Semantic Scholar paper page URL")
+    year: Optional[int] = None
+    venue: str = ""
+    is_open_access: bool = False
+    citation_count: int = 0
+
+
+class DocumentMatchItem(BaseModel):
+    user_start: int = 0
+    user_end: int = 0
+    matched_text: str = ""
+    source_document_id: str = ""
+    source_url: str = ""
+    source_title: str = ""
+    similarity: float = Field(ge=0, le=100, default=0)
+    source_excerpt: str = ""
+
+
 class CompetitorMapEntry(BaseModel):
     name: str = ""
     description: str = ""
@@ -78,6 +104,14 @@ class AnalysisReport(BaseModel):
     found_projects: List[SimilarProjectItem] = Field(
         default_factory=list,
         description="Named competitors/projects extracted from web search results",
+    )
+    similar_documents: List[SimilarDocumentItem] = Field(
+        default_factory=list,
+        description="Similar PDFs/papers (Semantic Scholar + web PDF search)",
+    )
+    document_matches: List[DocumentMatchItem] = Field(
+        default_factory=list,
+        description="Passage-level overlaps between user text and similar documents",
     )
     company_name: str = Field(
         default="",

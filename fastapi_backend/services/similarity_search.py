@@ -11,6 +11,11 @@ import re
 from typing import Any, Optional
 
 from fastapi_backend.core.config import settings
+from fastapi_backend.services.web_search import web_search_summary
+from fastapi_backend.utils.document_text import (
+    document_excerpt_for_search,
+    search_keywords_from_text,
+)
 
 HF_SIMILARITY_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 MAX_USER_CHARS = 2000
@@ -60,52 +65,25 @@ def _clean_text(text: str) -> str:
 
 
 def _duckduckgo_summary(query: str) -> str:
-    """Web search for competitor context. Tries duckduckgo-search first (works better on servers)."""
-    q = (query or "").strip()
-    if not q:
-        return ""
-
-    # Primary: duckduckgo-search (more reliable on Render/datacenter IPs than langchain wrapper)
-    try:
-        from duckduckgo_search import DDGS
-
-        with DDGS() as ddgs:
-            results = list(ddgs.text(q, max_results=6))
-        if results:
-            parts = []
-            for r in results:
-                title = (r.get("title") or "").strip()
-                body = (r.get("body") or "").strip()
-                href = (r.get("href") or "").strip()
-                if title or body:
-                    line = title
-                    if body:
-                        line = f"{line}: {body}" if line else body
-                    if href:
-                        line = f"{line} {href}".strip()
-                    parts.append(line)
-            if parts:
-                return "\n".join(parts)
-    except Exception as e:
-        print(f"similarity_search: duckduckgo_search.DDGS failed: {e}")
-
-    try:
-        from langchain_community.tools import DuckDuckGoSearchRun
-
-        tool = DuckDuckGoSearchRun()
-        out = tool.run(q)
-        return (out or "").strip()
-    except Exception as e:
-        print(f"similarity_search: DuckDuckGoSearchRun failed: {e}")
-        return ""
+    """Web search for competitor context (Bing/Brave via shared web_search helper)."""
+    return web_search_summary(query, max_results=6)
 
 
-def _get_smart_context(title: str, description: str) -> SmartContext:
+def _get_smart_context(
+    title: str, description: str, project_content: str = ""
+) -> SmartContext:
+    doc_excerpt = document_excerpt_for_search(project_content, 2500)
+    kw_fallback = search_keywords_from_text(project_content or description, 20)
+    fallback_query = _truncate(
+        f"{title} {kw_fallback} competitors alternatives".strip()
+        or f'"{title}" software startup alternative',
+        220,
+    )
     fallback = SmartContext(
         functionality=_truncate(title or "software tool", 64),
         location="Global",
         industry="software",
-        search_query=f'"{title}" software startup alternative description',
+        search_query=fallback_query,
     )
     api_key = (getattr(settings, "GROQ_API_KEY", "") or "").strip()
     if not api_key:
@@ -114,18 +92,22 @@ def _get_smart_context(title: str, description: str) -> SmartContext:
         from groq import Groq
 
         client = Groq(api_key=api_key)
+        doc_block = ""
+        if doc_excerpt:
+            doc_block = f"\nDocument excerpt (use for search_query — what the product actually does):\n{doc_excerpt[:2000]}\n"
         prompt = f"""
 Analyze this project and extract concise context for competitor search.
+Base the search_query on what the project DOES (from description and document), not generic words.
 
 Title: {title}
 Description: {description[:1200]}
-
+{doc_block}
 Return JSON only:
 {{
   "functionality": "3 words max",
   "location": "country/region or Global",
   "industry": "industry name",
-  "search_query": "precise competitor search query"
+  "search_query": "precise web search query for real competing products (8-14 words)"
 }}
 """.strip()
         completion = client.chat.completions.create(
@@ -264,22 +246,29 @@ def _extract_projects_fallback(search_text: str) -> list[SimilarProject]:
 
 
 def _groq_competitors_from_project(
-    title: str, description: str, ctx: SmartContext
+    title: str,
+    description: str,
+    ctx: SmartContext,
+    project_content: str = "",
 ) -> list[SimilarProject]:
     """When web search is empty/blocked, ask Groq for real competitor names + links."""
     api_key = (getattr(settings, "GROQ_API_KEY", "") or "").strip()
     if not api_key:
         return []
+    doc_excerpt = document_excerpt_for_search(project_content, 2000)
     try:
         from groq import Groq
 
         client = Groq(api_key=api_key)
+        doc_block = f"\nDocument excerpt:\n{doc_excerpt}\n" if doc_excerpt else ""
         prompt = f"""
 List 3-4 real, existing software products or companies that compete with this project.
+Match competitors to the actual functionality described (not generic AI tools unless relevant).
 Use well-known products where possible and valid https:// official site URLs.
 
 Title: {title}
 Description: {(description or "")[:1500]}
+{doc_block}
 Functionality: {ctx.functionality}
 Industry: {ctx.industry}
 Location/market: {ctx.location}
@@ -326,7 +315,8 @@ def _extract_project_list(search_text: str, ctx: SmartContext) -> list[SimilarPr
         client = Groq(api_key=api_key)
         prompt = f"""
 Extract the top 3-4 real software projects/companies from this search text.
-Prioritize entries matching this context:
+Prioritize products that match what this project actually does (functionality/industry below).
+Skip generic news sites unless they name a specific competing product.
 - functionality: {ctx.functionality}
 - location: {ctx.location}
 - industry: {ctx.industry}
@@ -384,12 +374,21 @@ def compute_similarity_overlap(title: str, description: str, file_content: str) 
     if len(user_blob) < 24:
         user_blob = f"{title}\n{description}".strip() or title or "Project"
 
-    smart_ctx = _get_smart_context(title, description)
+    smart_ctx = _get_smart_context(title, description, body)
     search_text = _duckduckgo_smart_search(smart_ctx)
+    # If the main query is thin, add a keyword search from the document body
+    if len(search_text or "") < 120:
+        kw = search_keywords_from_text(body, 22)
+        if kw:
+            extra = _duckduckgo_summary(_truncate(f"{title} {kw} competitors", 220), 4)
+            if extra:
+                search_text = f"{search_text}\n{extra}".strip() if search_text else extra
     search_ok = bool(search_text and len(search_text) > 48)
     found_projects = _extract_project_list(search_text, smart_ctx) if search_ok else []
     if not found_projects:
-        found_projects = _groq_competitors_from_project(title, description, smart_ctx)
+        found_projects = _groq_competitors_from_project(
+            title, description, smart_ctx, body
+        )
         if found_projects and not search_ok:
             search_ok = True
             search_text = (

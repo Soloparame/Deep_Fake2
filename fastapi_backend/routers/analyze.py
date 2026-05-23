@@ -25,11 +25,43 @@ from fastapi_backend.schemas.analysis import (
     SWOTBlock,
     TechComparisonRow,
 )
-from fastapi_backend.utils.document_text import extract_text_from_upload, merge_content_snippet
+from fastapi_backend.utils.document_text import (
+    extract_document_body,
+    extract_text_from_upload,
+    merge_content_snippet,
+)
 from fastapi_backend.services import project_intel_docx, project_intel_ppt
 from fastapi_backend.services.competitor_map_service import build_competitor_map
+from fastapi_backend.services.document_similarity_service import (
+    DocumentSimilarityResult,
+    compute_document_similarity,
+)
+from fastapi_backend.schemas.analysis import DocumentMatchItem, SimilarDocumentItem
 
 router = APIRouter()
+
+DOC_SIM_TIMEOUT_SEC = 55.0
+
+
+async def _run_document_similarity(title: str, description: str, document_body: str) -> DocumentSimilarityResult:
+    try:
+        return await asyncio.wait_for(
+            asyncio.to_thread(
+                compute_document_similarity,
+                title,
+                description,
+                document_body,
+            ),
+            timeout=DOC_SIM_TIMEOUT_SEC,
+        )
+    except asyncio.TimeoutError:
+        print(f"analyze: document similarity timed out after {DOC_SIM_TIMEOUT_SEC}s")
+        return DocumentSimilarityResult(
+            analysis_note=(
+                "Document similarity timed out — similar papers may be incomplete. "
+                "For faster runs, use a shorter PDF or paste one chapter."
+            ),
+        )
 
 
 def _user_from_request(request: Request) -> Tuple[Optional[str], Optional[str]]:
@@ -50,6 +82,7 @@ def _build_report(
     description: str,
     file_content: str,
     sim: SimilarityResult,
+    doc_sim: DocumentSimilarityResult,
     swot: SWOTBlock,
     tech_comparison: list[TechComparisonRow],
     recommendations: list[str],
@@ -61,16 +94,50 @@ def _build_report(
     found_list = [
         SimilarProjectItem(name=p.name, link=p.link, snippet=p.snippet) for p in sim.found_projects
     ]
+    similar_docs = [
+        SimilarDocumentItem(
+            id=d.id,
+            title=d.title,
+            url=d.url,
+            snippet=d.snippet,
+            document_type=d.document_type,
+            source=d.source,
+            paper_id=d.paper_id,
+            s2_url=d.s2_url,
+            year=d.year,
+            venue=d.venue,
+            is_open_access=d.is_open_access,
+            citation_count=d.citation_count,
+        )
+        for d in doc_sim.similar_documents
+    ]
+    doc_matches = [
+        DocumentMatchItem(
+            user_start=m.user_start,
+            user_end=m.user_end,
+            matched_text=m.matched_text,
+            source_document_id=m.source_document_id,
+            source_url=m.source_url,
+            source_title=m.source_title,
+            similarity=m.similarity,
+            source_excerpt=m.source_excerpt,
+        )
+        for m in doc_sim.document_matches
+    ]
+    content_cap = 30_000
+    stored_content = file_content[:content_cap] + ("..." if len(file_content) > content_cap else "")
     return AnalysisReport(
         id=analysis_id,
         title=display_title,
         description=description,
-        file_content=file_content[:8000] + ("..." if len(file_content) > 8000 else ""),
+        file_content=stored_content,
         similarity_score=sim.score,
         similarity_label=sim.label,
         similarity_description=sim.description,
         market_search_snippet=sim.market_snippet,
         found_projects=found_list,
+        similar_documents=similar_docs,
+        document_matches=doc_matches,
         company_name=display_title,
         competitor_map=build_competitor_map(display_title, description.strip(), found_list),
         similarity_hf_live=sim.hf_ok,
@@ -133,63 +200,75 @@ async def analyze_project(
     if not extracted and pasted:
         extracted = pasted
 
-    file_content = merge_content_snippet(title, description, extracted)
-    if not file_content.strip():
-        file_content = "(No document body — title and description only.)"
+    document_body = extract_document_body(extracted, pasted, description.strip())
+    if not document_body.strip():
+        document_body = "(No document body — add a file, paste text, or use the description field.)"
+
+    # Market overlap index uses title + description + body; highlights/SWOT use body only.
+    market_context = merge_content_snippet(title, description.strip(), extracted or pasted)
 
     analysis_id = new_id()
-    sim = await asyncio.to_thread(
-        compute_similarity_overlap,
-        title,
-        description.strip(),
-        file_content,
+    desc = description.strip()
+
+    sim, doc_sim = await asyncio.gather(
+        asyncio.to_thread(compute_similarity_overlap, title, desc, market_context),
+        _run_document_similarity(title, desc, document_body),
     )
+
+    if doc_sim.analysis_note:
+        document_body = f"ℹ️ {doc_sim.analysis_note}\n\n{document_body}"
+
     swot = await asyncio.to_thread(
         generate_swot_analysis,
         title,
-        description.strip(),
-        file_content,
+        desc,
+        document_body,
         sim.score,
         sim.market_snippet,
         my_tech_stack,
     )
-    tech_lens = await asyncio.to_thread(
-        generate_tech_lens,
-        title,
-        description.strip(),
-        my_tech_stack,
-        sim.market_snippet,
+
+    tech_lens, devils_advocate, strategy = await asyncio.gather(
+        asyncio.to_thread(
+            generate_tech_lens,
+            title,
+            desc,
+            my_tech_stack,
+            sim.market_snippet,
+        ),
+        asyncio.to_thread(
+            generate_devils_advocate_questions,
+            title,
+            desc,
+            sim.score,
+            sim.market_snippet,
+        ),
+        asyncio.to_thread(
+            generate_market_positioning,
+            title,
+            desc,
+            sim.score,
+            sim.market_snippet,
+            swot.weaknesses,
+            my_tech_stack,
+        ),
     )
     recommendations, references = await asyncio.to_thread(
         generate_recommendations_and_resources,
         title,
-        description.strip(),
+        desc,
         sim.score,
         swot,
         sim.market_snippet,
     )
-    devils_advocate = await asyncio.to_thread(
-        generate_devils_advocate_questions,
-        title,
-        description.strip(),
-        sim.score,
-        sim.market_snippet,
-    )
-    strategy = await asyncio.to_thread(
-        generate_market_positioning,
-        title,
-        description.strip(),
-        sim.score,
-        sim.market_snippet,
-        swot.weaknesses,
-        my_tech_stack,
-    )
+
     report = _build_report(
         analysis_id=analysis_id,
         title=title,
-        description=description.strip(),
-        file_content=file_content,
+        description=desc,
+        file_content=document_body,
         sim=sim,
+        doc_sim=doc_sim,
         swot=swot,
         tech_comparison=tech_lens,
         recommendations=recommendations,

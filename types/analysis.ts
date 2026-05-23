@@ -36,6 +36,32 @@ export interface SimilarProjectItem {
   snippet: string;
 }
 
+export interface SimilarDocumentItem {
+  id: string;
+  title: string;
+  url: string;
+  snippet: string;
+  document_type: string;
+  source: string;
+  paper_id?: string;
+  s2_url?: string;
+  year?: number | null;
+  venue?: string;
+  is_open_access?: boolean;
+  citation_count?: number;
+}
+
+export interface DocumentMatchItem {
+  user_start: number;
+  user_end: number;
+  matched_text: string;
+  source_document_id: string;
+  source_url: string;
+  source_title: string;
+  similarity: number;
+  source_excerpt?: string;
+}
+
 export type CompetitorMapTag = "Competitor" | "Global player";
 
 export interface CompetitorMapEntry {
@@ -65,6 +91,8 @@ export interface AnalysisReport {
   market_search_snippet?: string | null;
   /** Extracted real-world projects/competitors from market search text */
   found_projects: SimilarProjectItem[];
+  similar_documents?: SimilarDocumentItem[];
+  document_matches?: DocumentMatchItem[];
   /** User-facing name for positioning map (usually same as title) */
   company_name?: string;
   /** Scatter chart: you + competitors with synthetic axis scores */

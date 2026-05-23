@@ -71,6 +71,9 @@ class Settings:
     GROQ_API_KEY: str = os.getenv("GROQ_API_KEY", "")
     GROQ_MODEL: str = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
 
+    # Semantic Scholar (Project Intel document discovery; optional key raises rate limits)
+    SEMANTIC_SCHOLAR_API_KEY: str = os.getenv("SEMANTIC_SCHOLAR_API_KEY", "")
+
     def hf_video_model_ids(self) -> List[str]:
         raw = (self.HF_VIDEO_MODELS or "").strip()
         if raw:

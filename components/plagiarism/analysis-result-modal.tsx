@@ -7,6 +7,7 @@ import { StrategyPanel } from "@/components/plagiarism/strategy-panel";
 import { SwotGrid } from "@/components/plagiarism/swot-grid";
 import { TechLensSection } from "@/components/plagiarism/tech-lens-section";
 import { CompetitorMap } from "@/components/plagiarism/competitor-map";
+import { DocumentHighlightView } from "@/components/plagiarism/document-highlight-view";
 import type { AnalysisReport } from "@/types/analysis";
 import { API_BASE } from "@/lib/api";
 
@@ -329,34 +330,21 @@ export function AnalysisResultModal(props: {
                 />
                 <TechLensSection report={report} />
                 <DevilsAdvocateCard questions={report.devils_advocate} />
-                <details className="group rounded-2xl border border-white/5 bg-zinc-950/40 transition-colors open:bg-zinc-900/40 hover:border-white/10">
-                  <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-5 py-4 text-sm font-medium text-zinc-300 [&::-webkit-details-marker]:hidden sm:px-6 sm:py-5">
-                    <span className="flex items-center gap-3">
-                      <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-zinc-800/80 text-xs text-zinc-400 shadow-inner ring-1 ring-white/5 group-hover:text-amber-400 group-hover:ring-amber-500/30 transition-all">
-                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-                        </svg>
-                      </span>
-                      Extracted & merged content
-                    </span>
-                    <svg
-                      className="h-5 w-5 shrink-0 text-zinc-500 transition-transform duration-300 group-open:rotate-180"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </summary>
-                  <div className="border-t border-white/[0.04] px-5 pb-5 pt-3 sm:px-6 sm:pb-6">
-                    <div className="relative rounded-xl border border-white/5 bg-black/40 p-1 shadow-inner overflow-hidden">
-                       <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-amber-500/20 to-transparent"></div>
-                       <pre className="max-h-56 overflow-auto custom-scrollbar whitespace-pre-wrap p-4 font-mono text-[13px] leading-relaxed text-zinc-400 sm:max-h-72">
-                         {report.file_content}
-                       </pre>
-                    </div>
+                <section className="rounded-2xl border border-amber-500/25 bg-gradient-to-b from-amber-500/5 to-zinc-950/40">
+                  <div className="border-b border-amber-500/15 px-5 py-4 sm:px-6">
+                    <h3 className="text-sm font-semibold text-amber-100">Uploaded document</h3>
+                    <p className="mt-1 text-xs text-zinc-500">
+                      Similar papers, downloads, and overlap with your file — not shown in the competitor
+                      list above.
+                    </p>
                   </div>
-                </details>
+                  <div className="px-5 pb-5 pt-4 sm:px-6 sm:pb-6">
+                    <DocumentHighlightView
+                      report={report}
+                      originalUploadedFile={originalUploadedFile}
+                    />
+                  </div>
+                </section>
               </div>
             ) : (
               <StrategyPanel report={report} />

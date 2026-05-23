@@ -78,16 +78,21 @@ def generate_swot_analysis(
 You are a professional startup strategy consultant.
 Analyze this project and return SWOT as JSON only.
 
-PROJECT TITLE: {title}
-DESCRIPTION: {description}
+IMPORTANT: Base your analysis on the DOCUMENT BODY below — not only the title.
+The title and description are metadata; the document body is the actual project content.
+
+PROJECT TITLE (metadata): {title}
+SHORT DESCRIPTION (metadata): {description}
 TECH STACK: {my_tech_stack or "Not specified"}
 SIMILARITY SCORE: {round(similarity_score)}%
 MARKET CONTEXT SNIPPET: {market_snippet[:600]}
-PROJECT TEXT SNIPPET: {file_content[:1400]}
+
+DOCUMENT BODY (primary — analyze this):
+{file_content[:8000]}
 
 Rules:
-- Provide exactly 2-3 concise bullets per quadrant.
-- Be specific to this project and market overlap.
+- Provide exactly 2-3 concise bullets per quadrant grounded in the document body.
+- Do not invent features that are not supported by the document body.
 - No markdown, no prose, JSON only.
 
 Required JSON schema:

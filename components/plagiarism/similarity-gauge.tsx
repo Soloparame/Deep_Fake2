@@ -14,6 +14,7 @@ export function SimilarityGauge({ report }: Props) {
   const blurb =
     report.similarity_description ||
     "Relative overlap with indexed sources and public descriptions.";
+  const competitors = report.found_projects ?? [];
   const r = 54;
   const c = 2 * Math.PI * r;
   const offset = c - (pct / 100) * c;
@@ -72,7 +73,7 @@ export function SimilarityGauge({ report }: Props) {
 
       <p className="relative mt-6 text-center text-xs leading-relaxed text-zinc-500">{blurb}</p>
 
-      {report.found_projects?.length ? (
+      {competitors.length ? (
         <div className="relative mt-6 overflow-hidden rounded-2xl border border-indigo-500/20 bg-gradient-to-b from-indigo-500/10 to-transparent p-4 shadow-[0_0_20px_rgba(99,102,241,0.05)] backdrop-blur-sm sm:p-5">
           <div className="mb-4 flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
@@ -85,11 +86,11 @@ export function SimilarityGauge({ report }: Props) {
               </p>
             </div>
             <span className="rounded-full border border-indigo-400/30 bg-indigo-500/20 px-2.5 py-0.5 text-[11px] font-bold text-indigo-200">
-              {report.found_projects.length}
+              {competitors.length}
             </span>
           </div>
           <div className="space-y-2.5">
-            {report.found_projects.slice(0, 4).map((p, idx) => (
+            {competitors.slice(0, 4).map((p, idx) => (
               <a
                 key={`${p.link}-${idx}`}
                 href={p.link}
@@ -100,12 +101,9 @@ export function SimilarityGauge({ report }: Props) {
                 <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/0 via-indigo-500/0 to-indigo-500/0 transition-all duration-500 group-hover:from-indigo-500/5 group-hover:to-purple-500/5" />
                 <p className="relative truncate text-sm font-semibold text-white transition-colors duration-300 group-hover:text-indigo-300">
                   {p.name}
-                  <svg className="ml-1.5 inline-block h-3 w-3 text-indigo-400/50 opacity-0 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                  </svg>
                 </p>
-                <p className="relative mt-1 line-clamp-2 text-xs leading-relaxed text-zinc-400 transition-colors group-hover:text-zinc-300">{p.snippet}</p>
-                <p className="relative mt-2 truncate text-[10px] text-zinc-500 group-hover:text-indigo-400/70">{p.link}</p>
+                <p className="relative mt-1 line-clamp-2 text-xs leading-relaxed text-zinc-400">{p.snippet}</p>
+                <p className="relative mt-2 truncate text-[10px] text-zinc-500">{p.link}</p>
               </a>
             ))}
           </div>
@@ -127,8 +125,8 @@ export function SimilarityGauge({ report }: Props) {
             </span>
           </div>
           <p className="text-sm leading-relaxed text-zinc-300">
-            No competitor links were confidently extracted for this run. This can happen with short inputs,
-            low-coverage market snippets, or temporary search/rate-limit issues.
+            No competitor links were confidently extracted for this run. Similar academic documents appear
+            in the uploaded document section below.
           </p>
           <div className="mt-3 grid gap-2 sm:grid-cols-2">
             <div className="rounded-lg border border-white/10 bg-black/30 px-3 py-2.5 text-[11px] text-zinc-300">
