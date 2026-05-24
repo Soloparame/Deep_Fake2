@@ -68,6 +68,7 @@ class SimilarDocument:
     venue: str = ""
     is_open_access: bool = False
     citation_count: int = 0
+    similarity_percent: Optional[float] = None
 
 
 @dataclass
@@ -80,6 +81,7 @@ class DocumentMatch:
     source_title: str
     similarity: float
     source_excerpt: str = ""
+    source_type: str = ""
 
 
 @dataclass
@@ -87,6 +89,9 @@ class DocumentSimilarityResult:
     similar_documents: List[SimilarDocument] = field(default_factory=list)
     document_matches: List[DocumentMatch] = field(default_factory=list)
     analysis_note: str = ""
+    plagiarism_summary: Optional[dict] = None
+    highlighted_segments: Optional[List[dict]] = None
+    sources_list: Optional[List[dict]] = None
 
 
 def _truncate(s: str, n: int) -> str:
@@ -499,16 +504,22 @@ def _merge_documents(*groups: List[SimilarDocument]) -> List[SimilarDocument]:
     merged: List[SimilarDocument] = []
     seen_urls: set[str] = set()
     seen_paper_ids: set[str] = set()
+    seen_ids: set[str] = set()
     for group in groups:
         for doc in group:
+            if doc.id and doc.id in seen_ids:
+                continue
             if doc.paper_id and doc.paper_id in seen_paper_ids:
                 continue
             norm = _normalize_url(doc.url)
-            if not norm or norm in seen_urls:
+            if norm and norm in seen_urls:
                 continue
             if doc.paper_id:
                 seen_paper_ids.add(doc.paper_id)
-            seen_urls.add(norm)
+            if doc.id:
+                seen_ids.add(doc.id)
+            if norm:
+                seen_urls.add(norm)
             merged.append(doc)
             if len(merged) >= MAX_DOCS:
                 return merged
@@ -888,49 +899,10 @@ def compute_document_similarity(
     file_content: str,
 ) -> DocumentSimilarityResult:
     """
-    Discover similar PDFs/papers and highlight overlapping passages in the user's text.
+    Six-source check: 2 database + 2 online (DDGS) + 2 publications (Semantic Scholar).
+    Sentence-level fuzzy highlights via SequenceMatcher.
     """
-    raw_text = strip_extraction_banner((file_content or "").strip())
-    user_text, fast_mode, analysis_note = _prepare_user_text(raw_text)
+    from fastapi_backend.services.plagiarism_engine import run_plagiarism_check, to_document_similarity_result
 
-    documents = _discover_similar_documents(
-        title, description, user_text or raw_text, fast_mode=fast_mode
-    )
-
-    if not documents:
-        return DocumentSimilarityResult(analysis_note=analysis_note)
-
-    if len(user_text) < 40:
-        return DocumentSimilarityResult(
-            similar_documents=documents, analysis_note=analysis_note
-        )
-
-    max_user = LARGE_DOC_USER_CHUNKS if fast_mode else MAX_USER_CHUNKS
-    max_source = LARGE_DOC_SOURCE_CHUNKS if fast_mode else MAX_SOURCE_CHUNKS_PER_DOC
-
-    user_chunks = _chunk_text(user_text, max_user)
-    if not user_chunks:
-        return DocumentSimilarityResult(
-            similar_documents=documents, analysis_note=analysis_note
-        )
-
-    source_texts: List[str] = []
-    for doc in documents:
-        text = _fetch_document_text(doc, fast_mode=True)
-        if not text or len(text) < 24:
-            text = (doc.snippet or "")[:MAX_SOURCE_TEXT]
-        source_texts.append(text)
-
-    matches = _find_passage_matches(
-        user_text,
-        user_chunks,
-        documents,
-        source_texts,
-        max_source_chunks_per_doc=max_source,
-        allow_sentence_fallback=not fast_mode,
-    )
-    return DocumentSimilarityResult(
-        similar_documents=documents,
-        document_matches=matches,
-        analysis_note=analysis_note,
-    )
+    engine = run_plagiarism_check(title, description, file_content)
+    return to_document_similarity_result(engine)

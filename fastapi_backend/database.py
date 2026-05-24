@@ -84,6 +84,7 @@ try:
     chat_sessions_col = db["chat_sessions"]
     knowledge_col = db["knowledge_base"]
     analyses_col = db["analyses"]
+    bahirdar_documents_col = db["bahirdar_documents"]
 
 except Exception as e:
     print(f"[WARN] MongoDB connection failed: {e}")
@@ -147,6 +148,7 @@ except Exception as e:
     chat_sessions_col = DummyCollection()
     knowledge_col = DummyCollection()
     analyses_col = DummyCollection()
+    bahirdar_documents_col = DummyCollection()
 
 
 def now_iso() -> str:

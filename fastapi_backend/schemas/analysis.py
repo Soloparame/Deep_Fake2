@@ -57,6 +57,10 @@ class SimilarDocumentItem(BaseModel):
     venue: str = ""
     is_open_access: bool = False
     citation_count: int = 0
+    similarity_percent: Optional[float] = Field(
+        default=None,
+        description="Overall semantic similarity to the upload (Bahir Dar corpus)",
+    )
 
 
 class DocumentMatchItem(BaseModel):
@@ -68,6 +72,34 @@ class DocumentMatchItem(BaseModel):
     source_title: str = ""
     similarity: float = Field(ge=0, le=100, default=0)
     source_excerpt: str = ""
+    source_type: str = Field(default="", description="database | online | publication")
+
+
+class PlagiarismSummaryItem(BaseModel):
+    db_matches: int = 0
+    web_matches: int = 0
+    pub_matches: int = 0
+    total_plagiarism_percent: float = 0.0
+
+
+class HighlightSegmentItem(BaseModel):
+    segment: str = ""
+    is_plagiarized: bool = False
+    start_index: int = 0
+    end_index: int = 0
+    source_id: str = ""
+    source_title: str = ""
+    source_type: str = ""
+    similarity: float = 0.0
+    color: str = ""
+
+
+class PlagiarismSourceItem(BaseModel):
+    type: str = ""
+    id: str = ""
+    title: str = ""
+    link: str = ""
+    similarity_percent: float = 0.0
 
 
 class CompetitorMapEntry(BaseModel):
@@ -112,6 +144,18 @@ class AnalysisReport(BaseModel):
     document_matches: List[DocumentMatchItem] = Field(
         default_factory=list,
         description="Passage-level overlaps between user text and similar documents",
+    )
+    plagiarism_summary: Optional[PlagiarismSummaryItem] = Field(
+        default=None,
+        description="2 DB + 2 web + 2 publication source counts and total flagged %",
+    )
+    highlighted_segments: List[HighlightSegmentItem] = Field(
+        default_factory=list,
+        description="Original document split into plain and plagiarized segments",
+    )
+    plagiarism_sources: List[PlagiarismSourceItem] = Field(
+        default_factory=list,
+        description="Exactly six sources when available: 2 database, 2 online, 2 publication",
     )
     company_name: str = Field(
         default="",

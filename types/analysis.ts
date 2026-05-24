@@ -49,6 +49,8 @@ export interface SimilarDocumentItem {
   venue?: string;
   is_open_access?: boolean;
   citation_count?: number;
+  /** Overall similarity to your upload (Bahir Dar corpus) */
+  similarity_percent?: number | null;
 }
 
 export interface DocumentMatchItem {
@@ -60,6 +62,34 @@ export interface DocumentMatchItem {
   source_title: string;
   similarity: number;
   source_excerpt?: string;
+  source_type?: string;
+}
+
+export interface PlagiarismSummaryItem {
+  db_matches: number;
+  web_matches: number;
+  pub_matches: number;
+  total_plagiarism_percent: number;
+}
+
+export interface HighlightSegmentItem {
+  segment: string;
+  is_plagiarized: boolean;
+  start_index: number;
+  end_index: number;
+  source_id?: string;
+  source_title?: string;
+  source_type?: string;
+  similarity?: number;
+  color?: string;
+}
+
+export interface PlagiarismSourceItem {
+  type: string;
+  id: string;
+  title: string;
+  link: string;
+  similarity_percent: number;
 }
 
 export type CompetitorMapTag = "Competitor" | "Global player";
@@ -93,6 +123,9 @@ export interface AnalysisReport {
   found_projects: SimilarProjectItem[];
   similar_documents?: SimilarDocumentItem[];
   document_matches?: DocumentMatchItem[];
+  plagiarism_summary?: PlagiarismSummaryItem | null;
+  highlighted_segments?: HighlightSegmentItem[];
+  plagiarism_sources?: PlagiarismSourceItem[];
   /** User-facing name for positioning map (usually same as title) */
   company_name?: string;
   /** Scatter chart: you + competitors with synthetic axis scores */

@@ -19,7 +19,12 @@ from fastapi_backend.schemas.analysis import (
     AnalysisHistoryResponse,
     AnalysisListItem,
     AnalysisReport,
+    DocumentMatchItem,
+    HighlightSegmentItem,
+    PlagiarismSourceItem,
+    PlagiarismSummaryItem,
     ReferenceItem,
+    SimilarDocumentItem,
     SimilarProjectItem,
     StrategyBlock,
     SWOTBlock,
@@ -29,6 +34,7 @@ from fastapi_backend.utils.document_text import (
     extract_document_body,
     extract_text_from_upload,
     merge_content_snippet,
+    strip_extraction_banner,
 )
 from fastapi_backend.services import project_intel_docx, project_intel_ppt
 from fastapi_backend.services.competitor_map_service import build_competitor_map
@@ -36,32 +42,44 @@ from fastapi_backend.services.document_similarity_service import (
     DocumentSimilarityResult,
     compute_document_similarity,
 )
-from fastapi_backend.schemas.analysis import DocumentMatchItem, SimilarDocumentItem
 
 router = APIRouter()
 
-DOC_SIM_TIMEOUT_SEC = 55.0
+DOC_SIM_TIMEOUT_SEC = 120.0
 
 
 async def _run_document_similarity(title: str, description: str, document_body: str) -> DocumentSimilarityResult:
+    body = (document_body or "").strip()
+    if body.startswith("(No document body"):
+        body = f"{title}\n{description}".strip()
+
     try:
         return await asyncio.wait_for(
             asyncio.to_thread(
                 compute_document_similarity,
                 title,
                 description,
-                document_body,
+                body,
             ),
             timeout=DOC_SIM_TIMEOUT_SEC,
         )
     except asyncio.TimeoutError:
-        print(f"analyze: document similarity timed out after {DOC_SIM_TIMEOUT_SEC}s")
-        return DocumentSimilarityResult(
-            analysis_note=(
-                "Document similarity timed out — similar papers may be incomplete. "
-                "For faster runs, use a shorter PDF or paste one chapter."
-            ),
-        )
+        print(f"analyze: document similarity timed out after {DOC_SIM_TIMEOUT_SEC}s — using database-only fallback")
+        from fastapi_backend.services.plagiarism_engine import run_plagiarism_check_db_only, to_document_similarity_result
+
+        try:
+            engine = await asyncio.to_thread(run_plagiarism_check_db_only, title, description, body)
+            result = to_document_similarity_result(engine)
+            result.analysis_note = (
+                "Web/publication search timed out; showing Bahir Dar database matches. "
+                "Retry with a shorter file for full online results."
+            )
+            return result
+        except Exception as e:
+            print(f"analyze: db-only fallback failed: {e}")
+            return DocumentSimilarityResult(
+                analysis_note="Document similarity timed out. Check MongoDB connection and try again.",
+            )
 
 
 def _user_from_request(request: Request) -> Tuple[Optional[str], Optional[str]]:
@@ -108,6 +126,7 @@ def _build_report(
             venue=d.venue,
             is_open_access=d.is_open_access,
             citation_count=d.citation_count,
+            similarity_percent=d.similarity_percent,
         )
         for d in doc_sim.similar_documents
     ]
@@ -121,23 +140,37 @@ def _build_report(
             source_title=m.source_title,
             similarity=m.similarity,
             source_excerpt=m.source_excerpt,
+            source_type=getattr(m, "source_type", "") or "",
         )
         for m in doc_sim.document_matches
     ]
+    plag_summary = None
+    if doc_sim.plagiarism_summary:
+        plag_summary = PlagiarismSummaryItem(**doc_sim.plagiarism_summary)
+    highlight_segs = [
+        HighlightSegmentItem(**h) for h in (doc_sim.highlighted_segments or [])
+    ]
+    plag_sources = [
+        PlagiarismSourceItem(**s) for s in (doc_sim.sources_list or [])
+    ]
     content_cap = 30_000
     stored_content = file_content[:content_cap] + ("..." if len(file_content) > content_cap else "")
+    plag_total = plag_summary.total_plagiarism_percent if plag_summary else sim.score
     return AnalysisReport(
         id=analysis_id,
         title=display_title,
         description=description,
         file_content=stored_content,
-        similarity_score=sim.score,
+        similarity_score=plag_total,
         similarity_label=sim.label,
         similarity_description=sim.description,
         market_search_snippet=sim.market_snippet,
         found_projects=found_list,
         similar_documents=similar_docs,
         document_matches=doc_matches,
+        plagiarism_summary=plag_summary,
+        highlighted_segments=highlight_segs,
+        plagiarism_sources=plag_sources,
         company_name=display_title,
         competitor_map=build_competitor_map(display_title, description.strip(), found_list),
         similarity_hf_live=sim.hf_ok,
@@ -201,8 +234,13 @@ async def analyze_project(
         extracted = pasted
 
     document_body = extract_document_body(extracted, pasted, description.strip())
+    if not document_body.strip() or document_body.startswith("(No document body"):
+        document_body = (extracted or pasted or description or title).strip()
     if not document_body.strip():
         document_body = "(No document body — add a file, paste text, or use the description field.)"
+
+    # Plagiarism uses clean extracted text (not the placeholder message)
+    plagiarism_input = strip_extraction_banner(extracted or pasted or document_body)
 
     # Market overlap index uses title + description + body; highlights/SWOT use body only.
     market_context = merge_content_snippet(title, description.strip(), extracted or pasted)
@@ -212,7 +250,7 @@ async def analyze_project(
 
     sim, doc_sim = await asyncio.gather(
         asyncio.to_thread(compute_similarity_overlap, title, desc, market_context),
-        _run_document_similarity(title, desc, document_body),
+        _run_document_similarity(title, desc, plagiarism_input),
     )
 
     if doc_sim.analysis_note:

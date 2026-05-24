@@ -1,13 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { SimilarityGauge } from "@/components/plagiarism/similarity-gauge";
 import { DevilsAdvocateCard } from "@/components/plagiarism/devils-advocate-card";
 import { StrategyPanel } from "@/components/plagiarism/strategy-panel";
 import { SwotGrid } from "@/components/plagiarism/swot-grid";
-import { TechLensSection } from "@/components/plagiarism/tech-lens-section";
-import { CompetitorMap } from "@/components/plagiarism/competitor-map";
-import { DocumentHighlightView } from "@/components/plagiarism/document-highlight-view";
+import { OriginalityReportView } from "@/components/plagiarism/originality-report-view";
 import type { AnalysisReport } from "@/types/analysis";
 import { API_BASE } from "@/lib/api";
 
@@ -320,31 +317,42 @@ export function AnalysisResultModal(props: {
 
             {resultTab === "overview" ? (
               <div className="relative space-y-8">
-                <div className="grid gap-6 2xl:grid-cols-2">
-                  <SimilarityGauge report={report} />
-                  <SwotGrid swot={report.swot} />
-                </div>
-                <CompetitorMap
-                  data={report.competitor_map ?? []}
-                  companyName={report.company_name?.trim() || report.title}
-                />
-                <TechLensSection report={report} />
-                <DevilsAdvocateCard questions={report.devils_advocate} />
-                <section className="rounded-2xl border border-amber-500/25 bg-gradient-to-b from-amber-500/5 to-zinc-950/40">
-                  <div className="border-b border-amber-500/15 px-5 py-4 sm:px-6">
-                    <h3 className="text-sm font-semibold text-amber-100">Uploaded document</h3>
-                    <p className="mt-1 text-xs text-zinc-500">
-                      Similar papers, downloads, and overlap with your file — not shown in the competitor
-                      list above.
+                <OriginalityReportView report={report} originalUploadedFile={originalUploadedFile} />
+                {(report.found_projects?.length ?? 0) > 0 ? (
+                  <section className="rounded-lg border border-slate-200 bg-white px-5 py-4 shadow-sm">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-indigo-600">
+                      Projects found based on the document
                     </p>
-                  </div>
-                  <div className="px-5 pb-5 pt-4 sm:px-6 sm:pb-6">
-                    <DocumentHighlightView
-                      report={report}
-                      originalUploadedFile={originalUploadedFile}
-                    />
-                  </div>
-                </section>
+                    <p className="mt-1 text-xs text-slate-500">
+                      Related products and projects discovered from your upload context and web search.
+                    </p>
+                    <ul className="mt-4 divide-y divide-slate-100">
+                      {report.found_projects.map((p, idx) => (
+                        <li key={`${p.link}-${idx}`} className="flex items-start gap-3 py-3 first:pt-1">
+                          <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center bg-indigo-600 text-[10px] font-bold text-white">
+                            {idx + 1}
+                          </span>
+                          <div className="min-w-0 flex-1">
+                            <a
+                              href={p.link}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-sm font-medium text-indigo-700 hover:underline"
+                            >
+                              {p.name}
+                            </a>
+                            {p.snippet ? (
+                              <p className="mt-0.5 line-clamp-2 text-xs text-slate-500">{p.snippet}</p>
+                            ) : null}
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+                ) : null}
+
+                <SwotGrid swot={report.swot} />
+                <DevilsAdvocateCard questions={report.devils_advocate} />
               </div>
             ) : (
               <StrategyPanel report={report} />

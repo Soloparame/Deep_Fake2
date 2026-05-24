@@ -194,7 +194,7 @@ export function DocumentHighlightView({ report, originalUploadedFile }: Props) {
           Similar documents
         </p>
         <p className="mt-1 text-xs text-zinc-500">
-          From Semantic Scholar and web PDF search — related papers to your uploaded content.
+          Compared to your Bahir Dar document corpus (MongoDB) and related papers from Semantic Scholar / web PDF search.
         </p>
         {similarDocuments.length === 0 ? (
           <p className="mt-4 text-sm text-zinc-400">
@@ -249,19 +249,28 @@ export function DocumentHighlightView({ report, originalUploadedFile }: Props) {
 
 function SimilarDocumentRow({ doc, matchCount }: { doc: SimilarDocumentItem; matchCount: number }) {
   const sourceLabel =
-    doc.source === "semantic_scholar_recommendation"
-      ? "Semantic Scholar · recommended"
-      : doc.source === "semantic_scholar"
-        ? "Semantic Scholar"
-        : doc.source === "arxiv"
-          ? "arXiv"
-          : doc.source === "duckduckgo_pdf"
-            ? "Web PDF"
-            : "Document";
+    doc.source === "bahirdar_documents"
+      ? "Bahir Dar corpus (MongoDB)"
+      : doc.source === "semantic_scholar_recommendation"
+        ? "Semantic Scholar · recommended"
+        : doc.source === "semantic_scholar"
+          ? "Semantic Scholar"
+          : doc.source === "arxiv"
+            ? "arXiv"
+            : doc.source === "duckduckgo_pdf"
+              ? "Web PDF"
+              : "Document";
 
   return (
     <li className="rounded-xl border border-white/10 bg-black/35 px-4 py-3">
-      <p className="text-sm font-semibold text-white">{doc.title}</p>
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <p className="text-sm font-semibold text-white">{doc.title}</p>
+        {doc.similarity_percent != null ? (
+          <span className="shrink-0 rounded-full border border-amber-400/40 bg-amber-500/15 px-2.5 py-0.5 text-xs font-bold text-amber-200">
+            {doc.similarity_percent}% similar
+          </span>
+        ) : null}
+      </div>
       <p className="mt-1 line-clamp-2 text-xs text-zinc-400">{doc.snippet}</p>
       <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] text-zinc-500">
         <span>{sourceLabel}</span>
@@ -270,9 +279,13 @@ function SimilarDocumentRow({ doc, matchCount }: { doc: SimilarDocumentItem; mat
         {matchCount > 0 ? <span className="text-amber-300/90">{matchCount} flagged passage(s)</span> : null}
       </div>
       <div className="mt-2 flex flex-wrap gap-3 text-xs font-semibold">
-        <a href={doc.url} target="_blank" rel="noreferrer" className="text-indigo-400 hover:underline">
-          {doc.document_type === "pdf" ? "Open PDF" : "Open document"} ↗
-        </a>
+        {doc.source === "bahirdar_documents" ? (
+          <span className="text-zinc-500">Stored in Bahir Dar corpus</span>
+        ) : doc.url && !doc.url.startsWith("bahirdar://") ? (
+          <a href={doc.url} target="_blank" rel="noreferrer" className="text-indigo-400 hover:underline">
+            {doc.document_type === "pdf" ? "Open PDF" : "Open document"} ↗
+          </a>
+        ) : null}
         {doc.s2_url ? (
           <a href={doc.s2_url} target="_blank" rel="noreferrer" className="text-indigo-400/80 hover:underline">
             Semantic Scholar ↗
