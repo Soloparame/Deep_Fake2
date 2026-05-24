@@ -271,6 +271,8 @@ export function CompetitorMap(props: { data: CompetitorMapEntry[]; companyName: 
 
   const selected = selectedIndex != null ? data[selectedIndex] : null;
 
+  const competitorCount = data.filter((e) => !e.is_you).length;
+
   if (!data.length) {
     return (
       <section className="rounded-2xl border border-indigo-100 bg-white/85 p-6 shadow-sm ring-1 ring-slate-100">
@@ -285,6 +287,22 @@ export function CompetitorMap(props: { data: CompetitorMapEntry[]; companyName: 
     );
   }
 
+  if (competitorCount === 0) {
+    return (
+      <section className="rounded-2xl border border-amber-100 bg-white/85 p-6 shadow-sm ring-1 ring-amber-100">
+        <h3 className="font-nacelle text-lg font-bold text-slate-900">Competitive positioning map</h3>
+        <p className="mt-1 text-sm text-slate-600">
+          Each dot is a detected competitor from your market scan (plus your project). None were found for this
+          run — add a clearer description, domain, and target market, then analyze again.
+        </p>
+        <p className="mt-4 text-sm text-amber-800/90">
+          Only <span className="font-medium">{companyName || "your project"}</span> is on the map until competitors
+          are discovered.
+        </p>
+      </section>
+    );
+  }
+
   return (
     <section className="rounded-2xl border border-indigo-100 bg-white/90 p-5 shadow-sm ring-1 ring-slate-100 sm:p-6">
       <h3 className="font-nacelle text-lg font-bold text-slate-900">Competitive positioning map</h3>
@@ -292,8 +310,9 @@ export function CompetitorMap(props: { data: CompetitorMapEntry[]; companyName: 
         Click any dot to explore. Switch axes to see different dimensions of competition.
       </p>
       <p className="mt-2 text-xs text-slate-500">
-        Map includes <span className="font-medium text-slate-700">{companyName || "your project"}</span>{" "}
-        and references from your market scan. Axis scores are visualization estimates, not third‑party benchmarks.
+        <span className="font-medium text-slate-700">{competitorCount} competitor{competitorCount === 1 ? "" : "s"}</span>{" "}
+        from your market scan, plus <span className="font-medium text-slate-700">{companyName || "your project"}</span>.
+        Each competitor dot uses scores derived from their name, URL, and snippet (for relative positioning, not live benchmarks).
       </p>
 
       <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">

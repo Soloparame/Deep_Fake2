@@ -215,6 +215,25 @@ def _rank_projects(projects: list[SimilarProject], ctx: SmartContext) -> list[Si
     return sorted(projects, key=lambda p: _project_rank_bonus(p, ctx), reverse=True)
 
 
+def _merge_projects(*groups: list[SimilarProject], max_items: int = 6) -> list[SimilarProject]:
+    """Deduplicate by URL and keep the best-ranked competitors."""
+    seen: set[str] = set()
+    merged: list[SimilarProject] = []
+    for group in groups:
+        for p in group:
+            link = (p.link or "").strip().rstrip("/")
+            if not link or not link.startswith("http"):
+                continue
+            key = link.lower()
+            if key in seen:
+                continue
+            seen.add(key)
+            merged.append(p)
+            if len(merged) >= max_items:
+                return merged
+    return merged
+
+
 def _extract_projects_fallback(search_text: str) -> list[SimilarProject]:
     lines = [ln.strip(" -•\t") for ln in (search_text or "").splitlines() if ln.strip()]
     projects: list[SimilarProject] = []
@@ -384,17 +403,23 @@ def compute_similarity_overlap(title: str, description: str, file_content: str) 
             if extra:
                 search_text = f"{search_text}\n{extra}".strip() if search_text else extra
     search_ok = bool(search_text and len(search_text) > 48)
-    found_projects = _extract_project_list(search_text, smart_ctx) if search_ok else []
-    if not found_projects:
-        found_projects = _groq_competitors_from_project(
-            title, description, smart_ctx, body
+    extracted: list[SimilarProject] = []
+    if search_text.strip():
+        extracted = _extract_project_list(search_text, smart_ctx)
+        if not extracted:
+            extracted = _rank_projects(_extract_projects_fallback(search_text), smart_ctx)
+
+    groq_projects = _groq_competitors_from_project(title, description, smart_ctx, body)
+    found_projects = _merge_projects(extracted, groq_projects, max_items=6)
+    found_projects = _rank_projects(found_projects, smart_ctx)[:6]
+
+    if found_projects and not search_ok:
+        search_ok = True
+        search_text = (
+            search_text
+            or f"Competitor context for {smart_ctx.functionality} in {smart_ctx.industry} "
+            f"({smart_ctx.location}), sourced via Groq when live web search was unavailable."
         )
-        if found_projects and not search_ok:
-            search_ok = True
-            search_text = (
-                f"Competitor context for {smart_ctx.functionality} in {smart_ctx.industry} "
-                f"({smart_ctx.location}), sourced via Groq when live web search was unavailable."
-            )
 
     if search_ok:
         market_snippet = _truncate(search_text, MAX_MARKET_CHARS)

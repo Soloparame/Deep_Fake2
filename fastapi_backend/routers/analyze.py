@@ -107,6 +107,7 @@ def _build_report(
     references: list[ReferenceItem],
     devils_advocate: list[str],
     strategy: StrategyBlock,
+    had_file: bool = False,
 ) -> AnalysisReport:
     display_title = (title or "Untitled project").strip() or "Untitled project"
     found_list = [
@@ -155,13 +156,12 @@ def _build_report(
     ]
     content_cap = 30_000
     stored_content = file_content[:content_cap] + ("..." if len(file_content) > content_cap else "")
-    plag_total = plag_summary.total_plagiarism_percent if plag_summary else sim.score
     return AnalysisReport(
         id=analysis_id,
         title=display_title,
         description=description,
         file_content=stored_content,
-        similarity_score=plag_total,
+        similarity_score=sim.score,
         similarity_label=sim.label,
         similarity_description=sim.description,
         market_search_snippet=sim.market_snippet,
@@ -181,6 +181,7 @@ def _build_report(
         strategy=strategy,
         devils_advocate=devils_advocate,
         created_at=datetime.datetime.utcnow(),
+        had_file=had_file,
     )
 
 
@@ -247,11 +248,16 @@ async def analyze_project(
 
     analysis_id = new_id()
     desc = description.strip()
+    had_file = bool(file and file.filename)
 
-    sim, doc_sim = await asyncio.gather(
-        asyncio.to_thread(compute_similarity_overlap, title, desc, market_context),
-        _run_document_similarity(title, desc, plagiarism_input),
-    )
+    if had_file:
+        sim, doc_sim = await asyncio.gather(
+            asyncio.to_thread(compute_similarity_overlap, title, desc, market_context),
+            _run_document_similarity(title, desc, plagiarism_input),
+        )
+    else:
+        sim = await asyncio.to_thread(compute_similarity_overlap, title, desc, market_context)
+        doc_sim = DocumentSimilarityResult()
 
     if doc_sim.analysis_note:
         document_body = f"ℹ️ {doc_sim.analysis_note}\n\n{document_body}"
@@ -313,6 +319,7 @@ async def analyze_project(
         references=references,
         devils_advocate=devils_advocate,
         strategy=strategy,
+        had_file=had_file,
     )
 
     record = report.model_dump()
@@ -322,7 +329,7 @@ async def analyze_project(
         "title": title,
         "description": description,
         "my_tech_stack": my_tech_stack,
-        "had_file": bool(file and file.filename),
+        "had_file": had_file,
     }
     record["user_id"] = user_id
     record["user_email"] = user_email
@@ -437,6 +444,9 @@ async def get_analysis(request: Request, analysis_id: str):
     doc.pop("_id", None)
     if "id" not in doc and analysis_id:
         doc["id"] = analysis_id
+    if "had_file" not in doc:
+        inp = doc.get("input")
+        doc["had_file"] = bool(inp.get("had_file")) if isinstance(inp, dict) else False
     try:
         report = AnalysisReport(**doc)
     except Exception as e:
@@ -444,8 +454,10 @@ async def get_analysis(request: Request, analysis_id: str):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Invalid stored record: {e}",
         )
-    if not report.competitor_map:
-        cn = (report.company_name or report.title or "").strip() or "Untitled project"
+    cn = (report.company_name or report.title or "").strip() or "Untitled project"
+    rivals_on_map = sum(1 for e in (report.competitor_map or []) if not e.is_you)
+    rivals_expected = len(report.found_projects or [])
+    if rivals_on_map < rivals_expected or not report.competitor_map:
         report = report.model_copy(
             update={
                 "company_name": cn,

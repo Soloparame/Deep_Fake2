@@ -37,7 +37,7 @@ export default function ProjectIntelWorkspace({ embedded = false }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [report, setReport] = useState<AnalysisReport | null>(null);
-  const [resultTab, setResultTab] = useState<"overview" | "strategy">("overview");
+  const [resultTab, setResultTab] = useState<"overview" | "document" | "strategy">("overview");
   const [resultModalOpen, setResultModalOpen] = useState(false);
 
   const [historyLoading, setHistoryLoading] = useState(true);
@@ -136,7 +136,7 @@ export default function ProjectIntelWorkspace({ embedded = false }: Props) {
         throw new Error(detail);
       }
       setReport(data as AnalysisReport);
-      setResultTab("overview");
+      setResultTab(mode === "upload" && file ? "document" : "overview");
       setResultModalOpen(true);
       if (mode === "upload" && file) setLastSubmittedFile(file);
       else setLastSubmittedFile(null);
@@ -160,7 +160,7 @@ export default function ProjectIntelWorkspace({ embedded = false }: Props) {
       const data = (await res.json()) as AnalysisReport;
       setReport(data);
       setSelectedId(id);
-      setResultTab("overview");
+      setResultTab(data.had_file ? "document" : "overview");
       setResultModalOpen(true);
       setLastSubmittedFile(null);
     } catch (err) {

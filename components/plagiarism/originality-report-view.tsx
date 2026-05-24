@@ -5,6 +5,7 @@ import type {
   AnalysisReport,
   HighlightSegmentItem,
   PlagiarismSourceItem,
+  SimilarProjectItem,
 } from "@/types/analysis";
 
 const TYPE_COLORS: Record<string, { bg: string; text: string; label: string; badge: string }> = {
@@ -179,6 +180,46 @@ export function OriginalityReportView({ report, originalUploadedFile }: Props) {
           ) : null}
         </aside>
       </div>
+
+      <ProjectsDoneSection projects={report.found_projects ?? []} />
+    </div>
+  );
+}
+
+function ProjectsDoneSection({ projects }: { projects: SimilarProjectItem[] }) {
+  return (
+    <div className="border-t border-slate-200 bg-slate-50/80 px-5 py-4">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-indigo-700">
+        Projects done (market search)
+      </p>
+      <p className="mt-1 text-xs text-slate-500">
+        Related products and student projects discovered from your document context — not part of the plagiarism
+        source check above.
+      </p>
+      {projects.length === 0 ? (
+        <p className="mt-3 text-sm text-slate-400">No related projects found in this run.</p>
+      ) : (
+        <ul className="mt-3 divide-y divide-slate-200 rounded-lg border border-slate-200 bg-white">
+          {projects.map((p, idx) => (
+            <li key={`${p.link}-${idx}`} className="flex items-start gap-3 px-4 py-3">
+              <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center bg-indigo-600 text-[10px] font-bold text-white">
+                {idx + 1}
+              </span>
+              <div className="min-w-0 flex-1">
+                <a
+                  href={p.link}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-sm font-medium text-indigo-700 hover:underline"
+                >
+                  {p.name}
+                </a>
+                {p.snippet ? <p className="mt-0.5 line-clamp-2 text-xs text-slate-500">{p.snippet}</p> : null}
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

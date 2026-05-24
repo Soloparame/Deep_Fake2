@@ -11,7 +11,7 @@ from typing import Any
 
 SEARCH_TIMEOUT_SEC = 12
 # ddgs 9.x: brave, duckduckgo, google, mojeek, … (no bing)
-DEFAULT_BACKENDS = ("brave", "google", "mojeek")
+DEFAULT_BACKENDS = ("brave", "duckduckgo", "google", "mojeek")
 MAX_QUERY_LEN = 220
 
 

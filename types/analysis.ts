@@ -139,6 +139,8 @@ export interface AnalysisReport {
   strategy: StrategyBlock;
   devils_advocate: string[];
   created_at?: string | null;
+  /** True when analysis included an uploaded PDF/DOCX (Document tab). */
+  had_file?: boolean;
 }
 
 export interface AnalysisListItem {

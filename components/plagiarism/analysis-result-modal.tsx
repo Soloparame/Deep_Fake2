@@ -1,14 +1,22 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { CompetitorMap } from "@/components/plagiarism/competitor-map";
+import { SimilarityGauge } from "@/components/plagiarism/similarity-gauge";
 import { DevilsAdvocateCard } from "@/components/plagiarism/devils-advocate-card";
 import { StrategyPanel } from "@/components/plagiarism/strategy-panel";
 import { SwotGrid } from "@/components/plagiarism/swot-grid";
+import { TechLensSection } from "@/components/plagiarism/tech-lens-section";
 import { OriginalityReportView } from "@/components/plagiarism/originality-report-view";
 import type { AnalysisReport } from "@/types/analysis";
 import { API_BASE } from "@/lib/api";
 
-type Tab = "overview" | "strategy";
+type Tab = "overview" | "document" | "strategy";
+
+/** Document tab only for file uploads — paste/description runs use Overview + Strategy. */
+function showDocumentTabForReport(report: AnalysisReport, originalUploadedFile?: File | null) {
+  return Boolean(originalUploadedFile || report.had_file);
+}
 
 /** Visible on white modal header (avoid zinc-on-white). */
 const headerBtnClass =
@@ -86,6 +94,13 @@ export function AnalysisResultModal(props: {
   originalUploadedFile?: File | null;
 }) {
   const { open, onClose, report, resultTab, onTabChange, originalUploadedFile } = props;
+  const showDocumentTab = showDocumentTabForReport(report, originalUploadedFile);
+
+  useEffect(() => {
+    if (!showDocumentTab && resultTab === "document") {
+      onTabChange("overview");
+    }
+  }, [showDocumentTab, resultTab, onTabChange]);
   const [exportLoading, setExportLoading] = useState<null | "ppt" | "docx">(null);
   const [exportError, setExportError] = useState<string | null>(null);
 
@@ -287,11 +302,11 @@ export function AnalysisResultModal(props: {
                 ) : null}
               </div>
               
-              <div className="relative inline-flex shrink-0 rounded-2xl border border-white/10 bg-white/5 p-1.5 shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] backdrop-blur-md">
+              <div className="relative inline-flex shrink-0 flex-wrap rounded-2xl border border-white/10 bg-white/5 p-1.5 shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] backdrop-blur-md">
                 <button
                   type="button"
                   onClick={() => onTabChange("overview")}
-                  className={`relative z-10 flex min-w-[110px] items-center justify-center rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-300 ${
+                  className={`relative z-10 flex min-w-[100px] items-center justify-center rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-300 ${
                     resultTab === "overview" ? "text-white text-shadow-sm" : "text-zinc-500 hover:text-zinc-300"
                   }`}
                 >
@@ -300,10 +315,24 @@ export function AnalysisResultModal(props: {
                   )}
                   Overview
                 </button>
+                {showDocumentTab ? (
+                  <button
+                    type="button"
+                    onClick={() => onTabChange("document")}
+                    className={`relative z-10 flex min-w-[100px] items-center justify-center rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-300 ${
+                      resultTab === "document" ? "text-white text-shadow-sm" : "text-zinc-500 hover:text-zinc-300"
+                    }`}
+                  >
+                    {resultTab === "document" && (
+                      <span className="absolute inset-0 -z-10 rounded-xl bg-gradient-to-r from-amber-600 to-orange-500 shadow-[0_0_20px_rgba(245,158,11,0.35)]" />
+                    )}
+                    Document
+                  </button>
+                ) : null}
                 <button
                   type="button"
                   onClick={() => onTabChange("strategy")}
-                  className={`relative z-10 flex min-w-[110px] items-center justify-center rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-300 ${
+                  className={`relative z-10 flex min-w-[100px] items-center justify-center rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-300 ${
                     resultTab === "strategy" ? "text-white text-shadow-sm" : "text-zinc-500 hover:text-zinc-300"
                   }`}
                 >
@@ -317,42 +346,25 @@ export function AnalysisResultModal(props: {
 
             {resultTab === "overview" ? (
               <div className="relative space-y-8">
-                <OriginalityReportView report={report} originalUploadedFile={originalUploadedFile} />
-                {(report.found_projects?.length ?? 0) > 0 ? (
-                  <section className="rounded-lg border border-slate-200 bg-white px-5 py-4 shadow-sm">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-indigo-600">
-                      Projects found based on the document
-                    </p>
-                    <p className="mt-1 text-xs text-slate-500">
-                      Related products and projects discovered from your upload context and web search.
-                    </p>
-                    <ul className="mt-4 divide-y divide-slate-100">
-                      {report.found_projects.map((p, idx) => (
-                        <li key={`${p.link}-${idx}`} className="flex items-start gap-3 py-3 first:pt-1">
-                          <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center bg-indigo-600 text-[10px] font-bold text-white">
-                            {idx + 1}
-                          </span>
-                          <div className="min-w-0 flex-1">
-                            <a
-                              href={p.link}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="text-sm font-medium text-indigo-700 hover:underline"
-                            >
-                              {p.name}
-                            </a>
-                            {p.snippet ? (
-                              <p className="mt-0.5 line-clamp-2 text-xs text-slate-500">{p.snippet}</p>
-                            ) : null}
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
-                  </section>
-                ) : null}
-
-                <SwotGrid swot={report.swot} />
+                <div className="grid gap-6 2xl:grid-cols-2">
+                  <SimilarityGauge report={report} showProjectsList />
+                  <SwotGrid swot={report.swot} />
+                </div>
+                <CompetitorMap
+                  data={report.competitor_map ?? []}
+                  companyName={report.company_name?.trim() || report.title}
+                />
+                <TechLensSection report={report} />
                 <DevilsAdvocateCard questions={report.devils_advocate} />
+              </div>
+            ) : resultTab === "document" && showDocumentTab ? (
+              <div className="relative space-y-4">
+                <p className="text-sm text-zinc-500">
+                  Plagiarism check: Bahir Dar database, DuckDuckGo web pages, and Semantic Scholar publications.
+                  Use the <strong className="text-zinc-300">Overview</strong> tab for market overlap, SWOT, and
+                  strategy.
+                </p>
+                <OriginalityReportView report={report} originalUploadedFile={originalUploadedFile} />
               </div>
             ) : (
               <StrategyPanel report={report} />

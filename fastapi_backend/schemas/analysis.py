@@ -176,6 +176,10 @@ class AnalysisReport(BaseModel):
     strategy: StrategyBlock = Field(default_factory=StrategyBlock)
     devils_advocate: List[str] = Field(default_factory=list)
     created_at: Optional[datetime] = None
+    had_file: bool = Field(
+        default=False,
+        description="True when the user uploaded a PDF/DOCX (enables plagiarism/originality report)",
+    )
 
 
 class AnalysisListItem(BaseModel):

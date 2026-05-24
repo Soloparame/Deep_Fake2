@@ -5,9 +5,11 @@ import type { AnalysisReport } from "@/types/analysis";
 
 type Props = {
   report: AnalysisReport;
+  /** Market overlap gauge only; project list belongs on the Document tab. */
+  showProjectsList?: boolean;
 };
 
-export function SimilarityGauge({ report }: Props) {
+export function SimilarityGauge({ report, showProjectsList = true }: Props) {
   const gradId = useId().replace(/:/g, "");
   const pct = Math.min(100, Math.max(0, report.similarity_score));
   const badge = (report.similarity_label || "similar").toLowerCase();
@@ -73,7 +75,7 @@ export function SimilarityGauge({ report }: Props) {
 
       <p className="relative mt-6 text-center text-xs leading-relaxed text-zinc-500">{blurb}</p>
 
-      {competitors.length ? (
+      {showProjectsList && competitors.length ? (
         <div className="relative mt-6 overflow-hidden rounded-2xl border border-indigo-500/20 bg-gradient-to-b from-indigo-500/10 to-transparent p-4 shadow-[0_0_20px_rgba(99,102,241,0.05)] backdrop-blur-sm sm:p-5">
           <div className="mb-4 flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
@@ -82,7 +84,7 @@ export function SimilarityGauge({ report }: Props) {
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-indigo-500"></span>
               </span>
               <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-indigo-200">
-                Competitors Found
+                Similar projects found
               </p>
             </div>
             <span className="rounded-full border border-indigo-400/30 bg-indigo-500/20 px-2.5 py-0.5 text-[11px] font-bold text-indigo-200">
@@ -125,8 +127,8 @@ export function SimilarityGauge({ report }: Props) {
             </span>
           </div>
           <p className="text-sm leading-relaxed text-zinc-300">
-            No competitor links were confidently extracted for this run. Similar academic documents appear
-            in the uploaded document section below.
+            No competitor links were confidently extracted for this run. Add a clearer product description,
+            domain, and target market, then run analysis again.
           </p>
           <div className="mt-3 grid gap-2 sm:grid-cols-2">
             <div className="rounded-lg border border-white/10 bg-black/30 px-3 py-2.5 text-[11px] text-zinc-300">
