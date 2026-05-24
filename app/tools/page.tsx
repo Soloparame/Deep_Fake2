@@ -428,7 +428,7 @@ export default function ToolsPage() {
               </button>
             </nav>
             <p className="mt-3 px-3 text-[11px] leading-relaxed text-slate-500">
-              Full Project Intel (same as the standalone page) is also at{" "}
+              The full Turnitin-like report is also available at{" "}
               <button type="button" onClick={() => router.push("/plagiarism")} className="font-semibold text-indigo-600 underline-offset-2 hover:underline">
                 /plagiarism
               </button>
@@ -468,7 +468,7 @@ export default function ToolsPage() {
                   Project Intel
                 </h1>
                 <p className="text-slate-600">
-                  Similarity intelligence, competitor discovery, SWOT, and strategy — same workflow as the dedicated page.
+                  Similarity intelligence, competitor discovery, SWOT, and strategy — plus Turnitin-style plagiarism reports for uploads.
                 </p>
               </header>
               <div className="mt-6">

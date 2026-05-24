@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AnalysisHistorySidebar } from "@/components/plagiarism/analysis-history-sidebar";
 import { AnalysisResultModal } from "@/components/plagiarism/analysis-result-modal";
+import TurnitinReport from "@/components/plagiarism/turnitin-report";
 import type { AnalysisListItem, AnalysisReport } from "@/types/analysis";
 import { API_BASE } from "@/lib/api";
 const ACCEPT_FILES =
@@ -37,6 +38,8 @@ export default function ProjectIntelWorkspace({ embedded = false }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [report, setReport] = useState<AnalysisReport | null>(null);
+  const [plagiarismReport, setPlagiarismReport] = useState<any>(null);
+  const [showPlagiarismReport, setShowPlagiarismReport] = useState(false);
   const [resultTab, setResultTab] = useState<"overview" | "strategy">("overview");
   const [resultModalOpen, setResultModalOpen] = useState(false);
 
@@ -83,6 +86,7 @@ export default function ProjectIntelWorkspace({ embedded = false }: Props) {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    console.log("Submitting analysis...", { mode, title, hasFile: !!file });
     setError(null);
     if (!title.trim()) {
       setError("Please enter a project title.");
@@ -112,17 +116,23 @@ export default function ProjectIntelWorkspace({ embedded = false }: Props) {
 
     setLoading(true);
     setReport(null);
+    setPlagiarismReport(null);
+    setShowPlagiarismReport(false);
     setSelectedId(null);
     setResultModalOpen(false);
     setLastSubmittedFile(null);
     try {
-      const res = await fetch(`${API_BASE}/api/analyze`, {
+      // Use plagiarism check if document is uploaded, otherwise use SWOT analysis
+      const isPlagiarismCheck = mode === "upload" || (file !== null);
+      const endpoint = isPlagiarismCheck ? `${API_BASE}/api/plagiarism/check` : `${API_BASE}/api/analyze`;
+      
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: authHeaders(),
         body: fd,
       });
       const text = await res.text();
-      let data: unknown = null;
+      let data: any = null;
       try {
         data = JSON.parse(text);
       } catch {
@@ -135,13 +145,20 @@ export default function ProjectIntelWorkspace({ embedded = false }: Props) {
             : text || res.statusText;
         throw new Error(detail);
       }
-      setReport(data as AnalysisReport);
-      setResultTab("overview");
-      setResultModalOpen(true);
+
+      if (isPlagiarismCheck) {
+        setPlagiarismReport(data);
+        setShowPlagiarismReport(true);
+      } else {
+        setReport(data as AnalysisReport);
+        setResultTab("overview");
+        setResultModalOpen(true);
+      }
+      
       if (mode === "upload" && file) setLastSubmittedFile(file);
       else setLastSubmittedFile(null);
       await loadHistory();
-      setSelectedId((data as AnalysisReport).id);
+      if (data.id) setSelectedId(data.id);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Analysis failed.");
     } finally {
@@ -224,6 +241,10 @@ export default function ProjectIntelWorkspace({ embedded = false }: Props) {
     }
     setError(null);
     setFile(f);
+    setMode("upload");
+    if (!title.trim()) {
+      setTitle(f.name.replace(/\.[^/.]+$/, ""));
+    }
   };
 
   const idSuffix = embedded ? "-tools" : "";
@@ -397,6 +418,12 @@ export default function ProjectIntelWorkspace({ embedded = false }: Props) {
                       const f = e.target.files?.[0] ?? null;
                       setFile(f);
                       setError(null);
+                      if (f) {
+                        setMode("upload");
+                        if (!title.trim()) {
+                          setTitle(f.name.replace(/\.[^/.]+$/, ""));
+                        }
+                      }
                     }}
                   />
                   <div
@@ -498,6 +525,19 @@ export default function ProjectIntelWorkspace({ embedded = false }: Props) {
             </div>
           </div>
         </form>
+
+        {/* Plagiarism Report Modal */}
+        {showPlagiarismReport && plagiarismReport && (
+          <TurnitinReport
+            title={plagiarismReport.title}
+            similarityIndex={plagiarismReport.results.similarity_index}
+          internetSources={plagiarismReport.results.internet_sources_percent}
+          publications={plagiarismReport.results.publications_percent}
+          studentPapers={plagiarismReport.results.student_papers_percent}
+          sources={plagiarismReport.results.sources}
+            onClose={() => setShowPlagiarismReport(false)}
+          />
+        )}
 
         {report && (
           <>
