@@ -88,117 +88,115 @@ class PlagiarismService:
 
     async def check_online_sources(self, text: str) -> Dict[str, Any]:
         """
-        Integrates multiple layers for online plagiarism checking.
+        Aggressively integrates multiple layers for online plagiarism checking.
+        Calculates source percentages based on sentence-level overlap.
         """
-        internet_percent = 0.0
-        publications_percent = 0.0
         sources = []
         
-        # 0. Better Sentence Extraction (handle newlines, dots, etc.)
-        clean_text = re.sub(r'\s+', ' ', text)
-        sentences = [s.strip() for s in re.split(r'[.!?\n]', clean_text) if len(s.strip()) > 50]
-        sentences = sorted(list(set(sentences)), key=len, reverse=True) # Unique, long sentences first
+        # 0. Enhanced Text Cleaning for Search
+        clean_text = text.replace('\xad', '').replace('-\n', '')
+        clean_text = re.sub(r'\s+', ' ', clean_text)
         
-        if not sentences:
-            print("[WARN] No long sentences found for online checking.")
+        # Extract potential search snippets (long and unique)
+        all_sentences = [s.strip() for s in re.split(r'[.!?\n]', clean_text) if len(s.strip()) > 50]
+        all_sentences = sorted(list(set(all_sentences)), key=len, reverse=True)
+        
+        if not all_sentences:
             return {"internet_percent": 0.0, "publications_percent": 0.0, "sources": []}
 
-        # Select 5 representative long sentences
-        search_queries = sentences[:5]
-        print(f"Starting online check with {len(search_queries)} queries...")
+        # Take top 10 sentences for search
+        search_queries = all_sentences[:10]
+        total_queries = len(search_queries)
+        
+        # track which sentences matched which domain
+        sentence_matches = {} # domain -> set of sentence indices
+        domain_links = {} # domain -> actual URL
+        domain_types = {} # domain -> "Internet Source" | "Publication"
 
-        # 1. Semantic Scholar API Layer (Academic Research)
+        print(f"--- Running Precision Check ({total_queries} queries) ---")
+
+        # 1. Semantic Scholar API
         semantic_scholar_api_key = os.getenv("SEMANTIC_SCHOLAR_API_KEY")
         if semantic_scholar_api_key and len(semantic_scholar_api_key) > 10:
             try:
-                print(f"  [Scholar] Checking academic matches...")
                 headers = {"x-api-key": semantic_scholar_api_key}
-                query = " ".join(clean_text.split()[:30])
-                url = f"https://api.semanticscholar.org/graph/v1/paper/search?query={query}&limit=5&fields=title,url,venue,year"
-                response = requests.get(url, headers=headers, timeout=10)
-                
-                if response.status_code == 200:
-                    data = response.json()
-                    for paper in data.get("data", []):
-                        title = paper.get("title", "Academic Publication")
-                        if not any(s["name"] == title for s in sources):
-                            match_percent = round(12.5 + (len(sources) * 2), 1)
-                            publications_percent += match_percent
-                            sources.append({
-                                "name": title,
-                                "percent": match_percent,
-                                "type": "Publication",
-                                "link": paper.get("url")
-                            })
-                            print(f"    [Scholar] Match found: {title}")
-            except Exception as e:
-                print(f"  [Scholar] Error: {e}")
+                for i, snippet in enumerate(search_queries[:4]):
+                    url = f"https://api.semanticscholar.org/graph/v1/paper/search?query={snippet[:100]}&limit=3&fields=title,url"
+                    res = requests.get(url, headers=headers, timeout=10)
+                    if res.status_code == 200:
+                        for paper in res.json().get("data", []):
+                            title = paper.get("title", "Publication")
+                            if title not in sentence_matches: sentence_matches[title] = set()
+                            sentence_matches[title].add(i)
+                            domain_links[title] = paper.get("url")
+                            domain_types[title] = "Publication"
+            except Exception: pass
 
-        # 2. DuckDuckGo Search Layer (Reliable Fallback)
+        # 2. DuckDuckGo Search (Primary Engine)
         try:
             from duckduckgo_search import DDGS
-            print(f"  [DDG] Searching web (no key needed)...")
             with DDGS() as ddgs:
-                for query in search_queries:
-                    # Try both exact phrase and broad search
-                    for search_type in ["exact", "broad"]:
-                        clean_query = f'"{query[:100]}"' if search_type == "exact" else query[:100]
+                for i, query in enumerate(search_queries):
+                    # Try Exact Phrase, then Broad
+                    modes = ["exact", "broad"] if i < 5 else ["broad"]
+                    for mode in modes:
+                        search_term = f'"{query[:120]}"' if mode == "exact" else query[:100]
                         try:
-                            results = list(ddgs.text(clean_query, max_results=3))
+                            results = list(ddgs.text(search_term, max_results=3))
+                            if not results: continue
+                            
                             for r in results:
                                 href = r.get("href", "")
-                                if not href or "google.com" in href: continue
+                                if not href or any(x in href for x in ["google.com", "bing.com", "dictionary.", "imdb.", "merriam-"]): continue
                                 
                                 domain = href.split('/')[2] if "http" in href else "Web Source"
-                                if not any(s["name"] == domain for s in sources):
-                                    match_percent = round(15.5 + (len(sources) * 1.5), 1)
-                                    internet_percent += match_percent
-                                    sources.append({
-                                        "name": domain,
-                                        "percent": match_percent,
-                                        "type": "Internet Source",
-                                        "link": href
-                                    })
-                                    print(f"    [DDG] Match found: {domain}")
-                        except Exception:
-                            continue
-        except Exception as e:
-            print(f"  [DDG] Error: {e}")
+                                if domain not in sentence_matches: sentence_matches[domain] = set()
+                                sentence_matches[domain].add(i)
+                                domain_links[domain] = href
+                                if domain not in domain_types: domain_types[domain] = "Internet Source"
+                                print(f"    [FOUND] {domain} matches sentence {i+1}")
+                            
+                            if results: break 
+                        except Exception: continue
+        except Exception: pass
 
-        # 3. Google Custom Search Layer
-        google_api_key = os.getenv("GOOGLE_API_KEY")
-        google_cse_id = os.getenv("GOOGLE_CSE_ID")
+        # Aggregate Results
+        formatted_sources = []
+        unique_matched_sentences = set()
         
-        # Check if it's a real Google key (starts with AIzaSy)
-        if google_api_key and google_api_key.startswith("AIzaSy") and google_cse_id:
-            try:
-                print(f"  [Google] Checking search engine...")
-                for query in search_queries[:2]:
-                    url = f"https://www.googleapis.com/customsearch/v1?key={google_api_key}&cx={google_cse_id}&q=\"{query[:100]}\""
-                    response = requests.get(url, timeout=10)
-                    if response.status_code == 200:
-                        data = response.json()
-                        for item in data.get("items", []):
-                            domain = item.get("displayLink", "Google Result")
-                            if not any(s["name"] == domain for s in sources):
-                                match_percent = 10.0
-                                internet_percent += match_percent
-                                sources.append({
-                                    "name": domain,
-                                    "percent": match_percent,
-                                    "type": "Internet Source",
-                                    "link": item.get("link")
-                                })
-                                print(f"    [Google] Match found: {domain}")
-            except Exception as e:
-                print(f"  [Google] Error: {e}")
-        elif google_api_key and google_api_key.startswith("gsk_"):
-            print("  [Google] SKIPPING: The key in .env is a Groq key (gsk_...), not a Google API key.")
+        for domain, matched_indices in sentence_matches.items():
+            # Percentage = (sentences matched / total queries) * 100
+            # We add a small weight if multiple sentences match the same domain
+            match_count = len(matched_indices)
+            percent = (match_count / total_queries) * 100
+            
+            # Cap at reasonable realistic levels for snippet matches
+            percent = round(min(98.0, percent + (match_count * 2)), 1)
+            
+            formatted_sources.append({
+                "name": domain,
+                "percent": percent,
+                "type": domain_types.get(domain, "Internet Source"),
+                "link": domain_links.get(domain)
+            })
+            unique_matched_sentences.update(matched_indices)
+
+        # Calculate overall internet % based on unique sentence matches
+        internet_percent = (len(unique_matched_sentences) / total_queries) * 100
+        
+        # Split publications vs internet for the header boxes
+        pub_percent = sum(s["percent"] for s in formatted_sources if s["type"] == "Publication")
+        int_percent = sum(s["percent"] for s in formatted_sources if s["type"] == "Internet Source")
+        
+        # Normalize headers
+        total_online = internet_percent
+        pub_header = min(total_online, (pub_percent / (pub_percent + int_percent + 0.1)) * total_online)
+        int_header = total_online - pub_header
 
         return {
-            "internet_percent": round(min(100, internet_percent), 1),
-            "publications_percent": round(min(100, publications_percent), 1),
-            "sources": sources
+            "internet_percent": round(int_header, 1),
+            "publications_percent": round(pub_header, 1),
+            "sources": sorted(formatted_sources, key=lambda x: x["percent"], reverse=True)
         }
 
     async def run_full_check(self, text: str) -> Dict[str, Any]:
